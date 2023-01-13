@@ -14,9 +14,8 @@ The system consists of:
 5. Speaker Stand (1 custom constructed),
 6. USB hubs (2) and cables,
 7. Computer (1) . 
-   
-Speakers and microphones are mounted as shown below. 
-You may find information [here][01.data_collection] about 
+
+Following information is given in the [data collection directory][01.data_collection]
 - How to construct this system
 - How to start recording sounds in a room.
 - How to clean records and extract RIRs from that records.
@@ -25,18 +24,43 @@ You may find information [here][01.data_collection] about
   - RIR signal waves
 - How to compare recorded RIRs (read data) with a pre-existing model's ([FAST-RIR][FAST-RIR]) generated RIR data .
 
-![RIR Collection System Design][rir_measurement_setup]
+Speakers and microphones are mounted as shown below. 
+
+![RIR Collection System Design][rir_measurement_setup]  
+
+<br>
+<br>
 
 ---
 
-
+<br>
+<br>
 
 ## 2. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="02"></a>
+We took [MESH2IR][MESH2IR] paper as a referrence point, we modified it to find our own model.  
+Within this work , we tried to 
+- Change models
+- Change inputs/outputs
+  
+We tested the fidelity of generated RIRs using out collected real data (GTU-RIR) as shown below :
 
+![mesh2ir_generate_and_test][mesh2ir_generate_and_test]
+
+We obtained comparison results as follows :
+
+![EXAMPLE_COMPARE_1][EXAMPLE_COMPARE_1]
+![EXAMPLE_COMPARE_2][EXAMPLE_COMPARE_2]  
+
+Details are found at [02.data_generation][02.data_generation] directory.
 
 
 
 
 [01.data_collection]: 01.data_collection/README.md
+[02.data_generation]: 02.data_generation/README.md
 [rir_measurement_setup]: README.md.resources/rir-measurement-setup.png
+[mesh2ir_generate_and_test]: README.md.resources/mesh2ir.generate.and.gtu-rir.test.small.png
 [FAST-RIR]: https://github.com/anton-jeran/FAST-RIR
+[MESH2IR]: https://github.com/anton-jeran/MESH2IR
+[EXAMPLE_COMPARE_1]: README.md.resources/example.compare.1.small.png
+[EXAMPLE_COMPARE_2]: README.md.resources/example.compare.2.small.png
