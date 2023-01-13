@@ -1,7 +1,9 @@
 # GTU-RIR
 This is a Room Impulse Response (RIR) data collection and generation project.
+1. [Collecting real data](#01)
+2. [Generating RIR data using MESH, positions and a GAN model](#02)
 
-## COLLECTING REAL RIR DATA
+## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
 We built a semi-automated RIR collection system to collect real "room impulse response" data in a room.
 The system consists of:
@@ -29,7 +31,7 @@ You may find information [here][01.data_collection] about
 
 
 
-## GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL
+## 2. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="02"></a>
 
 
 
