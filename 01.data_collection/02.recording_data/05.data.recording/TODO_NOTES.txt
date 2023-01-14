@@ -1,0 +1,14 @@
+1. mikrofonlarin bulundugu metal plakalari etiketle,
+   mikrofonlarin USB connectorunu etiketle
+   mikrofondan gelen kablonun , USB hub uzerinde girdigi yeri etiketle 
+   mikrofonlarin girdigi USB hub'in bilgisayarda girdigi yeri etiketle
+   Bunlar birbirinden ayrilmasin diye bantla.
+   1-6 sozle soyle, record et ve USB adreslerden emin ol.
+
+2.  webcam ile odanin neresinde onu belirle.
+   webcam'i hep , her odanin kapiya gore sol en on kosesine koymak gerekecektir.
+
+
+TODO:
+
+1. 

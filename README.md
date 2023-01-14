@@ -1,7 +1,9 @@
 # GTU-RIR
 This is a Room Impulse Response (RIR) data collection and generation project.
 1. [Collecting real data](#01)
+   1. Collected data may be downloaded from : [DATA][DATA]
 2. [Generating RIR data using MESH, positions and a GAN model](#02)
+  
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
@@ -64,3 +66,4 @@ Details are found at [02.data_generation][02.data_generation] directory.
 [MESH2IR]: https://github.com/anton-jeran/MESH2IR
 [EXAMPLE_COMPARE_1]: README.md.resources/example.compare.1.small.png
 [EXAMPLE_COMPARE_2]: README.md.resources/example.compare.2.small.png
+[DATA]: https://gtu-my.sharepoint.com/:f:/g/personal/mpekmezci_gtu_edu_tr/EjlbBA4NIEJDhu38ee1uCvMBcbBOUIEgW9AfEuRcLtILJw?e=NSd46X

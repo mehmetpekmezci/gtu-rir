@@ -1,0 +1,27 @@
+CONFIG_NAME: 'eval'
+
+DATASET_NAME: 'RIR'
+EMBEDDING_TYPE: 'cnn-rnn'
+GPU_ID: '0'
+# Z_DIM: 100
+
+NET_G: '../generate/netG_epoch_1400.pth'
+
+DATA_DIR: '../data/Medium_Room'
+EVAL_DIR: '../example1.pickle'
+WORKERS: 4
+RIRSIZE: 4096
+STAGE: 1
+TRAIN:
+    FLAG: False
+    BATCH_SIZE: 16
+
+GAN:
+    CONDITION_DIM: 10
+    DF_DIM: 96
+    GF_DIM: 256
+    #DF_DIM: 16
+    #GF_DIM: 64
+
+TEXT:
+    DIMENSION: 10

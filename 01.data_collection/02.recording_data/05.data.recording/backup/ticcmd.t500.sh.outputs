@@ -1,0 +1,38 @@
+Encoder position:             0
+Current position:             40
+Acting target position:       0
+Encoder position:             0
+Current position:             80
+Acting target position:       0
+Encoder position:             0
+Current position:             120
+Acting target position:       0
+Encoder position:             0
+Current position:             160
+Acting target position:       0
+Encoder position:             0
+Current position:             200
+Acting target position:       0
+Encoder position:             0
+Current position:             240
+Acting target position:       0
+Encoder position:             0
+Current position:             280
+Acting target position:       0
+Encoder position:             0
+Current position:             320
+Acting target position:       0
+
+ticcmd -d $TIC_T500 --resume --exit-safe-start --velocity 200000 
+sleep 2
+
+
+Tam tur  = 200
+
+
+
+360 derece - 200 birim
+
+36 derece - 20 birim => v=100000 sleep=2 STEPS=10
+
+

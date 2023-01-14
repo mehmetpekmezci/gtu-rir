@@ -1,0 +1,14 @@
+ESS signal properties
+
+parser.add_option('-r', '--rate', default=48000, type='int', metavar='HZ', help='Sample rate, default is 48 kHz')
+    parser.add_option('-I', '--fmin', default=15., type='float', metavar='HZ', help='Minimum frequency, default is 15 Hz')
+    parser.add_option('-A', '--fmax', default=22e3, type='float', metavar='HZ', help='Maximum frequency, default is 22 kHz')
+    parser.add_option('-d', '--duration', default=10., type='float', metavar='sec', help='Duration of sweep, default is 10s')
+    parser.add_option('-f', '--fadein', default=0.01, type='float', metavar='sec', help='Fadein duration, default is 10 ms')
+    parser.add_option('-s', '--silence', default=1.0, type='float', metavar='sec', help='Amount of silence around sweep, default is 1s')
+    parser.add_option('-e', '--equalize', default=False, action='store_true', help='Equalize sweep with -3dB/octave to ensure uniform power density'+ ', default is off.')
+    parser.add_option('-a', '--attenuate', default=0.0, type='float', metavar='dB', help='Attenuate by dB (e.g. 6 dB = half FS amplitude)'+', default is no attenuation: the amplitude is 16 bit full scale')
+    opts, args = parser.parse_args()
+
+
+

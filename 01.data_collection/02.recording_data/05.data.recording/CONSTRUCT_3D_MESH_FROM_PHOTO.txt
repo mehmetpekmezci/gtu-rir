@@ -1,0 +1,12 @@
+1. snap install visualsfm-mardy
+2. apt install meshlab blender
+3. Take 300+ photos per room
+4. visualsfm-mardy.visualsfm
+5. visualsfm > Open Multiple Images
+6. visualsfm > Compute Missing Matches
+7. visualsfm > Reconstruct Sparse
+8. visualsfm > Reconstruct Dense
+9. meshlab
+10. meshlab  > File > Open Project -- Select *.nvm file generated in 8. step
+11. meshlab  > File > Import Mesh  --  Select *.ply file
+12. meshlab  > Filters > Point Set > Surface Reconstruction Poisson > 

@@ -1,0 +1,5 @@
+webcamde ilgili yerde degilse direk , direk oynanamis demektir.
+hoparlerlerin dibindeki mikrofonlardan olmasi gereken ses gelmiyorsa, usb de sorun var, hoparlor sorunlu demektir.
+soylenen numaralara bakarak , mikrofonlarin yeri ve id si arasindaki matching yapilacak.
+SNR degeri yeterince yuksek olmayan mikrofon kayitlarinin isaretlenmesi ve silinmesi
+

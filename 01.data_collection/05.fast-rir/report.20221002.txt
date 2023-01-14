@@ -1,0 +1,126 @@
+len(self.fastRirDataline)=15202
+triggerFastRIRToGenerateRIRsAndT60s already generated
+wavesAndSpectrograms already generated
+
+
+
+
+1.0 COMPARE - RANDOM 1000  DATA POINT PAIRS - REAL DATA :
+-------------------------------------------------------------------
+SUMMARY TABLE :
+                ROOM		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+            ANY ROOM		0.0000		0.0154		0.0042		0.0003		966		0.8409		0.7094		0.4014		999
+
+
+
+
+1.1 COMPARE - RANDOM 1000  DATA POINT PAIRS - GENERATED DATA :
+------------------------------------------------------------------------
+SUMMARY TABLE :
+                ROOM		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+            ANY ROOM		0.0000		0.0107		0.0041		0.0001		995		0.9975		0.8657		0.6888		1000
+
+
+
+
+2.0 COMPARE - RANDOM 500  DATA POINT PAIRS - REAL DATA - SAME ROOM:
+-------------------------------------------------------------------------------
+SUMMARY TABLE :
+                ROOM		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+            room-207		172.8660		0.0067		0.0024		0.0004		500		0.8612		0.7643		0.5070		500
+            room-208		146.1032		0.0124		0.0050		0.0000		489		1.0000		0.7916		0.6477		500
+  room-conferrence01		209.7450		0.0069		0.0026		0.0006		500		0.8247		0.7111		0.4888		500
+        room-sport01		363.4330		0.0090		0.0017		0.0004		500		0.8641		0.7827		0.5885		500
+        room-sport02		160.1842		0.0100		0.0037		0.0006		500		0.8310		0.7297		0.4597		500
+            room-z02		139.7839		0.0167		0.0079		0.0017		377		0.8569		0.7943		0.6516		500
+            room-z04		139.9681		0.0168		0.0076		0.0000		386		1.0000		0.7916		0.6288		500
+            room-z06		326.5284		0.0109		0.0046		0.0010		497		0.8489		0.7921		0.6399		500
+            room-z10		328.6192		0.0084		0.0038		0.0008		500		0.8422		0.7903		0.6538		500
+            room-z11		204.6330		0.0139		0.0055		0.0013		490		0.8483		0.7890		0.6022		500
+            room-z23		410.2050		0.0030		0.0011		0.0000		500		1.0000		0.7919		0.6280		500
+
+
+
+
+2.1 COMPARE - RANDOM 500  DATA POINT PAIRS - GENERATED DATA - SAME ROOM :
+-------------------------------------------------------------------------------------
+SUMMARY TABLE :
+                ROOM		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+            room-207		172.8660		0.0065		0.0019		0.0001		500		0.9886		0.8853		0.7603		500
+            room-208		146.1032		0.0064		0.0025		0.0000		500		1.0000		0.9853		0.9083		500
+  room-conferrence01		209.7450		0.0067		0.0027		0.0002		500		0.9890		0.8885		0.7736		500
+        room-sport01		363.4330		0.0036		0.0009		0.0000		500		0.9993		0.9745		0.9266		500
+        room-sport02		160.1842		0.0085		0.0038		0.0001		500		0.9995		0.9737		0.8849		500
+            room-z02		139.7839		0.0070		0.0017		0.0001		500		0.9986		0.9767		0.8773		500
+            room-z04		139.9681		0.0063		0.0019		0.0000		500		1.0000		0.9755		0.9086		500
+            room-z06		326.5284		0.0042		0.0010		0.0000		500		1.0000		0.9417		0.8071		500
+            room-z10		328.6192		0.0112		0.0026		0.0001		499		0.9964		0.9077		0.7184		500
+            room-z11		204.6330		0.0068		0.0020		0.0000		500		1.0000		0.9859		0.9220		500
+            room-z23		410.2050		0.0044		0.0006		0.0000		500		1.0000		0.9466		0.7954		500
+
+
+
+
+3.0 COMPARE - RANDOM 100 DATA POINT PAIRS - REAL DATA - ANY ROOM - SIMILAR SPEAKER COORDINATES:
+---------------------------------------------------------------------------------------------------
+SUMMARY TABLE :
+   TOTAL DATA POINTS		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+               15202		0.00		0.0205		0.0035		0.0000		14417		1.0000		0.8046		0.0000		15201
+
+
+
+
+3.1 COMPARE - RANDOM 100 DATA POINT PAIRS - REAL DATA - ANY ROOM - SIMILAR MICROPHONE COORDINATES:
+---------------------------------------------------------------------------------------------------
+SUMMARY TABLE :
+   TOTAL DATA POINTS		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+               15202		0.00		0.0193		0.0025		0.0000		14182		1.0000		0.4710		0.0000		15198
+
+
+
+
+4.0 COMPARE - RANDOM 100 DATA POINT PAIRS - GENERATED DATA - ANY ROOM - SIMILAR SPEAKER COORDINATES:
+---------------------------------------------------------------------------------------------------
+SUMMARY TABLE :
+   TOTAL DATA POINTS		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+               15152		0.00		0.0115		0.0016		0.0000		15149		1.0000		0.9527		0.0000		15152
+
+
+
+
+4.1 COMPARE - RANDOM 100 DATA POINT PAIRS - GENERATED DATA - ANY ROOM - SIMILAR MICROPHONE COORDINATES:
+---------------------------------------------------------------------------------------------------
+SUMMARY TABLE :
+   TOTAL DATA POINTS		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+               15143		0.00		0.0105		0.0006		0.0000		15142		1.0000		0.5714		0.0000		15143
+
+
+
+
+5.1 COMPARE - GENERATED DATA - REAL DATA :
+-------------------------------------------------------------------------------
+SUMMARY TABLE :
+        ROOM		VOLUME		MAX_MSE		MEAN_MSE	MIN_MSE		MSE<0.01	MAX_SSIM	MEAN_SSIM	MIN_SSIM	SSIM>0.5
+    room-207		172.87		0.0363		0.0116		0.0029		683		0.5680		0.4809		0.3589		1245
+    room-208		146.10		0.0629		0.0216		0.0058		334		0.5568		0.4613		0.2981		909
+room-conferr		209.75		0.0344		0.0130		0.0041		538		0.5575		0.4777		0.4018		1275
+room-sport01		363.43		0.0647		0.0078		0.0023		1183		0.5352		0.4272		0.2895		466
+room-sport02		160.18		0.0516		0.0188		0.0033		321		0.5485		0.4503		0.3024		699
+    room-z02		139.78		0.0843		0.0324		0.0084		24		0.5308		0.4617		0.3408		1016
+    room-z04		139.97		0.0837		0.0324		0.0086		22		0.5535		0.4571		0.3419		906
+    room-z06		326.53		0.0642		0.0187		0.0047		448		0.5628		0.4879		0.3784		1443
+    room-z10		328.62		0.0457		0.0174		0.0050		436		0.5853		0.5047		0.4320		1409
+    room-z11		204.63		0.0590		0.0229		0.0062		140		0.5382		0.4455		0.3427		410
+    room-z23		410.21		0.0163		0.0057		0.0018		1030		0.5550		0.4675		0.3380		844
+Graphics are generated for room : room-conferrence01
+Graphics are generated for room : room-z11
+Graphics are generated for room : room-sport02
+Graphics are generated for room : room-207
+Graphics are generated for room : room-sport01
+Graphics are generated for room : room-208
+Graphics are generated for room : room-z23
+Graphics are generated for room : room-z10
+Graphics are generated for room : room-z04
+Graphics are generated for room : room-z06
+Graphics are generated for room : room-z02
+
