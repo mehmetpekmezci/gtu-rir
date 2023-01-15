@@ -29,6 +29,7 @@ Before starting to construct our devices, we need the following materials.
 21.  3  x 1 metre usb extension cable
 22.  10 x Aluminium unequal angle L profile ( 20mm x 20mm , 2mm , 1 meter )
 23.  1  x Angle grinder
+24.  1  x Measuring Tape
 
 
 

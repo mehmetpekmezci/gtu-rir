@@ -1,5 +1,6 @@
 # GTU-RIR
-This is a Room Impulse Response (RIR) data collection and generation project.
+This is a Room Impulse Response (RIR) data collection and generation project from Gebze Technical University (GTU). 
+
 1. [Collecting real data](#01)
    1. Collected data may be downloaded from : [DATA][DATA]
 2. [Generating RIR data using MESH, positions and a GAN model](#02)

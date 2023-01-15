@@ -11,7 +11,7 @@
 5. The scripts for " generating synthetic data using [FAST-RIR][FAST-RIR] and comparing to real data "   
    are explained in [05.fast-rir][05.fast-rir].
  
-[setting_to_work]: setting_to_work.md
+[setting_to_work]: 01.setting_to_work/README.md
 [02.recording_data]: 02.recording_data/README.md
 [03.post_processing]: 03.post_processing/README.md
 [04.data_statistics]: 04.data_statistics/README.md

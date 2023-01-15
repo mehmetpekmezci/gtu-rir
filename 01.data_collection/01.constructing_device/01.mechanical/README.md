@@ -41,6 +41,7 @@ Speaker stand construction instructions :
 8. Stick "Electric 6 Gang 10 Metre Extension Lead" onto the steel profile using duct tape.
 9. Plug 5 metre usb cable to Molix usb hub and stick , stick the cable onto the steel profile using duct tape.
    1.  Be carefull while sticking the cable,  arrange the the cable so that it will not restrain the rotation of the **Arms**
+10. Stick a "green sticker" on the arms, be careful :  the "face of the arm green sticker" and "speaker directions" should be the same.
   
   
 
@@ -84,11 +85,14 @@ Microphone stand construction instructions :
    2. Mount 4 of profiles horizontally to each other (totally making 3 meters long), and 2 of the L porfiles bir be mounted vertically as shown in the above drawings. 
 5. Put the Arms on the NEMA motor and screw the shaft fastener.
 6. Stick usb microphones onto the **Arms** using duct tapes .
+   1. Left and right microphones should be directed outwards
+   2. Microphones at top should be directed downwards
+   3. Micphone at bottom should be directed horizontally, both of them the same direction.
 7. Stick Molix 10 port usb 2.0 hub onto the **Arms** using duct tapes.
 8. Stick "Electric 6 Gang 10 Metre Extension Lead" onto the steel profile using duct tape.
-9. Plug 5 metre usb cable to Molix usb hub and stick , stick the cable onto the steel profile using duct tape.
+9.  Plug 5 metre usb cable to Molix usb hub and stick , stick the cable onto the steel profile using duct tape.
    1.  Be carefull while sticking the cable,  arrange the the cable so that it will not restrain the rotation of the **Arms**
-  
+10. Stick a "green sticker" on the arms, be careful :  the "face of the arm green sticker" and "directions of the microphones at bottom" should be the same.  
   
 
 At the end of the work, the microphone stand looks like the following :
