@@ -37,7 +37,9 @@ class RIRData :
    self.final_sound_data_length=int(self.track_length/self.rir_seconds)
    self.number_of_microphones=6
    self.number_of_speakers=4
-   self.data_dir=self.script_dir+'/../../../data/single-speaker/'
+   HOME_DIR=str(os.path.expanduser('~'))
+   self.data_dir=HOME_DIR+'/GTU-RIR-DATA/single-speaker/'
+   #self.data_dir=self.script_dir+'/../../../data/single-speaker/'
    self.fast_rir_eval_yml='/var/tmp/fast_rir_eval.yml'
    self.fast_rir_dir=fast_rir_dir
    self.fast_rir_training_data_dir=fast_rir_dir+'/data/Medium_Room'

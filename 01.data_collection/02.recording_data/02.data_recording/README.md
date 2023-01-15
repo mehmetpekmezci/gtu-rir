@@ -12,9 +12,6 @@ General program execution is :
          3. Stop 6 microphone recording parallely (thread.join)
          4. Save microphone and speaker position and directions to a txt file.  
    
-   
-
-
 **NOTE-1** : You may control the recording start time by changing START_HOUR variable value in the main.py file .  
          This is by default 0 (starts immediately, but it would be more convenient to start at night to not to disturb other people, i recommend starting at 21:00). 
 

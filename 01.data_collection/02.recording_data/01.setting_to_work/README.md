@@ -66,6 +66,8 @@ Before starting to record sound in a room, we need to prepare our recording syst
     >math  
     >shutil  
 
+13. **Don't forget to leave a light open (a bedside light may be enough), as the webcam will take photo for each recording step**
+
 
 
 

@@ -3,7 +3,8 @@
 SCRIPT_DIR=$(realpath $(pwd))
 
 
-DATA_DIR=$(realpath "../../../data/single-speaker/");
+DATA_DIR=$HOME/GTU-RIR-DATA/single-speaker
+
 cd $DATA_DIR
 for i in $(find room* -name rec*Signal-*.wav.bz2 -size -1000k | grep -v trash | grep -v '\.ir\.wav'); do   echo mv $i $i.corrupted;mv $i $i.corrupted;  done
 

@@ -1,18 +1,21 @@
 # GTU-RIR
 This is a Room Impulse Response (RIR) data collection and generation project from Gebze Technical University (GTU). 
-
+Data collection and generation phases are described below. You may also find the data that we collected for our work.
 1. [Collecting real data](#01)
-   1. Collected data may be downloaded from : [DATA][DATA]
-2. [Generating RIR data using MESH, positions and a GAN model](#02)
+2. Collected data may be downloaded from : 
+   1. [DATA][DATA] (5GB) 
+   2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
+   3. You may find python file to read this pickle file in 04.data_statistics directory.
+3. [Generating RIR data using MESH, positions and a GAN model](#02)
   
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
 The **Arms** of the microphone stand and the speaker stand turns one step (to change speaker/microphone positions) , then records the sound transmitted from speaker.  
 
-The system collects 2400 data points ( microphone-speaker position based sound records) in 8 hours.  
+The system collects 2400 data points ( microphone-speaker position based sound records) in 10 hours.  
 
-We built a automated RIR collection system to collect real "room impulse response" data in a room.
+We built an automated RIR collection system to collect real "room impulse response" data in a room.
 The system consists of:
 1. Speakers (4), 
 2. Microphones (6), 

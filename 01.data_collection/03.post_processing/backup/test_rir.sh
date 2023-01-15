@@ -3,7 +3,7 @@
 SCRIPT_DIR=$(realpath $(pwd))
 
 
-DATA_DIR=$(realpath "../../../data/single-speaker/");
+DATA_DIR=$HOME/GTU-RIR-DATA/single-speaker/
 cd $DATA_DIR
 
 
