@@ -1,9 +1,0 @@
-[0/2000][584/585] Loss_D: 0.7624 Loss_G: 61.8342 Loss_real: 0.2796 Loss_wrong:0.9322 Loss_fake 0.0333  MSE Error:649.9325 RT_error0.1437 Total Time: 1182.25sec
-[1/2000][584/585] Loss_D: 0.3437 Loss_G: 68.3439 Loss_real: 0.1337 Loss_wrong:0.4037 Loss_fake 0.0164  MSE Error:545.8772 RT_error0.2428 Total Time: 1191.89sec
-[2/2000][584/585] Loss_D: 0.2133 Loss_G: 73.6458 Loss_real: 0.0939 Loss_wrong:0.1945 Loss_fake 0.0445  MSE Error:616.4221 RT_error0.3220 Total Time: 1145.97sec
-[3/2000][584/585] Loss_D: 0.0970 Loss_G: 59.1511 Loss_real: 0.0435 Loss_wrong:0.1061 Loss_fake 0.0008  MSE Error:535.7301 RT_error0.0989 Total Time: 1157.11sec
-[4/2000][584/585] Loss_D: 0.0967 Loss_G: 65.9604 Loss_real: 0.0485 Loss_wrong:0.0790 Loss_fake 0.0174  MSE Error:562.9666 RT_error0.1735 Total Time: 1159.58sec
-[5/2000][584/585] Loss_D: 0.0605 Loss_G: 57.1803 Loss_real: 0.0176 Loss_wrong:0.0855 Loss_fake 0.0003  MSE Error:482.6906 RT_error0.0411 Total Time: 1160.32sec
-[6/2000][584/585] Loss_D: 0.0407 Loss_G: 56.2684 Loss_real: 0.0089 Loss_wrong:0.0636 Loss_fake 0.0001  MSE Error:539.1774 RT_error0.0929 Total Time: 1182.93sec
-[7/2000][584/585] Loss_D: 0.1728 Loss_G: 63.1023 Loss_real: 0.0552 Loss_wrong:0.1026 Loss_fake 0.1326  MSE Error:652.1395 RT_error0.1233 Total Time: 1184.10sec
-[8/2000][584/585] Loss_D: 0.0226 Loss_G: 61.2247 Loss_real: 0.0059 Loss_wrong:0.0332 Loss_fake 0.0001  MSE Error:556.2097 RT_error0.1069 Total Time: 1183.51sec

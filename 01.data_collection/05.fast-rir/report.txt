@@ -1,6 +1,4 @@
 
-
-
 1.0 COMPARE - RANDOM 1000  DATA POINT PAIRS - REAL DATA :
 -------------------------------------------------------------------
 SUMMARY TABLE :
