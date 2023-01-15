@@ -1,4 +1,5 @@
 # GTU-RIR : COLLECTING REAL RIR DATA / FAST-RIR
+TODO :
 
 1. screen shots from last presentation odp (4. donem)
 2. FAST-RIR link + FAST-RIR page from last odp
