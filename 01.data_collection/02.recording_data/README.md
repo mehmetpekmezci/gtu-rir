@@ -1,19 +1,19 @@
 # GTU-RIR : COLLECTING REAL RIR DATA / RECORDING DATA
 
-1. Before starting to record any data, we need to prepare our setup which is described in [setting to work][setting_to_work].
+How do we use the system to record sound data :
+1. We go in a room and place the microphone and speaker stands in a position.
+2. We first prepare the recording system using instructions in [01.setting_to_work](01.setting_to_work/README.md).  
+2. Then we start recording data using the run.sh script as described in [02.data_recording](02.data_recording/README.md).  
 
-2. The scripts for recording sound and how to run them are explained in [02.recording_data][02.recording_data].
+The system collects 2400 data points ( microphone-speaker position based sound records) in 8 hours.
 
-3. The scripts for cleaning and for extracting RIR are explained in [03.post_processing][03.post_processing].
+We restart the system when we change microphone/speaker stand positions.
 
-4. The scripts for data position heatmaps and sound wave plots are explained in [04.data_statistics][04.data_statistics].
+IMPORTANT NOTE : We tried also a translating system ( not rotating but going straight). But the system was not stable because :
+   1. It was nearly impossible maintain a straight line, which leads to deviations in coordinates of microphones and speakers.
+   2. Moving whole microphone/speaker stand requires more power, this causes the step motor to stop at some point randomly.
+   3. Moving the stands by using small wheels mounted at the bottom is very instable because of the floor properties change room-to-room.
+
  
-5. The scripts for " generating synthetic data using [FAST-RIR][FAST-RIR] and comparing to real data "   
-   are explained in [05.fast-rir][05.fast-rir].
- 
-[setting_to_work]: 01.setting_to_work/README.md
-[02.recording_data]: 02.recording_data/README.md
-[03.post_processing]: 03.post_processing/README.md
-[04.data_statistics]: 04.data_statistics/README.md
-[05.fast-rir]: 05.fast-rir/README.md
-[FAST-RIR]: https://github.com/anton-jeran/FAST-RIR
+
+

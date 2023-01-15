@@ -9,8 +9,10 @@ cat /var/tmp/cardlist | grep Microphone > /var/tmp/cardlist.1
 
 mv /var/tmp/cardlist.1 /var/tmp/cardlist
 
+echo "usb_port:"
 cat /var/tmp/cardlist 
 
+echo "mic_no is the port number label on the usb hub hub"
 
 ### I commented out the exit line below, 
 ### and rerun this script untill determining all the usb adresses of microphone devices

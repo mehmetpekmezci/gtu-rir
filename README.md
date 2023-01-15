@@ -8,7 +8,11 @@ This is a Room Impulse Response (RIR) data collection and generation project fro
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
-We built a semi-automated RIR collection system to collect real "room impulse response" data in a room.
+The **Arms** of the microphone stand and the speaker stand turns one step (to change speaker/microphone positions) , then records the sound transmitted from speaker.  
+
+The system collects 2400 data points ( microphone-speaker position based sound records) in 8 hours.  
+
+We built a automated RIR collection system to collect real "room impulse response" data in a room.
 The system consists of:
 1. Speakers (4), 
 2. Microphones (6), 
@@ -17,6 +21,8 @@ The system consists of:
 5. Speaker Stand (1 custom constructed),
 6. USB hubs (2) and cables,
 7. Computer (1) . 
+
+
 
 Following information is given in the [data collection directory][01.data_collection]
 - How to construct this system

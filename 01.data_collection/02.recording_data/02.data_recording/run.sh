@@ -2,17 +2,25 @@
 
 mkdir -p $HOME/GTU-RIR-DATA
 
+if [ ! -f usb_microphone.conf ]
+then
+	echo "Please build usb_microphone.conf file"
+	echo "See the ../01.setting_to_work/README.md file"
+	exit 1
+fi
+
 rm -f /tmp/last.motor.pos.*
 rm -f /tmp/dummy.*
 
-if [ $# -lt 1 ]
-then
-   echo "Usage $0 [ TEST_MODE_NONE | TEST_MODE_FAST_DEVICE_MOC | TEST_MODE_DEVICE_MOC ]"
-   exit 1
-fi   
-
-
-TEST_MODE=$1
+#if [ $# -lt 1 ]
+#then
+#   echo "Usage $0 [ TEST_MODE_NONE | TEST_MODE_FAST_DEVICE_MOC | TEST_MODE_DEVICE_MOC ]"
+#   exit 1
+#fi   
+#
+#
+#TEST_MODE=$1
+TEST_MODE="TEST_MODE_NONE"
 
 
 
@@ -68,11 +76,11 @@ then
 	exit 1
 fi
 
-if [ ! -f usbreset ]
-then
-	gcc -o usbreset usbreset.c
-	chmod +x usbreset
-fi
+#if [ ! -f usbreset ]
+#then
+#	gcc -o usbreset usbreset.c
+#	chmod +x usbreset
+#fi
 
 #echo "Set of USB Devices :"
 #echo "--------------------"
@@ -108,7 +116,7 @@ fi
 echo "Did you test the turning arms of mechanism? (Press Enter when done)"
 read
 
-echo "Did you isolated motor controller cards from vibration? (if not this coups usb connection temporarily)"
+echo "Did you isolated motor controller cards from vibration? (if not this cuts usb connection temporarily)"
 read
 
 echo "Did you put the microphone and speaker stands GREEN STICKERS FACING THE DOOR OF THE ROOM (starting position)? (Press Enter when done)"
