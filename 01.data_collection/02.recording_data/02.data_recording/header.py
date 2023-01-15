@@ -30,10 +30,11 @@ shutil      = importlib.import_module("shutil")
 
 
 
-
+HOME_DIR=str(os.path.expanduser('~'))
 SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
 SCRIPT_NAME=os.path.basename(SCRIPT_DIR)
-DATA_DIR = SCRIPT_DIR+'/../../../data/'
+#DATA_DIR = SCRIPT_DIR+'/../../../data/'
+DATA_DIR = HOME_DIR+'/GTU-RIR-DATA'
 LOG_DIR=SCRIPT_DIR+"/../../../logs/"+SCRIPT_NAME
 ROOM_NUMBER=0
 RECORD_TIMESTAMP=str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y.%m.%d_%H.%M.%S'))

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p $HOME/GTU-RIR-DATA
+
 rm -f /tmp/last.motor.pos.*
 rm -f /tmp/dummy.*
 
