@@ -4,9 +4,9 @@
 
 
 
-1. You may find Sketchup Drawing File [here][sketchup] which contains 3D drawings of the stands.  
-2. [Speaker Stand Construction](#01)
-3. [Microphone Stand Construction](#02)
+1. [Speaker Stand Construction](#01)
+2. [Microphone Stand Construction](#02)
+3. You may find Sketchup Drawing File [here][sketchup] which contains 3D drawings of the stands.  
 
 
 ![overview](drawings/0.png)  
