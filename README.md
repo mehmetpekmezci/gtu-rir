@@ -2,11 +2,11 @@
 This is a Room Impulse Response (RIR) data collection and generation project from Gebze Technical University (GTU). 
 Data collection and generation phases are described below. You may also find the data that we collected for our work.
 1. [Collecting real data](#01)
-2. Collected data may be downloaded from : 
+2. [Generating RIR data using MESH, positions and a GAN model](#02)
+3. Collected data may be downloaded from : 
    1. [DATA][DATA] (5GB) 
    2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
    3. You may find python file to read this pickle file in 04.data_statistics directory.
-3. [Generating RIR data using MESH, positions and a GAN model](#02)
   
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
