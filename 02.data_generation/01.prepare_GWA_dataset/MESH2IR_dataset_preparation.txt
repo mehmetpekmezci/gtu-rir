@@ -1,0 +1,13 @@
+MESH2IR data preparation :
+-----------------------------
+
+1. download gwa full data from https://obj.umiacs.umd.edu/gamma-datasets/GWA_Dataset.zip (referenced from https://github.com/GAMMA-UMD/GWA/tree/master/download)
+1.1. extract to the directory /data.ext4/mpekmezci/GWA/GWA_Dataset_full ( this directory contains stats.csv and hash coded directories like 99fbb361-8436-4e2c-9ba9-f9293a0062e4)
+
+2. download 3d-front mesh data from https://tianchi.aliyun.com/specials/promotion/alibaba-3d-scene-dataset ( requires registration and login , find "TC Lab: 3D-FRONT Dataset" in the page )
+2.1. extract to the directory /data.ext4/mpekmezci/3D-FRONT  ( this directory will contain 3 sub directories : 3D-FRONT  3D-FRONT-texture   3D-FUTURE-model )
+
+3. ./run.sh
+
+
+
