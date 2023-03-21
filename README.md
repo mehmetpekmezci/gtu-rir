@@ -49,7 +49,7 @@ Speakers and microphones are mounted as shown below.
 <br>
 
 ## 2. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="02"></a>
-We took [MESH2IR][MESH2IR] paper as a referrence point, we modified it to find our own model.  
+We took [MESH2IR][MESH2IR] paper as a referrence point, we will modify it to find our own model.  
 Within this work , we tried to 
 - Change models
 - Change inputs/outputs
