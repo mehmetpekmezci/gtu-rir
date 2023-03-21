@@ -2,7 +2,7 @@
 
 Execute the run.sh file. The recorded data will be in the $HOME/GTI-RIR-DATA directory.  
 
-NOTE: Click On the 02.data_recording link above (or simple clone the repository) to see the scripts.
+NOTE: Click on the <a href='https://github.com/mehmetpekmezci/gtu-rir/tree/master/01.data_collection/02.recording_data/02.data_recording'>02.data_recording link </a>  (or simple clone the repository) to see the scripts.
 
 General program execution is :
 1. Generate ESS signal 
