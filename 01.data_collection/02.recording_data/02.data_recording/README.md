@@ -2,6 +2,8 @@
 
 Execute the run.sh file. The recorded data will be in the $HOME/GTI-RIR-DATA directory.  
 
+NOTE: Click On the 02.data_recording link above (or simple clone the repository) to see the scripts.
+
 General program execution is :
 1. Generate ESS signal 
 2. For each microphone rotation step
