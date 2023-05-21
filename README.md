@@ -7,7 +7,7 @@ Data collection and generation phases are described below. You may also find the
    1. [DATA][DATA] (5GB) 
    2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
    3. You may find python file to read this pickle file in 04.data_statistics directory.
-  
+4. Generated vs Real RIR data comparison [summary][summary]
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
