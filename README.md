@@ -77,3 +77,4 @@ Details are found at [02.data_generation][02.data_generation] directory.
 [EXAMPLE_COMPARE_1]: README.md.resources/example.compare.1.small.png
 [EXAMPLE_COMPARE_2]: README.md.resources/example.compare.2.small.png
 [DATA]: https://gtu-my.sharepoint.com/:u:/g/personal/mpekmezci_gtu_edu_tr/Ec9dwMtiymlOuu_NSv5yT0YB1xw9W8VvtPZLWpr09-Lgbg?e=zvFVyJ
+[summary]: summary/summary.html
