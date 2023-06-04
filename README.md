@@ -2,11 +2,8 @@
 This is a Room Impulse Response (RIR) data collection and generation project from Gebze Technical University (GTU). 
 Data collection and generation phases are described below. You may also find the data that we collected for our work.
 1. [Collecting real data](#01)
-2. [Generating RIR data using MESH, positions and a GAN model](#02)
-3. Collected data may be downloaded from : 
-   1. [DATA][DATA] (5GB) 
-   2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
-   3. You may find python file to read this pickle file in 04.data_statistics directory.
+2. [Data](#02)
+3. [Generating RIR data using MESH, positions and a GAN model](#03)
 4. Generated vs Real RIR data comparison [summary][summary]
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
@@ -48,7 +45,21 @@ Speakers and microphones are mounted as shown below.
 <br>
 <br>
 
-## 2. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="02"></a>
+## 2. DATA <a name="02"></a>
+
+   1. Download : [DATA][DATA] (5GB) 
+   2. Data Properties 
+   2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
+   3. You may find python file to read this pickle file in 04.data_statistics directory.
+
+<br>
+<br>
+
+---
+
+<br>
+<br>
+## 3. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="03"></a>
 We took [MESH2IR][MESH2IR] paper as a referrence point, we will modify it to find our own model.  
 Within this work , we tried to 
 - Change models
@@ -69,7 +80,8 @@ Details are found at [02.data_generation][02.data_generation] directory.
 
 
 [01.data_collection]: 01.data_collection/README.md
-[02.data_generation]: 02.data_generation/README.md
+[02.data]: 02.data/README.md
+[03.data_generation]: 03.data_generation/README.md
 [rir_measurement_setup]: README.md.resources/rir-measurement-setup.png
 [mesh2ir_generate_and_test]: README.md.resources/mesh2ir.generate.and.gtu-rir.test.small.png
 [FAST-RIR]: https://github.com/anton-jeran/FAST-RIR
