@@ -8,11 +8,9 @@ Data collection and generation phases are described below. You may also find the
 
 ## 1. COLLECTING REAL RIR DATA <a name="01"></a>
 
-The **Arms** of the microphone stand and the speaker stand turns one step (to change speaker/microphone positions) , then records the sound transmitted from speaker.  
-
+We built an automated RIR collection system to collect real "room impulse response" data in a room.
 The system collects 2400 data points ( microphone-speaker position based sound records) in 10 hours.  
 
-We built an automated RIR collection system to collect real "room impulse response" data in a room.
 The system consists of:
 1. Speakers (4), 
 2. Microphones (6), 
@@ -47,10 +45,11 @@ Speakers and microphones are mounted as shown below.
 
 ## 2. DATA <a name="02"></a>
 
+This dataset contains 15.202 RIRs, from 11 different rooms of the GTU Department of Computer Engineering .
+
    1. Download : [DATA][DATA] (5GB) 
-   2. Data Properties 
-   2. This data consists of nearly 15.000 RIRs, from 11 different rooms of the GTU Computer Engineering Building.
-   3. You may find python file to read this pickle file in 04.data_statistics directory.
+   2. You may find python file to read this pickle file in [read_data.py][02.data/data_reader/read_data.py]
+   3. [Data properties][02.data/data_properties/README.md]
 
 <br>
 <br>
@@ -61,7 +60,7 @@ Speakers and microphones are mounted as shown below.
 <br>
 
 ## 3. GENERATING RIR DATA USING MESH, POSITIONS and a GAN MODEL <a name="03"></a>
-We took [MESH2IR][MESH2IR] and [FAST-RIR][FAST-RIR] paper as a referrence point, we will modify it to find our own model.  
+We took [MESH2IR][MESH2IR] paper as a referrence point, we will modify it to find our own model.  
 Within this work , we tried to 
 - Change models
 - Change inputs/outputs
