@@ -1,0 +1,54 @@
+1. Open FreeCAD
+   
+1.1.  ALL DRAWINGS ARE MADE USING THE "LEFT DOWN CORNER OF THE WALL FACING THE DOOR OF THE ROOM" beacause all measurments are made according to that referrence during sound data collection.
+
+2. Select "Part Design" instead of "Start"
+
+3. Click "New" Button
+
+4. Click on "Create Body"
+
+5. Clieck on "Create Sketch"
+
+6. Select X-Y plane
+
+7. Click on "Create Rectangles"
+
+8. Draw a rectangle starting from origin to positive X-Y values.  (right-top)
+
+9. Select "Constrain Horizontal Distance"
+
+10. Select "Upper Horizontal line of the rectangle"
+
+11. Insert room_depth (5,42 mm for room-207), and press enter
+
+12. Select "Constrain Vertical Distance" 
+
+13. Select "Left vertical line of the rectangle"
+
+14. Insert room_height (2,83 mm for room-207), and press enter
+
+15. Click "Close" button in the "Tasks" tab.
+
+16. Click "Pad" text in the "Tasks" tab
+
+17. Insert room_width (11,27 mm for room-207), 
+    
+    DO_NOT_DO THE FOLLOWING:
+       #select "Custom Direction"
+       #insert Z=-1  
+       #and press OK button.
+    
+18. Select Model TAB
+
+19. Select File > Save As
+    room-207-freecad-mesh.FCStd
+    
+20. Select "Body" in the model tab
+
+21. Select File > Export 
+    File Name = room-207-freecad-mesh-Body.obj
+   
+    filename should be  in this format (attention : freecad-mesh added in between)  : <ROOM_ID>-freecad-mesh-Body.obj 
+22. Imported OBJ files into BLENDER to check if the origin of the mesh matches to the room. (check 1.1.)
+    
