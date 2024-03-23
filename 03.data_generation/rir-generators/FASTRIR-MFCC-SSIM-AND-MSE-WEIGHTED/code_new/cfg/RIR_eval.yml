@@ -1,0 +1,30 @@
+CONFIG_NAME: 'eval'
+
+DATASET_NAME: 'RIR'
+EMBEDDING_TYPE: 'cnn-rnn'
+#GPU_ID: '0,1'
+# Z_DIM: 100
+
+#NET_G: '../generate/netG_mse_plus_mfcc_ssim_epoch_111.pth'
+NET_G: '../generate/netg.pth'
+
+#DATA_DIR: '../data/Medium_Room'
+#EVAL_DIR: '../example1.pickle'
+#DATA_DIR: '/home/mpekmezci/workspace-python/FAST-RIR/data/Medium_Room'
+#EVAL_DIR: '/home/mpekmezci/workspace-python/room_impulse_response_phd_thessis/src/rir-measurement/08.fast-rir-cross-check/../../../data/single-speaker//RIR.fast_rir_inputs.pickle'
+WORKERS: 4
+RIRSIZE: 4096
+STAGE: 1
+TRAIN:
+    FLAG: False
+    BATCH_SIZE: 32
+
+GAN:
+    CONDITION_DIM: 10
+    DF_DIM: 96
+    GF_DIM: 256
+
+TEXT:
+    DIMENSION: 10
+
+
