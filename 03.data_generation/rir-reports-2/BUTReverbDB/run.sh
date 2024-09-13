@@ -30,7 +30,7 @@ fi
 
 for GANMODEL in $GANMODELS
 do
-for i in $RIR_GENERATORS_DIR/$GANMODEL-*
+for i in $RIR_GENERATORS_DIR/$GANMODEL*
 do
 MODEL=$(basename $i) 
 if [ -f $REPORT_DIR/$MODEL/summary/summary.db.txt ]
