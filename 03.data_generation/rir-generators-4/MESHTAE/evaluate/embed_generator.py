@@ -72,7 +72,6 @@ for dataline in rir_data:
               rt60=float(dataline[int(rir_data_field_numbers['rt60'])])
               #mesh2irInputDataLine=[roomId+"-freecad-mesh-Body.pickle",roomId+"-CONFIG_ID-"+configId,"SPEAKER_ITERATION-"+speakerMotorIterationNo+"-MICROPHONE_ITERATION-"+microphoneMotorIterationNo+"-PHYSICAL_SPEAKER_NO-"+physicalSpeakerNo+"-MICROPHONE_NO-"+micNo+".wav",[speakerCoordinatesX,speakerCoordinatesY,speakerCoordinatesZ],[microphoneCoordinatesX,microphoneCoordinatesY,microphoneCoordinatesZ]]
               mesh2irInputDataLine=[roomId+"-freecad-mesh-Body.obj",configId,"SPEAKER_ITERATION-"+speakerMotorIterationNo+"-MICROPHONE_ITERATION-"+microphoneMotorIterationNo+"-PHYSICAL_SPEAKER_NO-"+physicalSpeakerNo+"-MICROPHONE_NO-"+micNo+".wav",[speakerCoordinatesX,speakerCoordinatesY,speakerCoordinatesZ],[microphoneCoordinatesX,microphoneCoordinatesY,microphoneCoordinatesZ]]
-              r
               if not roomId  in roomProperties :
                roomProperties[roomId]=[roomWidth,roomHeight,roomDepth]
               if roomId not in mesh2irInputData :

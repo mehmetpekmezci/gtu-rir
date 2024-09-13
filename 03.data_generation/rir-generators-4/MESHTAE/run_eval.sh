@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #./run_eval.sh  $HOME/RIR_DATA/GTU-RIR-1.0/data/single-speaker $HOME/RIR_REPORT/GTURIR/MESH2IR-MSE GTURIR
+#./run_eval.sh /home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/ /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE GTURIR
 
 if [ $# -lt 2 ]
 then

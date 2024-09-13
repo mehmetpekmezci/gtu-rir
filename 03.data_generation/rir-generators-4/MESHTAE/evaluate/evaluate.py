@@ -90,7 +90,7 @@ def load_network_stageI(netG_path,mesh_net_path,batch_size):
         #mesh_net.cuda()
         return netG, mesh_net
 
-def get_mesh(self, full_graph_path):
+def get_mesh(full_mesh_path):
         
         tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
         
@@ -164,13 +164,14 @@ def evaluate():
         mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
 
         data=get_mesh(mesh_directory+"/"+mesh_obj)
-        triangle_coordinates=Variable(data['triangle_coordinates']).float()
-        normals=Variable(data['normals']).float()
-        centers=Variable(data['centers']).float()
-        areas=Variable(data['areas']).float()
+        triangle_coordinates=Variable(torch.from_numpy(data['triangle_coordinates'])).float()
+        normals=Variable(torch.from_numpy(data['normals'])).float()
+        centers=Variable(torch.from_numpy(data['centers'])).float()
+        areas=Variable(torch.from_numpy(data['areas'])).float()
         #print(f"triangle_coordinates.shape = {triangle_coordinates.shape} normals.shape={normals.shape} centers.shape={centers.shape} areas.shape={areas.shape} ")
-        faceDataDim=triangle_coordinates.shape[2]+centers.shape[2]+normals.shape[2]+areas.shape[2]
-        faceData=torch.cat((triangle_coordinates,normals,centers,areas),2).unsqueeze(0).detach()
+        faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+
+        faceData=torch.cat((triangle_coordinates,normals,centers,areas),1).unsqueeze(0).detach()
 
         faceData_predicted , latent_vector =  mesh_net(faceData)
         mesh_embed=latent_vector            
@@ -196,11 +197,10 @@ def evaluate():
                 folder_name_list.append(folder_name)
                 wave_name_list.append(wave_name)
 
-
             txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
             txt_embedding = Variable(txt_embedding)
-         
-            lr_fake, fake, _  = netG(txt_embedding,mesh_embed)
+            print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
+            lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
 
             for i in range(len(fake)):
                 if(not os.path.exists(output_embed+"/"+folder_name_list[i])):
