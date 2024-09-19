@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-
+import time
 import torch.utils.data as data
 # from PIL import Image
 import soundfile as sf
@@ -92,11 +92,9 @@ class MeshDataset(data.Dataset):
         return len(self.mesh_paths)
             
             
-        
-
 
 class TextDataset(data.Dataset):
-    def __init__(self, data_dir,embeddings, split='train',rirsize=4096): #, transform=None, target_transform=None):
+    def __init__(self, data_dir,embeddings,mesh_embeddings, split='train',rirsize=4096): #, transform=None, target_transform=None):
 
         self.rirsize = rirsize
         self.data = []
@@ -105,6 +103,7 @@ class TextDataset(data.Dataset):
         
   
         self.embeddings = embeddings
+        self.mesh_embeddings = mesh_embeddings
 
     def get_RIR(self, full_RIR_path):
         # wav,fs = sf.read(full_RIR_path) 
@@ -137,30 +136,6 @@ class TextDataset(data.Dataset):
 
         return RIR
 
-
-    def get_graph(self, full_graph_path):
-        
-        full_mesh_path = full_graph_path.replace('.pickle','.obj')
-        tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
-        
-        graph={}
-        
-        tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
-        graph={}
-        graph["triangle_coordinates"]=tirangle_coordinates
-        graph["normals"]=normals
-        graph["centers"]=centers
-        graph["areas"]=areas
-   
-        
-        return graph
-        
-        
-        #graph = load_pickle(full_graph_path)
-        
-        #return graph #edge_index, vertex_position
-
-
     def __getitem__(self, index):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
@@ -173,19 +148,112 @@ class TextDataset(data.Dataset):
 
         RIR = self.get_RIR(full_RIR_path)
 
-        graph = self.get_graph(full_graph_path)
+        data = {}
         
-        graph["RIR"] = RIR
-        graph["embeddings"] =  np.array(source_receiver).astype('float32')
+        data["RIR"] = RIR
+        data["embeddings"] =  np.array(source_receiver).astype('float32')
+        data["mesh_embeddings"] = self.mesh_embeddings[graph_path]
 
-        return graph
+        return data
         
     def __len__(self):
         return len(self.embeddings)
 
 
 
+def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_directory,data_set_name,obj_file_name_list):
+    print("build_mesh_embeddings_for_evaluation_data started...")
+    from model_mesh import MESH_TRANSFORMER_AE
+    gae_mesh_net=MESH_TRANSFORMER_AE()
 
+    mesh_embeddings={}
+  
+
+    if os.path.exists(mesh_net_path):
+            state_dict = \
+                torch.load( mesh_net_path,
+                           map_location=lambda storage, loc: storage)
+            gae_mesh_net.load_state_dict(state_dict)
+            print('Load GAE MESH NET from: ', mesh_net_path)
+    else:
+        print(f"Could not find GAE MESH NET pth file {mesh_net_path}")
+        exit(1)
+
+    gae_mesh_net.to(device='cuda:2')
+    gae_mesh_net.eval()
+
+    for i in range(len(obj_file_name_list)):
+        graph_path= obj_file_name_list[i]
+        full_graph_path = os.path.join(data_dir,graph_path)
+        if graph_path not in  mesh_embeddings:
+           print(f"calculating mesh embedding of {graph_path}")
+           triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
+           triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
+           triangle_coordinates=torch.from_numpy(triangle_coordinates).float()
+           normals=torch.from_numpy(normals).float()
+           centers=torch.from_numpy(centers).float()
+           areas=torch.from_numpy(areas).float()
+           faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+           faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
+           faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           #time.sleep(10)
+           faceData_predicted , latent_vector =  gae_mesh_net.forward(faceData)
+           faceData=faceData.detach().cpu()
+           faceData_predicted=faceData_predicted.detach().cpu()
+           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+
+ 
+    print("build_mesh_embeddings_for_evaluation_data finished...")
+    print(f"mesh_mbeddings size is : {len(mesh_embeddings)}")
+
+    write_pickle(embedding_directory+"/"+data_set_name+".mesh_embeddings.pickle",mesh_embeddings)
+    
+
+
+def build_mesh_embeddings(data_dir,embeddings):
+    from model_mesh import MESH_TRANSFORMER_AE
+    gae_mesh_net=MESH_TRANSFORMER_AE()
+
+    mesh_embeddings={}
+  
+
+    if cfg.PRE_TRAINED_MODELS_DIR!= '' and cfg.MESH_NET_GAE_FILE != '' and os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE):
+            state_dict = \
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE,
+                           map_location=lambda storage, loc: storage)
+            gae_mesh_net.load_state_dict(state_dict)
+            print('Load GAE MESH NET from: ', cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE)
+    else:
+        print(f"Could not find GAE MESH NET pth file {cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE}")
+        exit(1)
+
+    gae_mesh_net.cuda()
+    gae_mesh_net.eval()
+
+    for i in range(len(embeddings)):
+        if i%100000 == 0 :
+            print(f"{i}/{len(embeddings)}")
+        graph_path,RIR_path,source_location,receiver_location= embeddings[i]
+        full_graph_path = os.path.join(data_dir,graph_path)
+        if graph_path not in  mesh_embeddings:
+           full_mesh_path = full_graph_path.replace('.pickle','.obj')
+           triangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
+           triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
+           triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
+           normals=torch.autograd.Variable(torch.from_numpy(normals)).float()
+           centers=torch.autograd.Variable(torch.from_numpy(centers)).float()
+           areas=torch.autograd.Variable(torch.from_numpy(areas)).float()
+           faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+           faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
+           faceData=faceData.unsqueeze(0).detach().cuda()
+           faceData_predicted , latent_vector =  gae_mesh_net(faceData)
+           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+ 
+    print(f"mesh_mbeddings size is : {len(mesh_embeddings)}")
+
+    write_pickle(cfg.PRE_TRAINED_MODELS_DIR+"/"+cfg.GWA_MESH_EMBEDDINGS_FILE,mesh_embeddings)
+    
+    return mesh_embeddings
 
 
 
@@ -342,6 +410,9 @@ def denormalize_mesh_values(triangle_coordinates,normals,centers,areas):
 def load_mesh(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     mesh = trimesh.load_mesh(path, process=False)
+
+    random.shuffle(mesh.faces)
+
 #    print('BEGINNING : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
     if mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES-100 :
         while mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES:
@@ -360,7 +431,7 @@ def load_mesh(path, augments=[], request=[], seed=None):
 
     
     ## hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
-    if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and cfg.FORCE_DECIMATION_EVEN_IF_THE_SHAPE_WILL_DEFORM_AND_USELESS :
+    if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and cfg.FORCE_DECIMATION :
          mesh.faces=mesh.faces[:TOTAL_NUMBER_OF_FACES]
            
        

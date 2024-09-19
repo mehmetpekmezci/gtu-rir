@@ -56,12 +56,12 @@ class MESH_TRANSFORMER_AE(nn.Module):
                 
                 ## MP : h == 8 == number of parallel heads (multiheads)
                 self.transformer_encoder = TransformerEncoder(
-                                              d_model=self.EMBEDDING_DIM, h=12, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=2048, number_of_encoder_blocks=6,
+                                              d_model=self.EMBEDDING_DIM, h=51, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=512, number_of_encoder_blocks=1,
                                               d_latent_vector=cfg.LATENT_VECTOR_SIZE 
                                               )
                 self.transformer_decoder = TransformerDecoder(
                                                vocab_size=cfg.TRANSFORMER_VOCAB_SIZE, 
-                                               d_model=self.EMBEDDING_DIM, h=12, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=2048, number_of_decoder_blocks=6
+                                               d_model=self.EMBEDDING_DIM, h=51, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=512, number_of_decoder_blocks=1
                                             , masking=False)
                 
         def encode(self,embeddings):

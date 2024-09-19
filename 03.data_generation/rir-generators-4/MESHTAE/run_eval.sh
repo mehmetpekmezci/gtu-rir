@@ -30,6 +30,7 @@ cd evaluate
 
 if [ ! -f $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.embedding_pickle_files_are_generated_for_$DATASET_NAME ]
 then
+     echo python3 embed_generator.py $MESH2IR_INPUT_DATA_DIR/RIR.pickle.dat $GENERATED_RIRS_DIR $DATASET_NAME $METADATA_DIR_NAME
      python3 embed_generator.py $MESH2IR_INPUT_DATA_DIR/RIR.pickle.dat $GENERATED_RIRS_DIR $DATASET_NAME $METADATA_DIR_NAME
      if [ $? = 0 ]
      then
@@ -59,6 +60,7 @@ cd $CURRENT_DIR
 
 if [ ! -f $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.rirs_are_generated_for_$DATASET_NAME ]
 then
+     echo python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME
      python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME
      if [ $? = 0 ]
      then

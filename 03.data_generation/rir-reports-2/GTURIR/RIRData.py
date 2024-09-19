@@ -107,7 +107,7 @@ class RIRData :
 
 
 
- def plotWav(self,real_data,generated_data,MSE,SSIM,glitch_points,MFCC_MSE,MFCC_SSIM,MFCC_CROSS_ENTROPY,title,show=False,saveToPath=None):
+ def plotWav(self,real_data,generated_data,MSE,SSIM,glitch_points,title,show=False,saveToPath=None):
      pt1=time.time() 
      plt.clf()
 
@@ -118,7 +118,7 @@ class RIRData :
         minValue=minValue2
 
      pt2=time.time() 
-     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}\nMFCC_MSE={float(MFCC_MSE):.4f}\nMFCC_SSIM={float(MFCC_SSIM):.4f}\nMFCC_CROSS_ENTROPY={float(MFCC_CROSS_ENTROPY):.4f}", style='italic',
+     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
         bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
 
         
@@ -334,7 +334,7 @@ class RIRData :
        if roomId != self.selected_room_id :
              continue
 
-       print(f"roomId={roomId}, self.selected_room_id={self.selected_room_id}")
+       print(f"roomId={roomId}")
 
        configId=dataline[int(self.rir_data_field_numbers['configId'])] 
        roomWorkDir=self.report_dir+"/"+roomId+"/"+configId
@@ -358,13 +358,12 @@ class RIRData :
          real_data=librosa.resample(self.rir_data[i][-1], orig_sr=44100, target_sr=sr) 
          real_data=real_data[:generated_data.shape[0]]
         
-         print("-----------------")
-         print("Non aligned data :")
-         print(f"np.max(generated_data)={np.max(generated_data)}")
-         print(f"np.max(real_data)={np.max(real_data)}")
-         print(f"np.min(generated_data)={np.min(generated_data)}")
-         print(f"np.min(real_data)={np.min(real_data)}")
-         print("-----------------")
+         #print("Non aligned data :")
+         #print(f"np.max(generated_data)={np.max(generated_data)}")
+         #print(f"np.max(real_data)={np.max(real_data)}")
+         #print(f"np.min(generated_data)={np.min(generated_data)}")
+         #print(f"np.min(real_data)={np.min(real_data)}")
+         #print("-----------------")
          
          generated_data,real_data=self.allignHorizontally(generated_data,real_data)         
          
@@ -384,31 +383,6 @@ class RIRData :
          t2=time.time() 
          print(f"DeltaT.MSE={t2-t1}")
          
-         t1=time.time() 
-         MFCC_CROSS_ENTROPY=TF.cross_entropy(torch.from_numpy(real_data), torch.from_numpy(generated_data)).item()
-         #MFCC_CROSS_ENTROPY=-np.sum(real_data * np.log(generated_data))
-         #MFCC_CROSS_ENTROPY=-np.sum(real_spectrogram * np.log(generated_spectrogram))
-         print(f"MFCC_CROSS_ENTROPY={MFCC_CROSS_ENTROPY}")
-         t2=time.time() 
-         print(f"DeltaT.MFCC_CROSS_ENTROPY={t2-t1}")
-         
-         t1=time.time() 
-         MFCC_MSE=np.square(np.subtract(real_spectrogram,generated_spectrogram)).mean()
-         t2=time.time() 
-         print(f"DeltaT.MFCC_MSE={t2-t1}")
-         
-         t1=time.time() 
-         generated_spectrogram=np.reshape(generated_spectrogram,(generated_spectrogram.shape[0],generated_spectrogram.shape[1],1))
-         real_spectrogram=np.reshape(real_spectrogram,(real_spectrogram.shape[0],real_spectrogram.shape[1],1))
-
-         generated_spectrogram=np.reshape(generated_spectrogram,(1,1,generated_spectrogram.shape[0],generated_spectrogram.shape[1]))
-         real_spectrogram=np.reshape(real_spectrogram,(1,1,real_spectrogram.shape[0],real_spectrogram.shape[1]))
-         print(f"np.max(generated_spectrogram)={np.max(generated_spectrogram)}")
-         print(f"np.max(real_spectrogram)={np.max(real_spectrogram)}")
-         MFCC_SSIM=ssim( torch.Tensor(generated_spectrogram), torch.Tensor(real_spectrogram), data_range=255, size_average=False).item()
-         #SSIM=tf.image.ssim(generated_spectrogram_tensor, real_spectrogram_tensor, max_val=max_val_tensor, filter_size=4,filter_sigma=1.5, k1=0.01, k2=0.03).numpy()
-         t2=time.time() 
-         print(f"DeltaT.MFCC_SSIM={t2-t1}")
          
          t1=time.time() 
          generated_data_tiled=np.tile(generated_data, (2, 1)) ## duplicate 1d data to 2d
@@ -420,13 +394,6 @@ class RIRData :
          generated_data_tensor=torch.from_numpy(generated_data_tiled)
          real_data_tensor=torch.from_numpy(real_data_tiled)
 
-         print(f"np.max(generated_data)={np.max(generated_data)}")
-         print(f"np.max(real_data)={np.max(real_data)}")
-
-         #print(f"generated_data.shape={generated_data.shape}")
-         #print(f"real_data.shape={real_data.shape}")
-
-         #/usr/local/lib/python3.8/dist-packages/pytorch_msssim/ssim.py
 
          # data_range  = np.max(real_data)-np.min(real_data) --> bunu bi 2 olarak set ediyoruz.
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,size_average=True).item()
@@ -447,7 +414,7 @@ class RIRData :
 
          ## plot only 1 of 10 samples.
          if True or i%10 == 0 :
-            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,MFCC_MSE,MFCC_SSIM,MFCC_CROSS_ENTROPY,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
+            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
          
          t1=time.time() 
          f = open(roomWorkDir+"/MSE.db.txt", "a")
@@ -455,15 +422,6 @@ class RIRData :
          f.close()
          f = open(roomWorkDir+"/SSIM.db.txt", "a")
          f.write(record_name+"="+str(SSIM)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_MSE.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_MSE)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_SSIM.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_SSIM)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_CROSS_ENTROPY.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_CROSS_ENTROPY)+"\n")
          f.close()
          f = open(roomWorkDir+"/GLITCH_COUNT.db.txt", "a")
          f.write(record_name+"="+str(len(glitch_points))+"\n")
@@ -530,27 +488,3 @@ class RIRData :
 
 
 
-
-
-         
-
-
-
-'''
-from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
-# X: (N,3,H,W) a batch of RGB images with values ranging from 0 to 255.
-# Y: (N,3,H,W)
-ssim_val = ssim( X, Y, data_range=255, size_average=False) # return (N,)
-ms_ssim_val = ms_ssim( X, Y, data_range=255, size_average=False ) #(N,)
-
-# or set 'size_average=True' to get a scalar value as loss.
-ssim_loss = ssim( X, Y, data_range=255, size_average=True) # return scalar value
-ms_ssim_loss = ms_ssim( X, Y, data_range=255, size_average=True )
-
-# you can also use MS_SSIM & SSIM classes to reuse windows.
-ssim_module = SSIM(win_size=11, win_sigma=1.5, data_range=255, size_average=True, channel=3)
-ms_ssim_module = MS_SSIM(win_size=11, win_sigma=1.5, data_range=255, size_average=True, channel=3)
-
-ssim_loss = ssim_module(X, Y)
-ms_ssim_loss = ms_ssim_module(X, Y)
-'''

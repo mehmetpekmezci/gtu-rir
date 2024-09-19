@@ -39,7 +39,7 @@ import traceback
 from model_mesh import MESH_TRANSFORMER_AE 
 
 class GANTrainer(object):
-    def __init__(self, output_dir,gae_mesh_net):
+    def __init__(self, output_dir):
 
 
         print(f"###################### GANTrainer : cfg.TRAIN.FLAG={cfg.TRAIN.FLAG}  ############################")
@@ -55,8 +55,6 @@ class GANTrainer(object):
             # self.summary_writer = FileWriter(self.log_dir)
         print(f"###################### GANTrainer : self.model_dir={self.model_dir}  ############################")
 
-        self.gae_mesh_net=gae_mesh_net
-        self.gae_mesh_net.eval()
         self.cfg=cfg
         self.max_epoch = cfg.TRAIN.MAX_EPOCH
         self.snapshot_interval = cfg.TRAIN.SNAPSHOT_INTERVAL
@@ -64,8 +62,8 @@ class GANTrainer(object):
         s_gpus = cfg.GPU_ID.split(',')
         self.gpus = [int(ix) for ix in s_gpus]
         self.num_gpus = len(self.gpus)
-        #self.batch_size = cfg.TRAIN.BATCH_SIZE * self.num_gpus
-        self.batch_size = cfg.TRAIN.BATCH_SIZE 
+        self.batch_size = cfg.TRAIN.BATCH_SIZE * self.num_gpus
+        #self.batch_size = cfg.TRAIN.BATCH_SIZE 
         torch.cuda.set_device(self.gpus[0])
         cudnn.benchmark = True
 
@@ -101,12 +99,6 @@ class GANTrainer(object):
             netD.load_state_dict(state_dict)
             print('Load NETD from: ', cfg.NET_D)
 
-        if cfg.PRE_TRAINED_MODELS_DIR!= '' and cfg.MESH_NET_GAE_FILE != '' and os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE):
-            state_dict = \
-                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE,
-                           map_location=lambda storage, loc: storage)
-            self.gae_mesh_net.load_state_dict(state_dict)
-            print('Load GAE MESH NET from: ', cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE)
             
         SOURCE_RECEIVER_XYZ_DIM=6    
         summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,cfg.LATENT_VECTOR_SIZE)] )
@@ -115,65 +107,18 @@ class GANTrainer(object):
         if cfg.CUDA:
             netG.cuda()
             netD.cuda()
-            #self.gae_mesh_net.cuda()
         return netG, netD
 
-    # # ############# For training stageII GAN  #############
-    # def load_network_stageII(self):
-    #     from model import STAGE1_G, STAGE2_G, STAGE2_D
-
-    #     Stage1_G = STAGE1_G()
-    #     netG = STAGE2_G(Stage1_G)
-    #     netG.apply(weights_init)
-    #     print(netG)
-    #     if cfg.NET_G != '':
-    #         state_dict = \
-    #             torch.load(cfg.NET_G,
-    #                        map_location=lambda storage, loc: storage)
-    #         netG.load_state_dict(state_dict)
-    #         print('Load from: ', cfg.NET_G)
-    #     elif cfg.STAGE1_G != '':
-    #         state_dict = \
-    #             torch.load(cfg.STAGE1_G,
-    #                        map_location=lambda storage, loc: storage)
-    #         netG.STAGE1_G.load_state_dict(state_dict)
-    #         print('Load from: ', cfg.STAGE1_G)
-    #     else:
-    #         print("Please give the Stage1_G path")
-    #         return
-
-    #     netD = STAGE2_D()
-    #     netD.apply(weights_init)
-    #     if cfg.NET_D != '':
-    #         state_dict = \
-    #             torch.load(cfg.NET_D,
-    #                        map_location=lambda storage, loc: storage)
-    #         netD.load_state_dict(state_dict)
-    #         print('Load from: ', cfg.NET_D)
-    #     print(netD)
-
-    #     if cfg.CUDA:
-    #         netG.cuda()
-    #         netD.cuda()
-    #     return netG, netD
 
     def train(self, data_loader, stage=1):
-
-        self.gae_mesh_net.eval()
         if stage == 1:
             netG, netD = self.load_network_stageI()
         # else:
         #     netG, netD = self.load_network_stageII()
         
         netG.to(device='cuda')
-        self.gae_mesh_net.to(device='cuda:1')
-        #self.gae_mesh_net.cpu()
-        # nz = cfg.Z_DIM
         batch_size = self.batch_size
-        # noise = Variable(torch.FloatTensor(batch_size, nz))
-        # fixed_noise = \
-        #     Variable(torch.FloatTensor(batch_size, nz).normal_(0, 1),
-        #              volatile=True)
+
         real_labels = Variable(torch.FloatTensor(batch_size).fill_(1))
         fake_labels = Variable(torch.FloatTensor(batch_size).fill_(0))
         if cfg.CUDA:
@@ -216,13 +161,13 @@ class GANTrainer(object):
         for epoch in range(self.max_epoch):
             start_t = time.time()
             t1=start_t
-            if epoch % lr_decay_step == 0 and epoch > 0:
-                generator_lr *= 0.85#0.5
-                for param_group in optimizerG.param_groups:
-                    param_group['lr'] = generator_lr
-                discriminator_lr *= 0.85#0.5
-                for param_group in optimizerD.param_groups:
-                    param_group['lr'] = discriminator_lr
+#            if epoch % lr_decay_step == 0 and epoch > 0:
+#                generator_lr *= 0.85#0.5
+#                for param_group in optimizerG.param_groups:
+#                    param_group['lr'] = generator_lr
+#                discriminator_lr *= 0.85#0.5
+#                for param_group in optimizerD.param_groups:
+#                    param_group['lr'] = discriminator_lr
 
             
             # b1=0
@@ -232,8 +177,9 @@ class GANTrainer(object):
               errD_total=0
               errG_total=0              
               try: 
-                if  len(data) < self.batch_size :
-#                    print("len(data)",len(data))
+                if  len(data['RIR']) < self.batch_size :
+                    print("len(data['RIR']):",len(data))
+                    print("self.batch_size:",self.batch_size)
                     continue
                     ## MP : because we depend on batch_size in CustomInnerProductDecoder in model.py
 
@@ -245,58 +191,29 @@ class GANTrainer(object):
                 # print("Time 1   ",(b1-b3))
                
                 
-                
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
                 txt_embedding = torch.from_numpy(np.array(data['embeddings']))
+                mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings']))
                 
                 #data.pop('RIR')
                 #data.pop('embeddings')
                 
                 real_RIRs = Variable(real_RIR_cpu)
                 txt_embedding = Variable(txt_embedding)
-
-                #data['edge_index'] = Variable(data['edge_index']).long()
-                #data['pos'] = Variable(data['pos']).float()
-
-
-
-
-                triangle_coordinates=Variable(data['triangle_coordinates']).float()
-                normals=Variable(data['normals']).float()
-                centers=Variable(data['centers']).float()
-                areas=Variable(data['areas']).float()
-                #print(f"triangle_coordinates.shape = {triangle_coordinates.shape} normals.shape={normals.shape} centers.shape={centers.shape} areas.shape={areas.shape} ")
-                faceDataDim=triangle_coordinates.shape[2]+centers.shape[2]+normals.shape[2]+areas.shape[2]
-                faceData=torch.cat((triangle_coordinates,normals,centers,areas),2)
-
+                mesh_embed = Variable(mesh_embed)
 
                 
                 if cfg.CUDA:
                     real_RIRs = real_RIRs.cuda()
                     txt_embedding = txt_embedding.cuda()
-                    #faceData=faceData.to(device='cuda:1')
-                    #edge_weights = edge_weights.cuda()
-                    #data = data.cuda()
+                    mesh_embed = mesh_embed.cuda()
                 
                 #######################################################
                 # (2) Generate fake images (have to modify)
                 ######################################################
                 
-                mesh_embeds=[]
-                #while gae_mesh_net_batch_count<cfg.TRAIN.BATCH_SIZE*self.num_gpus :
-                for batchno in range(cfg.TRAIN.BATCH_SIZE): 
-                    faceData_1_batch=faceData[batchno].unsqueeze(0).detach().to(device='cuda:1')
-                    #print(f"faceData_1_batch.shape={faceData_1_batch.shape}")
-                    faceData_1_batch_predicted , latent_vector_1_batch =  self.gae_mesh_net(faceData_1_batch)
-                    mesh_embeds.append(latent_vector_1_batch.detach().cpu())
-                
-                mesh_embed=torch.vstack(mesh_embeds)      
-                
 #                print(txt_embedding.shape)#torch.Size([2, 6])
 #                print(mesh_embed.shape)#torch.Size([4226, 8])
-
-                if cfg.CUDA:
-                    mesh_embed = mesh_embed.cuda()
 
                 inputs = (txt_embedding,mesh_embed)
                 
@@ -367,26 +284,6 @@ class GANTrainer(object):
                     # _, fake_RIRs, mu, logvar = \
                     #     nn.parallel.data_parallel(netG, inputs, self.gpus)
 
-                    #mesh_embed = self.gae_mesh_net.encode(data['pos'], data['edge_index'],data['edge_weights'], data.batch)
-                    #mesh_embed = self.gae_mesh_net.encode(data['pos_dense'], data['edge_index_dense']).squeeze()
-                    mesh_embeds=[]
-                    #while gae_mesh_net_batch_count<cfg.TRAIN.BATCH_SIZE*self.num_gpus :
-                    for batchno in range(cfg.TRAIN.BATCH_SIZE): 
-                        faceData_1_batch=faceData[batchno].unsqueeze(0).detach().to(device='cuda:1')    
-    #                    print(f"faceData_1_batch.shape={faceData_1_batch.shape}")
-                        faceData_1_batch_predicted , latent_vector_1_batch =  self.gae_mesh_net(faceData_1_batch)
-                        mesh_embeds.append(latent_vector_1_batch.detach().cpu())
-                
-                    mesh_embed=torch.vstack(mesh_embeds)      
-                
-    #                print(txt_embedding.shape)#torch.Size([2, 6])
-    #                print(mesh_embed.shape)#torch.Size([4226, 8])
-
-                    if cfg.CUDA:
-                        mesh_embed = mesh_embed.cuda()
-
-                    inputs = (txt_embedding,mesh_embed)
-
                     _, fake_RIRs,c_code = nn.parallel.data_parallel(netG, inputs, self.gpus)
                     netG.zero_grad()
                     errG,L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5,MSE_error1,MSE_error2,criterion_loss  = compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs,
@@ -397,7 +294,8 @@ class GANTrainer(object):
                     errG_total.backward()
                     optimizerG.step()
                     ## NORMALDE BURADA BIR DE MESHNET OPTIMIZER (optimizerM) vardi , ama onu  sentetik verilerle egittik, onun icin MESHNET i egitmiyoruz.
-                    # errG_total.backward()
+                    # errM_total.backward()
+
 
 
                 count = count + 1
@@ -406,17 +304,19 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, netD, epoch, self.model_dir)
 
-                if i % 10000 == 0:
-                    print("decreasing lr by 0.85")
-                    generator_lr *= 0.85#0.5
+                if generator_lr > 0.00000005 and i>0 and ( i==1000 or  i==10000 or i%20000 == 0) :
+                    rate=0.5
+                    print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
+                    generator_lr *= rate
                     for param_group in optimizerG.param_groups:
                         param_group['lr'] = generator_lr
-                    discriminator_lr *= 0.85#0.5
+                    discriminator_lr *= rate
                     for param_group in optimizerD.param_groups:
                         param_group['lr'] = discriminator_lr
+                    print(f"new generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
 
                 
-                if i % 50 == 0:
+                if i % 10 == 0:
                     t2 = time.time()
                     print('''[%d/%d][%d/%d] Loss_D: %.4f Loss_G: %.4f
                      Loss_real: %.4f Loss_wrong:%.4f Loss_fake %.4f   L1_error  %.4f 

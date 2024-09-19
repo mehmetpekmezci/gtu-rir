@@ -33,6 +33,7 @@ metadata_dirname=str(sys.argv[4]).strip()
 metadata_dir = main_dir+"/"+metadata_dirname
 mesh2ir_embeddings_dir=metadata_dir+"/Embeddings"
 
+print(f"Loading pickle file : {rir_data_file_path}")
 rir_data=[] 
 if  os.path.exists( rir_data_file_path) :
          rir_data_file=open(rir_data_file_path,'rb')
@@ -43,6 +44,7 @@ else :
          exit(1)
 
 
+print(f"Generating embeddings for rir_data od length {len(rir_data)}")
 total_number_of_records=0
 mesh2irInputData={}
 for dataline in rir_data:

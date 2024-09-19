@@ -96,14 +96,15 @@ class GAETrainer(object):
             print('Load from: ', cfg.MESH_NET)
 
         #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,16).cuda()
-        faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE).cuda()
-        mesh_net=mesh_net.cuda()
+        #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE).cuda()
+        faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE)
         summary(mesh_net,input_data=[faces_summary] )
 
         return mesh_net
 
 
     def train(self, data_loader, stage=1):
+        self.mesh_net=self.mesh_net.cuda()
         MAX_DIM=cfg.MAX_DIM
         self.mesh_net.to(device='cuda')
         mesh_lr = cfg.TRAIN.MESH_LR
@@ -121,17 +122,18 @@ class GAETrainer(object):
 
             start_t = time.time()
             t1=start_t
-            if epoch % lr_decay_step == 0 and epoch > 0:
-                mesh_lr *= 0.5#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
-                for param_group in optimizerM.param_groups:
-                    param_group['lr'] = mesh_lr
-            
+#            if epoch % lr_decay_step == 0 and epoch > 0:
+#                mesh_lr *= 0.5#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
+#                for param_group in optimizerM.param_groups:
+#                    param_group['lr'] = mesh_lr
+#            
 
             for i, data in enumerate(data_loader, 0):
                
                # optimizerM.zero_grad() https://discuss.pytorch.org/t/model-zero-grad-or-optimizer-zero-grad/28426/7
                self.mesh_net.zero_grad()   
                (triangle_coordinates,normals,centers,areas, full_mesh_path)=data
+               #print(f"full_mesh_path[0]={full_mesh_path[0]}")
                triangle_coordinates=Variable(triangle_coordinates).float()
                normals=Variable(normals).float()
                centers=Variable(centers).float()
@@ -166,15 +168,19 @@ class GAETrainer(object):
                if i % 10 == 0 :
                   end_t = time.time()
                   print('''[%d/%d][%d/%d] loss: %.8f Total Time: %.8fsec'''% (epoch, self.max_epoch, i, len(data_loader),loss,(end_t - start_t)),flush=True)
-               if i>0 and i % 10000 == 0:
+               if i>0 and (i==100 or i==500 or i==1000 or i % 10000 == 0):
                     save_mesh_model(self.mesh_net, epoch, self.model_dir)
                     print(f"saved_model : {i}")
-                    mesh_lr *= 0.9#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
-                    for param_group in optimizerM.param_groups:
+                    if mesh_lr > 0.00000001:
+                     mesh_lr *= 0.5#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
+                     for param_group in optimizerM.param_groups:
+                        print(param_group['lr'])
                         param_group['lr'] = mesh_lr
+                        print(param_group['lr'])
                if  (epoch>0 and epoch%10 == 0 and i==0) or (i>0 and i % 10000 == 0) :
 #                 try :
                     path=full_mesh_path[0]
+                    print(f"Generating example mesh STARTED : {path}.face.regenerated.1.obj")
                     faceData_pred=faceData_predicted[0].cpu().detach().numpy()
                     faceData_pred=faceData_pred.reshape(cfg.MAX_FACE_COUNT,faceDataDim)
                     triangle_coordinates=faceData_pred[:,0:9]
@@ -184,6 +190,7 @@ class GAETrainer(object):
                     areas=abs(areas.squeeze()+0.000001)
                     triangle_coordinates,normals,centers,areas=denormalize_mesh_values(triangle_coordinates,normals,centers,areas)
                     save_face_normal_center_area_as_obj(normals,centers,areas,path+".face.regenerated.1.obj")
+                    print(f"Generating example mesh ENDED: {path}.face.regenerated.1.obj")
 #                 except:   
 
                   

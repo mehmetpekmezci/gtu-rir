@@ -108,7 +108,7 @@ class RIRData :
 
 
 
- def plotWav(self,real_data,generated_data,MSE,SSIM,glitch_points,MFCC_MSE,MFCC_SSIM,MFCC_CROSS_ENTROPY,title,show=False,saveToPath=None):
+ def plotWav(self,real_data,generated_data,MSE,SSIM,glitch_points,title,show=False,saveToPath=None):
      pt1=time.time() 
      plt.clf()
 
@@ -120,7 +120,7 @@ class RIRData :
 
      pt2=time.time() 
      print(f"pt2-pt1={pt2-pt1}")
-     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}\nMFCC_MSE={float(MFCC_MSE):.4f}\nMFCC_SSIM={float(MFCC_SSIM):.4f}\nMFCC_CROSS_ENTROPY={float(MFCC_CROSS_ENTROPY):.4f}", style='italic',
+     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}", style='italic',
         bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
 
         
@@ -353,25 +353,11 @@ class RIRData :
         
        try:
          
-         print("-----------------")
          print(roomWorkDir+"/"+wave_name)
-         print("generated_data::::::")
          generated_data,rate=librosa.load(roomWorkDir+"/"+wave_name,sr=sr,mono=True)
-
-         print("generated_data1")
-         print(generated_data)
-         print("generated_data2")
          generated_data=generated_data[0:3500] 
-         print("generated_data3")
          real_data=librosa.resample(self.rir_data[i][-1], orig_sr=44100, target_sr=sr) 
-         print("generated_data4")
          real_data=real_data[:generated_data.shape[0]]
-         print("Non aligned data :")
-         print(f"np.max(generated_data)={np.max(generated_data)}")
-         print(f"np.max(real_data)={np.max(real_data)}")
-         print(f"np.min(generated_data)={np.min(generated_data)}")
-         print(f"np.min(real_data)={np.min(real_data)}")
-         print("-----------------")
   
          generated_data,real_data=self.allignHorizontally(generated_data,real_data)         
          
@@ -392,32 +378,6 @@ class RIRData :
          print(f"DeltaT.MSE={t2-t1}")
          
          t1=time.time() 
-         MFCC_CROSS_ENTROPY=TF.cross_entropy(torch.from_numpy(real_data), torch.from_numpy(generated_data)).item()
-         #MFCC_CROSS_ENTROPY=-np.sum(real_data * np.log(generated_data))
-         #MFCC_CROSS_ENTROPY=-np.sum(real_spectrogram * np.log(generated_spectrogram))
-         print(f"MFCC_CROSS_ENTROPY={MFCC_CROSS_ENTROPY}")
-         t2=time.time() 
-         print(f"DeltaT.MFCC_CROSS_ENTROPY={t2-t1}")
-         
-         t1=time.time() 
-         MFCC_MSE=np.square(np.subtract(real_spectrogram,generated_spectrogram)).mean()
-         t2=time.time() 
-         print(f"DeltaT.MFCC_MSE={t2-t1}")
-         
-         t1=time.time() 
-         generated_spectrogram=np.reshape(generated_spectrogram,(generated_spectrogram.shape[0],generated_spectrogram.shape[1],1))
-         real_spectrogram=np.reshape(real_spectrogram,(real_spectrogram.shape[0],real_spectrogram.shape[1],1))
-
-         generated_spectrogram=np.reshape(generated_spectrogram,(1,1,generated_spectrogram.shape[0],generated_spectrogram.shape[1]))
-         real_spectrogram=np.reshape(real_spectrogram,(1,1,real_spectrogram.shape[0],real_spectrogram.shape[1]))
-         print(f"np.max(generated_spectrogram)={np.max(generated_spectrogram)}")
-         print(f"np.max(real_spectrogram)={np.max(real_spectrogram)}")
-         MFCC_SSIM=ssim( torch.Tensor(generated_spectrogram), torch.Tensor(real_spectrogram), data_range=255, size_average=True).item()
-         #SSIM=tf.image.ssim(generated_spectrogram_tensor, real_spectrogram_tensor, max_val=max_val_tensor, filter_size=4,filter_sigma=1.5, k1=0.01, k2=0.03).numpy()
-         t2=time.time() 
-         print(f"DeltaT.MFCC_SSIM={t2-t1}")
-         
-         t1=time.time() 
          generated_data_tiled=np.tile(generated_data, (3, 1)) ## duplicate 1d data to 2d
          real_data_tiled=np.tile(real_data, (3, 1)) ## duplicate 1d data to 2d
 
@@ -427,16 +387,9 @@ class RIRData :
          generated_data_tensor=torch.from_numpy(generated_data_tiled)
          real_data_tensor=torch.from_numpy(real_data_tiled)
 
-         print(f"np.max(generated_data)={np.max(generated_data)}")
-         print(f"np.max(real_data)={np.max(real_data)}")
-         print(f"np.min(generated_data)={np.min(generated_data)}")
-         print(f"np.min(real_data)={np.min(real_data)}")
-         #/usr/local/lib/python3.8/dist-packages/pytorch_msssim/ssim.py
-         # data_range  = np.max(real_data)-np.min(real_data) --> bunu  2 olarak set ediyoruz.
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,K=(0.01, 0.03),size_average=True).item()
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,K=(0.01, 0.5),size_average=True).item()
          SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=4.0,size_average=True).item()
-         print(f"SSIM={SSIM}")
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=255, size_average=True).item()
          #SSIM=tf.image.ssim(generated_spectrogram_tensor, real_spectrogram_tensor, max_val=max_val_tensor, filter_size=4,filter_sigma=1.5, k1=0.01, k2=0.03).numpy()
          t2=time.time() 
@@ -452,7 +405,7 @@ class RIRData :
 
          ## plot only 1 of 10 samples.
          if True or i%10 == 0 :
-            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,MFCC_MSE,MFCC_SSIM,MFCC_CROSS_ENTROPY,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
+            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
          
          t1=time.time() 
          f = open(roomWorkDir+"/MSE.db.txt", "a")
@@ -460,15 +413,6 @@ class RIRData :
          f.close()
          f = open(roomWorkDir+"/SSIM.db.txt", "a")
          f.write(record_name+"="+str(SSIM)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_MSE.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_MSE)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_SSIM.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_SSIM)+"\n")
-         f.close()
-         f = open(roomWorkDir+"/MFCC_CROSS_ENTROPY.db.txt", "a")
-         f.write(record_name+"="+str(MFCC_CROSS_ENTROPY)+"\n")
          f.close()
          f = open(roomWorkDir+"/GLITCH_COUNT.db.txt", "a")
          f.write(record_name+"="+str(len(glitch_points))+"\n")

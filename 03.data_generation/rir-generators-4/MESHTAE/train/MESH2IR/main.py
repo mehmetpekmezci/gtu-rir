@@ -17,7 +17,7 @@ import dateutil.tz
 dir_path = (os.path.abspath(os.path.join(os.path.realpath(__file__), './.')))
 sys.path.append(dir_path)
 
-from miscc.datasets import TextDataset,MeshDataset
+from miscc.datasets import TextDataset,MeshDataset,build_mesh_embeddings
 from miscc.config import cfg, cfg_from_file
 from miscc.utils import mkdir_p
 from trainer import GANTrainer
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
         mesh_dataset = MeshDataset(cfg.SYNTHETIC_GEOMETRIC_DATA_DIR, synthetic_geometric_embeddings) #,augment=["scale","deformation"])      
         assert mesh_dataset
-        mesh_only_train_data_loader=DataLoader(mesh_dataset, batch_size=cfg.TRAIN.GAE_BATCH_SIZE * num_gpu, num_workers=int(cfg.WORKERS),)
+        mesh_only_train_data_loader=DataLoader(mesh_dataset, batch_size=cfg.TRAIN.GAE_BATCH_SIZE * num_gpu, num_workers=int(cfg.WORKERS),shuffle=True)
         gaeTrainer = GAETrainer(output_dir)
 
         if not os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+"/"+cfg.MESH_NET_GAE_FILE):
@@ -89,12 +89,22 @@ if __name__ == "__main__":
         else :
            print("There exists a pre-trained GAE MESH NET model, GANTrainer will load it ......")
 
-        rir_dataset = TextDataset(cfg.DATA_DIR, embeddings, rirsize=cfg.RIRSIZE)
-        assert rir_dataset
-        rir_and_mesh_train_data_loader=DataLoader(rir_dataset, batch_size=cfg.TRAIN.BATCH_SIZE * num_gpu,num_workers=int(cfg.WORKERS),) #shuffle=True
+        if not os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+"/"+cfg.GWA_MESH_EMBEDDINGS_FILE):
+           print("MESH EMBEDDINGS FILE  DOES NOT EXISTS SO STARTING TO GENERATE ......")
+           mesh_embeddings = build_mesh_embeddings(cfg.DATA_DIR,embeddings)
+           print("FINISHED MESH EMBEDDINGS FILE  ......")
+        else :
+           print("There exists a mesh embeddings file, we load it ......")
+           mesh_embeddings = load_embedding(cfg.PRE_TRAINED_MODELS_DIR,cfg.GWA_MESH_EMBEDDINGS_FILE)
 
-        algo = GANTrainer(output_dir,gaeTrainer.mesh_net)
-        algo.train(rir_and_mesh_train_data_loader,cfg.STAGE)
+        rir_dataset = TextDataset(cfg.DATA_DIR, embeddings,mesh_embeddings, rirsize=cfg.RIRSIZE)
+        assert rir_dataset
+        print(f"batch_size of rir dataloaader : {cfg.TRAIN.BATCH_SIZE * num_gpu}")
+        rir_and_mesh_train_data_loader=DataLoader(rir_dataset, batch_size=cfg.TRAIN.BATCH_SIZE * num_gpu,num_workers=int(cfg.WORKERS),shuffle=True,drop_last=True)
+        print(f"len(rir_and_mesh_train_data_loader): {len(rir_and_mesh_train_data_loader)}")
+       
+        algo = GANTrainer(output_dir)
+        algo.train(rir_and_mesh_train_data_loader,stage=cfg.STAGE)
     # else:
     #     file_path = cfg.EVAL_DIR
     #     algo = GANTrainer(output_dir)

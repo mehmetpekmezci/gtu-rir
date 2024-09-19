@@ -223,7 +223,6 @@ class STAGE1_G(nn.Module):
             nn.Tanh())
 
     def forward(self, text_embedding,mesh_embed):
-
         full_embed= torch.cat((mesh_embed, text_embedding), 1)
         c_code = self.cond_net(full_embed)
 

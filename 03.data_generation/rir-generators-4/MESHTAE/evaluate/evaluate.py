@@ -36,7 +36,7 @@ import dateutil.tz
 import librosa
 
 from miscc.config import cfg, cfg_from_file
-from miscc.datasets import load_mesh, normalize_mesh_values
+from miscc.datasets import load_mesh, normalize_mesh_values, build_mesh_embeddings_for_evaluation_data
 
 
 generated_rirs_dir=str(sys.argv[1]).strip()
@@ -58,15 +58,13 @@ def weights_init(m):
         if m.bias is not None:
             m.bias.data.fill_(0.0)
 
-def load_network_stageI(netG_path,mesh_net_path,batch_size):
+def load_network_stageI(netG_path):
         from model import STAGE1_G, STAGE1_D
-        from model_mesh import MESH_TRANSFORMER_AE
         netG = STAGE1_G()
         netG.apply(weights_init)
 
         print(netG)
        
-        mesh_net = MESH_TRANSFORMER_AE()
 
 
 
@@ -77,34 +75,9 @@ def load_network_stageI(netG_path,mesh_net_path,batch_size):
             netG.load_state_dict(state_dict)
             print('Load from: ', netG_path)
        
-        if mesh_net_path != '':
-            state_dict = \
-                torch.load(mesh_net_path,
-                           map_location=lambda storage, loc: storage)
-            mesh_net.load_state_dict(state_dict)
-            print('Load from: ', mesh_net_path)
+        netG.to(device='cuda:2')
+        return netG
 
-
-        
-        #netG.cuda()
-        #mesh_net.cuda()
-        return netG, mesh_net
-
-def get_mesh(full_mesh_path):
-        
-        tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
-        
-        mesh={}
-        
-        tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
-        mesh={}
-        mesh["triangle_coordinates"]=tirangle_coordinates
-        mesh["normals"]=normals
-        mesh["centers"]=centers
-        mesh["areas"]=areas
-   
-        
-        return mesh
 
 def load_embedding(data_dir):
     # embedding_filename   = '/embeddings.pickle'  
@@ -115,6 +88,7 @@ def load_embedding(data_dir):
 
 def evaluate():
     print(f"metadata_dir={metadata_dir}") 
+    mesh_embeddings={}
 
     SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
     
@@ -141,17 +115,34 @@ def evaluate():
     if(not os.path.exists(output_directory)):
         os.mkdir(output_directory)
 
-    netG, mesh_net = load_network_stageI(netG_path,mesh_net_path,batch_size)
+    netG = load_network_stageI(netG_path)
     netG.eval()
-    mesh_net.eval()
 
 
     #netG.to(device='cuda')
     #mesh_net.to(device='cuda')
-
+ 
     embedding_list = os.listdir(embedding_directory)
+
+    if not os.path.exists(embedding_directory+"/"+metadata_dirname+".mesh_embeddings.pickle"):
+           obj_file_name_list=[]
+           for embed in embedding_list:
+              embed_path = embedding_directory + "/"+embed
+              embeddings = load_embedding(embed_path)
+              mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
+              if mesh_obj not in obj_file_name_list :
+                  obj_file_name_list.append(mesh_obj)
+
+           print(f"MESH EMBEDDINGS FILE  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle DOES NOT EXISTS SO STARTING TO GENERATE ......")
+           build_mesh_embeddings_for_evaluation_data(mesh_net_path,mesh_directory,embedding_directory,metadata_dirname,obj_file_name_list)
+           print("FINISHED MESH EMBEDDINGS FILE  ......")
     
+    print(f"load  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle")
+    mesh_embeddings = load_embedding(embedding_directory+'/'+metadata_dirname+".mesh_embeddings.pickle")
+
+
     for embed in embedding_list:
+      if not "mesh_embeddings" in embed:
         embed_path = embedding_directory + "/"+embed
         embeddings = load_embedding(embed_path)
         embed_name = embed[0:len(embed)-7]
@@ -163,23 +154,8 @@ def evaluate():
 
         mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
 
-        data=get_mesh(mesh_directory+"/"+mesh_obj)
-        triangle_coordinates=Variable(torch.from_numpy(data['triangle_coordinates'])).float()
-        normals=Variable(torch.from_numpy(data['normals'])).float()
-        centers=Variable(torch.from_numpy(data['centers'])).float()
-        areas=Variable(torch.from_numpy(data['areas'])).float()
-        #print(f"triangle_coordinates.shape = {triangle_coordinates.shape} normals.shape={normals.shape} centers.shape={centers.shape} areas.shape={areas.shape} ")
-        faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+        mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
 
-        faceData=torch.cat((triangle_coordinates,normals,centers,areas),1).unsqueeze(0).detach()
-
-        faceData_predicted , latent_vector =  mesh_net(faceData)
-        mesh_embed=latent_vector            
-
-                       
-
-
-    
         embed_sets = len(embeddings) /batch_size
         embed_sets = int(embed_sets)
 
@@ -198,8 +174,8 @@ def evaluate():
                 wave_name_list.append(wave_name)
 
             txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
-            txt_embedding = Variable(txt_embedding)
-            print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
+            txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
+            #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
             lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
 
             for i in range(len(fake)):
