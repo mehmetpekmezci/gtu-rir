@@ -340,7 +340,7 @@ class RIRData :
 
          # data_range  = np.max(real_data)-np.min(real_data) --> bunu bi 2 olarak set ediyoruz.
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,size_average=True).item()
-         SSIM=ssim(generated_data_tensor,real_data_tensor,data_range=4.0,size_average=True).item()
+         SSIM=ssim(generated_data_tensor.float(),real_data_tensor.float(),data_range=4.0,size_average=True).item()
          
          glitch_points=self.getGlitchPoints(generated_data,real_data)
 

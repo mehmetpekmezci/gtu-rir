@@ -366,7 +366,7 @@ class RIRData :
 
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,K=(0.01, 0.03),size_average=True).item()
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,K=(0.01, 0.5),size_average=True).item()
-         SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=4.0,size_average=True).item()
+         SSIM=ssim(generated_data_tensor.float(),real_data_tensor.float(), data_range=4.0,size_average=True).item()
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=255, size_average=True).item()
          
          glitch_points=self.getGlitchPoints(generated_data,real_data)

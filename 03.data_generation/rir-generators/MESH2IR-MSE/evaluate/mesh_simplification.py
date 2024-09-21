@@ -13,8 +13,8 @@ metadata_dir = main_dir+"/"+metadata_dirname
 path = metadata_dir+"/Meshes"
 move_path = metadata_dir+"/Simplified_Meshes"
 
-
-os.mkdir(move_path)
+if not os.path.exists(move_path):
+   os.mkdir(move_path)
 
 # path ="/scratch/anton/template"
 # move_path = "/scratch/anton/template_60000"
