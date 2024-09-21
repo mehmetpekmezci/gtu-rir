@@ -119,7 +119,6 @@ class RIRData :
         minValue=minValue2
 
      pt2=time.time() 
-     print(f"pt2-pt1={pt2-pt1}")
      plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}", style='italic',
         bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
 
@@ -130,19 +129,15 @@ class RIRData :
      #    fontsize=20)   
         
      pt3=time.time() 
-     print(f"pt3-pt2={pt3-pt2}")
      plt.plot(real_data,color='#101010', label='real_data')
      pt4=time.time() 
-     print(f"pt4-pt3={pt4-pt3}")
      plt.plot(generated_data,color='#909090', label='generated_data')
      plt.title(title)
      pt5=time.time() 
-     print(f"pt5-pt4={pt5-pt4}")
      plt.xlabel('Time')
      plt.ylabel('Amlpitude')
      plt.legend(loc = "upper right")
      pt6=time.time() 
-     print(f"pt6-pt5={pt6-pt5}")
     
      x=glitch_points
      y=generated_data[x]
@@ -203,7 +198,6 @@ class RIRData :
          #data=np.reshape(data,(1,1,data.shape[0]))
          
          
-         #print(data.shape)
 
          
          mfccs= mfcc_transform_fn( torch.Tensor(data) ).numpy()
@@ -211,7 +205,6 @@ class RIRData :
             self.plotSpectrogram(title,mfccs,sample_rate,saveToPath=saveToPath)
 
          t2=time.time() 
-         print(f"DeltaT.getSpectrogramMfcc={t2-t1}")
 
          return mfccs
  
@@ -230,8 +223,6 @@ class RIRData :
          max_point_index_within_first_1000_points_real_data=self.getLocalArgMax(1000,real_data) #np.argmax(real_data[0:1000])
          max_point_index_within_first_1000_points_generated_data=self.getLocalArgMax(1000,generated_data)#np.argmax(generated_data[0:1000])
 
-         #print("max_point_index_within_first_1000_points_real_data"+str(max_point_index_within_first_1000_points_real_data))
-         #print("max_point_index_within_first_1000_points_generated_data"+str(max_point_index_within_first_1000_points_generated_data))
 
          diff=int(abs(max_point_index_within_first_1000_points_real_data-max_point_index_within_first_1000_points_generated_data)/2)
 
@@ -256,8 +247,6 @@ class RIRData :
                  real_data=new_real_data
 
          
-         #print("0.MAX ALLIGNMENT : np.argmax(real_data[0:1000]):"+str(self.getLocalArgMax(1000,real_data)))
-         #print("0.MAX ALLIGNMENT : np.argmax(generated_data[0:1000]):"+str(self.getLocalArgMax(1000,generated_data)))
 
          localArgMaxReal=self.getLocalArgMax(1000,real_data)
          localArgMaxGenerted=self.getLocalArgMax(1000,generated_data)
@@ -275,13 +264,9 @@ class RIRData :
 
                   
          t2=time.time() 
-         print(f"DeltaT.allignHorizontally={t2-t1}")
-         print("1.MAX ALLIGNMENT : np.argmax(real_data[0:1000]):"+str(self.getLocalArgMax(1000,real_data)))
-         print("1.MAX ALLIGNMENT : np.argmax(generated_data[0:1000]):"+str(self.getLocalArgMax(1000,generated_data)))
 
          #real_data1=librosa.resample(self.rir_data[i][-1], orig_sr=44100, target_sr=sr)
          #real_data1=real_data1[:generated_data.shape[0]]
-         #print("1.MAX ALLIGNMENT : np.argmax(real_data1[0:1000]):"+str(self.getLocalArgMax(1000,real_data1)))
          # test edildi problem yok :)
          return generated_data,real_data
  
@@ -290,8 +275,6 @@ class RIRData :
          
  def diffBetweenGeneratedAndRealRIRData(self):
 
-     t0=time.time() 
-     print("diffBetweenGeneratedAndRealRIRData is started at : "+str(t0))
 
      if  os.path.exists( self.report_dir+"/."+self.selected_room_id+".wavesAndSpectrogramsGenerated") :
         print("wavesAndSpectrograms already generated for "+self.selected_room_id)
@@ -325,7 +308,9 @@ class RIRData :
      # (MFCC-MSE + MFCC-SSIM) -- no need.
 
      print("len(self.rir_data):{len(self.rir_data)}")
+     print(f"self.selected_room_id={self.selected_room_id}")
 
+     NOT_EXISTING_WAV_FILE_COUNT=0
      for i in range(len(self.rir_data)):
        t1=time.time() 
        dataline=self.rir_data[i] 
@@ -334,7 +319,6 @@ class RIRData :
        if roomId != self.selected_room_id :
              continue
 
-       print(f"roomId={roomId}, self.selected_room_id={self.selected_room_id}")
 
        configId=dataline[int(self.rir_data_field_numbers['configId'])] 
        roomWorkDir=self.report_dir+"/"+roomId+"/"+configId
@@ -349,11 +333,12 @@ class RIRData :
          
        wave_name=record_name+".wav"
           
-       #print(roomWorkDir+"/"+wave_name+" filename="+essFilePath+"  rir_data rt60 : "+rt60)
-        
+       if not os.path.exists( roomWorkDir+"/"+wave_name ):
+           NOT_EXISTING_WAV_FILE_COUNT+=1
+           continue
+ 
        try:
          
-         print(roomWorkDir+"/"+wave_name)
          generated_data,rate=librosa.load(roomWorkDir+"/"+wave_name,sr=sr,mono=True)
          generated_data=generated_data[0:3500] 
          real_data=librosa.resample(self.rir_data[i][-1], orig_sr=44100, target_sr=sr) 
@@ -368,16 +353,8 @@ class RIRData :
 
          generated_data,real_data=self.allignVertically(generated_data,real_data)         
          
-         generated_spectrogram=self.getSpectrogram(generated_data)
-         
-         real_spectrogram=self.getSpectrogram(real_data)
-
-         t1=time.time() 
          MSE=np.square(np.subtract(real_data,generated_data)).mean()
-         t2=time.time() 
-         print(f"DeltaT.MSE={t2-t1}")
          
-         t1=time.time() 
          generated_data_tiled=np.tile(generated_data, (3, 1)) ## duplicate 1d data to 2d
          real_data_tiled=np.tile(real_data, (3, 1)) ## duplicate 1d data to 2d
 
@@ -391,9 +368,6 @@ class RIRData :
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=2.0,K=(0.01, 0.5),size_average=True).item()
          SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=4.0,size_average=True).item()
          #SSIM=ssim(generated_data_tensor,real_data_tensor, data_range=255, size_average=True).item()
-         #SSIM=tf.image.ssim(generated_spectrogram_tensor, real_spectrogram_tensor, max_val=max_val_tensor, filter_size=4,filter_sigma=1.5, k1=0.01, k2=0.03).numpy()
-         t2=time.time() 
-         print(f"DeltaT.SSIM={t2-t1}")
          
          glitch_points=self.getGlitchPoints(generated_data,real_data)
 
@@ -407,7 +381,6 @@ class RIRData :
          if True or i%10 == 0 :
             self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
          
-         t1=time.time() 
          f = open(roomWorkDir+"/MSE.db.txt", "a")
          f.write(record_name+"="+str(MSE)+"\n")
          f.close()
@@ -418,13 +391,15 @@ class RIRData :
          f.write(record_name+"="+str(len(glitch_points))+"\n")
          f.close()
          t2=time.time() 
-         print(f"DeltaT.SAVE_ALL_TO_FILE=={t2-t1}")
        except:
            print("Exception: roomId="+roomId+", record_name="+record_name)
            print(traceback.format_exc())
            #traceback.print_exc()
 
      open( self.report_dir+"/."+self.selected_room_id+".wavesAndSpectrogramsGenerated", 'a').close()   
+     if NOT_EXISTING_WAV_FILE_COUNT > 0 :
+        print(f" THERE WAS {NOT_EXISTING_WAV_FILE_COUNT} FILES THAT WERE NOT FOUND")
+
  
  def getGlitchPoints(self,generated,real):
      t1=time.time()
@@ -439,7 +414,6 @@ class RIRData :
          if  abs(abs(generated[i])-abs(real[i]) )> glitchThreshold :
              glitchPoints.append(i)
      t2=time.time()
-     print(f"DeltaT.getGlitchPoints={t2-t1}")
      return glitchPoints
 
 # def isBiggerThanNextN(self,checkIndex,N,threshold,generated,real):
