@@ -9,35 +9,39 @@ fi
 
 DATA_DIR=$1
 REPORTS_DIR=$2
-REF_METRIC_TYPE=$3 # MAX/MIN
+REF_METRIC_TYPE=$3 # MAX/MIN/AVG
 
-SUMMARY_DIR=$REPORTS_DIR/summary/$REF_METRIC_TYPE-$REFERENCE_METRIC
+
+SUMMARY_DIR=$REPORTS_DIR/summary
+SUMMARY_PLOT_GROUP_DIR=$REPORTS_DIR/summary/$REF_METRIC_TYPE
+
+if [ ! -d $SUMMARY_PLOT_GROUP_DIR ]
+then
+     mkdir -p $SUMMARY_PLOT_GROUP_DIR
+fi
 
 PLOT_GROUP_PARAM=""
 PLOT_GROUP_PARAM_2=""
+
 for model in MESHTAE MESH2IR
 do
       for dataset in GTURIR BUTReverbDB
       do
-	     if [ ! -d $SUMMARY_DIR/$model-$metric ]
+	     if [ ! -f $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/*.new.png ]
 	     then
-		     mkdir -p $SUMMARY_DIR/$model-$metric
+		     convert -size 32x32 xc:white $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/white.new.png
 	     fi
-	     if [ ! -f $SUMMARY_DIR/$model-$metric/*.new.png ]
+	     if [ ! -f $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/*.new_real_front.png ]
 	     then
-		     convert -size 32x32 xc:white $SUMMARY_DIR/$model-$metric/white.new.png
+		     convert -size 32x32 xc:white $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/white.new_real_front.png
 	     fi
-	     if [ ! -f $SUMMARY_DIR/$model-$metric/*.new_real_front.png ]
-	     then
-		     convert -size 32x32 xc:white $SUMMARY_DIR/$model-$metric/white.new_real_front.png
-	     fi
-	     PLOT_GROUP_PARAM="$PLOT_GROUP_PARAM $SUMMARY_DIR/$model-$metric/*.new.png"
-	     PLOT_GROUP_PARAM_2="$PLOT_GROUP_PARAM_2 $SUMMARY_DIR/$model-$metric/*.new_real_front.png"
+	     PLOT_GROUP_PARAM="$PLOT_GROUP_PARAM $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/*.new.png"
+	     PLOT_GROUP_PARAM_2="$PLOT_GROUP_PARAM_2 $SUMMARY_DIR/$REF_METRIC_TYPE-*-$dataset/$model/*.new_real_front.png"
       done
 done
-echo python3 coherence_plot_group.py $SUMMARY_DIR "GENERATED_ON_TOP" $PLOT_GROUP_PARAM
-python3 coherence_plot_group.py $SUMMARY_DIR "GENERATED_ON_TOP" $PLOT_GROUP_PARAM
-echo python3 coherence_plot_group.py $SUMMARY_DIR "REAL_ON_TOP" $PLOT_GROUP_PARAM_2
-python3 coherence_plot_group.py $SUMMARY_DIR "REAL_ON_TOP" $PLOT_GROUP_PARAM_2
+echo python3 coherence_plot_group.py $SUMMARY_PLOT_GROUP_DIR "GENERATED_ON_TOP" $PLOT_GROUP_PARAM
+python3 coherence_plot_group.py $SUMMARY_PLOT_GROUP_DIR "GENERATED_ON_TOP" $PLOT_GROUP_PARAM
+echo python3 coherence_plot_group.py $SUMMARY_PLOT_GROUP_DIR "REAL_ON_TOP" $PLOT_GROUP_PARAM_2
+python3 coherence_plot_group.py $SUMMARY_PLOT_GROUP_DIR "REAL_ON_TOP" $PLOT_GROUP_PARAM_2
 
 

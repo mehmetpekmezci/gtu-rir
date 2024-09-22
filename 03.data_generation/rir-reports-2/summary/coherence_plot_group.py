@@ -13,19 +13,20 @@ MESH2IR_GTURIR=Image.open(sys.argv[5].strip())
 MESH2IR_BUT=Image.open(sys.argv[6].strip())
 
 
+
 images=[
          [MESHTAE_GTURIR,MESHTAE_BUT],
          [MESH2IR_GTURIR,MESH2IR_BUT],
       ]
 
 titles=[
-         ["(a.1) MESH-TAE GTU-RIR ","(a.2) MESH-TAE BUT ReverbDB"],
-         ["(b.1) MESH2IR  GTU-RIR ","(b.2) MESH2IR BUT RererbDB"],
+         ["(a.1) MESH-TAE / GTU-RIR ","(a.2) MESH-TAE / BUT ReverbDB"],
+         ["(b.1) MESH2IR / GTU-RIR ","(b.2) MESH2IR / BUT RererbDB"],
       ]
 
 
 width, height = MESHTAE_GTURIR.size
-total_width = 3*width+60
+total_width = 2*width+60
 max_height = 2*height+240
 fontsize=20
 new_im = Image.new('RGB', (total_width, max_height))

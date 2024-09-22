@@ -62,7 +62,8 @@ def saveRealAndGeneratedPlots(real_data,generated_data,MSE,SSIM,glitch_points,MF
         plt.plot(generated_data,color='#909090',label=label2)
         plt.plot(real_data,color='#101010',label=label1)
 
-     plt.text(2200, minValue+abs(minValue)/24, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}", style='italic',bbox={'facecolor': 'gray', 'alpha': 0.6, 'pad': 10})
+     plt.text(2200, minValue+abs(minValue)/24, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
+        bbox={'facecolor': 'gray', 'alpha': 0.6, 'pad': 10})
 
      x=glitch_points
      y=generated_data[x]
@@ -81,6 +82,14 @@ def saveRealAndGeneratedPlots(real_data,generated_data,MSE,SSIM,glitch_points,MF
      
      
      
+def getGlitchPoints(reduced_sampling_rate,generated,real):
+     INSENSITIVITY=5 ## DETECT ONLY VERY BIG DIFFERENCES
+     glitchThreshold=np.std(np.abs(real))*INSENSITIVITY
+     glitchPoints=[]
+     for i in range(len(generated)):
+         if  abs(abs(generated[i])-abs(real[i]) )> glitchThreshold :
+             glitchPoints.append(i)
+     return glitchPoints
 
 
 def getLocalArgMax(limit,data):

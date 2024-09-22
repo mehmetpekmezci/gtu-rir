@@ -12,6 +12,7 @@ REPORTS_DIR=$2
 REF_METRIC_TYPE=$3 # MAX/MIN
 DATASET=$4 # BUT_REVERBDB/GTURIR
 REFERENCE_METRIC=MSE
+#REFERENCE_METRIC=GLITCH_COUNT #MSE
 
 echo "$0 $DATA_DIR $REPORTS_DIR $REF_METRIC_TYPE $DATASET STARTED"
 
@@ -21,22 +22,22 @@ BUT_RIR_DATA_DIR=$DATA_DIR/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
 if [ "$REF_METRIC_TYPE" = "MAX" ]
 then
       # MX
-      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/FASTRIR-MSE/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | tail -2 | head -1)
+      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | tail -2 | head -1)
 elif [ "$REF_METRIC_TYPE" = "MIN" ]
 then
       # MIN
-      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/FASTRIR-MSE/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | head -50| tail -1)
+      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | head -50| tail -1)
 elif [ "$REF_METRIC_TYPE" = "AVG" ]
 then
       # AVERAGE
-      COUNT=$(cat $REPORTS_DIR/$DATASET/FASTRIR-MSE/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | wc -l)
+      COUNT=$(cat $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | wc -l)
       #COUNT=$( echo "scale=2 ; $COUNT / 2" | bc)
-      COUNT=$(($COUNT/3))
-      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/FASTRIR-MSE/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | head -$COUNT | tail -1)
+      COUNT=$(($COUNT/2))
+      REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | head -$COUNT | tail -1)
 fi 
 
-REF_METRIC_ROOM=$(basename $(dirname $(dirname $(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/FASTRIR-MSE/*/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f1))))
-RELATED_RECORD=$(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/FASTRIR-MSE/$REF_METRIC_ROOM/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f2)
+REF_METRIC_ROOM=$(basename $(dirname $(dirname $(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f1))))
+RELATED_RECORD=$(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/MESH2IR/$REF_METRIC_ROOM/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f2)
 echo "ROOM=$REF_METRIC_ROOM"
 echo "RECORD=$RELATED_RECORD"
    
@@ -79,9 +80,9 @@ echo "REAL_RIR=$REAL_RIR"
 
 python3 convolve.py $HOME/RIR_REPORT/transmittedSongSignal.wav $REAL_RIR
 
-for GENERATORTYPE in FASTRIR MESH2IR
+for GENERATORTYPE in MESH2IR MESHTAE
 do
-           for i in $REPORTS_DIR/$DATASET/$GENERATORTYPE-*
+           for i in $REPORTS_DIR/$DATASET/$GENERATORTYPE*
            do
 	       GENERATOR=$(basename $i)
 	       mkdir -p $SUMMARY_DIR/$GENERATOR
@@ -89,8 +90,8 @@ do
 	       then
 	        echo cp $i/$REF_METRIC_ROOM/*/$RELATED_RECORD.* $SUMMARY_DIR/$GENERATOR
 	        cp $i/$REF_METRIC_ROOM/*/$RELATED_RECORD.* $SUMMARY_DIR/$GENERATOR
-		echo ./coherence_plot.sh $DATA_DIR $REPORTS_DIR $REF_METRIC_TYPE $DATASET $RELATED_RECORD $REAL_RIR $GENERATOR 
-		./coherence_plot.sh $DATA_DIR $REPORTS_DIR $REF_METRIC_TYPE $DATASET $RELATED_RECORD $REAL_RIR $GENERATOR $i &
+		echo ./coherence_plot.sh $DATA_DIR $REPORTS_DIR $REF_METRIC_TYPE $DATASET $RELATED_RECORD $REAL_RIR $GENERATOR $i $REFERENCE_METRIC
+		./coherence_plot.sh $DATA_DIR $REPORTS_DIR $REF_METRIC_TYPE $DATASET $RELATED_RECORD $REAL_RIR $GENERATOR $i $REFERENCE_METRIC &
 	       fi
            done
 done
