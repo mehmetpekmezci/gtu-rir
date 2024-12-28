@@ -1,3 +1,4 @@
+exit 0
 rm -f netG.pth
 rm -f mesh_net.pth
 cat *_netG_*.* | tar xvf -

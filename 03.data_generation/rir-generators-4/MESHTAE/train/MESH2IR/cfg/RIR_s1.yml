@@ -12,7 +12,7 @@ SYNTHETIC_GEOMETRIC_DATA_DIR: '../dataset'
 PRE_TRAINED_MODELS_DIR: '../pre-trained-models/'
 MESH_NET_GAE_FILE: 'gae_mesh_net_trained_model.pth'
 
-#MAX_FACE_COUNT: 2000
+#MAX_FACE_COUNT: 2500
 MAX_FACE_COUNT: 2500
 FORCE_DECIMATION: True
 
