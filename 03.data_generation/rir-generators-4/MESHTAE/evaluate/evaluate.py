@@ -102,8 +102,10 @@ def evaluate():
 
     #netG_path = "Models/MESH2IR/netG_epoch_175.pth"
     #mesh_net_path = "Models/MESH2IR/mesh_net_epoch_175.pth"
-    netG_path = "Models/netG.pth"
-    mesh_net_path = "Models/gae_mesh_net_trained_model.pth"
+    #netG_path = "Models/netG.pth"
+    netG_path = "Models/netG_GAN_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
+    mesh_net_path = "Models/mesh_net_transformer_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
+    #mesh_net_path = "Models/gae_mesh_net_trained_model.pth"
     #gpus =[0,1]
     #gpus =[0]
 

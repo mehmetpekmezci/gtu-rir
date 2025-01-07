@@ -59,12 +59,15 @@ fi
 
 cd $CURRENT_DIR
 
-echo "1. Change the netG.pth file"
-echo "2. Change the mesh_net.pth file"
-echo "3. Change the number of nodes in the RIR_s1.yml file" 
-echo "4. Change the number of heads h in the mesh_model.py file" 
+#echo "1. Change the netG.pth file"
+#echo "2. Change the mesh_net.pth file"
+#echo "3. Change the number of nodes in the RIR_s1.yml file" 
+#echo "4. Change the number of heads h in the mesh_model.py file" 
 #echo "Press Enter When Done"
 #read 
+
+echo " Set the MAX_FACE_COUNT and NUMBER_OF_TRANSFORMER_HEADS in RIR_s1.yml corresponding your model file !"
+
 if [ ! -f $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.rirs_are_generated_for_$DATASET_NAME ]
 then
      echo python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME

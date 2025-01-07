@@ -64,5 +64,6 @@ then
 	GPU_NO=0
 fi
 
+rm train/pre-trained-models/mesh_embeddings.pickle
 
 python3 main.py --cfg cfg/RIR_s1.yml --gpu $GPU_NO --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs --synthetic_geometric_data_dir $DEFAULT_MAIN_DATA_DIR/APARTMENT_MESH

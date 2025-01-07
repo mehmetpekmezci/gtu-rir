@@ -13,6 +13,7 @@ PRE_TRAINED_MODELS_DIR: '../pre-trained-models/'
 MESH_NET_GAE_FILE: 'gae_mesh_net_trained_model.pth'
 
 #MAX_FACE_COUNT: 2500
+NUMBER_OF_TRANSFORMER_HEADS: 8
 MAX_FACE_COUNT: 2500
 FORCE_DECIMATION: True
 
