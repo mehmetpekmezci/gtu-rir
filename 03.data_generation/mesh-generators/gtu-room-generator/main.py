@@ -125,12 +125,15 @@ def get_konsol_mesh(konsol,roomX,roomY,rotationAngle,roomDepth,roomWidth):
 
      
     
-def generate_mesh(room_id):
+def generate_meshes(room_id):
 
     room=GTU_ROOM[room_id]
 
   
-    scene = trimesh.Scene()
+    scene1 = trimesh.Scene()
+    scene2 = trimesh.Scene()
+    scene3 = trimesh.Scene()
+    scene4 = trimesh.Scene()
     
     # floor plane
     #plane = trimesh.creation.box(extents=[GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"], FLAT_FLOOR_THICKNESS])
@@ -138,7 +141,10 @@ def generate_mesh(room_id):
 
     apartment_box = trimesh.creation.box(extents=[GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"],GTU_ROOM[room_id]["HEIGHT"]+0.01])
     apartment_box.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, GTU_ROOM[room_id]["HEIGHT"]/2] )
-    scene.add_geometry(apartment_box)
+    scene1.add_geometry(apartment_box)
+    scene2.add_geometry(apartment_box)
+    scene3.add_geometry(apartment_box)
+    scene4.add_geometry(apartment_box)
 
  
     for key in room["FURNITURE_ARRAY"]:
@@ -163,23 +169,35 @@ def generate_mesh(room_id):
             for mesh in mesh_array:
                 mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, 0] )
                #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, GTU_ROOM[room_id]["HEIGHT"]/2] )
-            scene.add_geometry(mesh_array)
-               
-    mesh = trimesh.util.concatenate(scene.dump())
+            if key % 1 == 0:
+                scene1.add_geometry(mesh_array)  
+            if key % 2 == 0:
+                scene2.add_geometry(mesh_array)  
+            if key % 3 == 0:
+                scene3.add_geometry(mesh_array)  
+            if key % 4 == 0:
+                scene4.add_geometry(mesh_array)  
+    mesh1 = trimesh.util.concatenate(scene1.dump())
+    mesh2 = trimesh.util.concatenate(scene2.dump())
+    mesh3 = trimesh.util.concatenate(scene3.dump())
+    mesh4 = trimesh.util.concatenate(scene4.dump())
     #mesh.visual = trimesh.visual.ColorVisuals()
-    rotateToMesh2IRNormal(mesh)
+    rotateToMesh2IRNormal(mesh1)
+    rotateToMesh2IRNormal(mesh2)
+    rotateToMesh2IRNormal(mesh3)
+    rotateToMesh2IRNormal(mesh4)
     #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, GTU_ROOM[room_id]["HEIGHT"]/2] )
     #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, GTU_ROOM[room_id]["WIDTH"]/2, 0] )
-    return mesh       
+    return [mesh1,mesh2,mesh3,mesh4]       
 
 
 
 
     
     
-def save_mesh(DATA_DIR,room_id,mesh):
+def save_mesh(DATA_DIR,room_id,mesh,i):
    
-    file_path=DATA_DIR+f'/gtu-cs-room-{room_id}.mesh.obj'
+    file_path=DATA_DIR+f'/gtu-cs-room-{room_id}.mesh.{i}.obj'
     MESH2IR_VGAE_MESH_INPUT_FACE_SIZE=4000
 
     face_index=list(range(len(mesh.faces)))
@@ -210,6 +228,9 @@ def save_mesh(DATA_DIR,room_id,mesh):
 
 
 room_id="208"
-generated_mesh=generate_mesh(room_id)
-save_mesh(DATA_DIR,room_id,generated_mesh)
+generated_meshes=generate_meshes(room_id)
+
+for i in range(len(generated_meshes)):
+   generated_mesh=generated_meshes[i]
+   save_mesh(DATA_DIR,room_id,generated_mesh,i)
 
