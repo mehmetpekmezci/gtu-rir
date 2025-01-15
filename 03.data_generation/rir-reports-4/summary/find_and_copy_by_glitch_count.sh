@@ -34,6 +34,8 @@ then
       COUNT=$(($COUNT/2))
       REF_METRIC_VALUE=$(cat $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt | grep -v 'e-'| cut -d'=' -f2| sort -g | head -$COUNT | tail -1)
 fi 
+mkdir -p $REPORTS_DIR/$DATASET/MESH2IR/fake/fake/
+touch $REPORTS_DIR/$DATASET/MESH2IR/fake/fake/$REFERENCE_METRIC.db.txt
 
 REF_METRIC_ROOM=$(basename $(dirname $(dirname $(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/MESH2IR/*/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f1))))
 RELATED_RECORD=$(grep =$REF_METRIC_VALUE $REPORTS_DIR/$DATASET/MESH2IR/$REF_METRIC_ROOM/*/$REFERENCE_METRIC.db.txt| head -1 | cut -d'=' -f1| cut -d: -f2)
@@ -64,7 +66,6 @@ then
 	   cp $GTURIR_DATA_DIR/$REF_METRIC_ROOM/micx*/micstep-$MICROPHONE_ITERATION-spkstep-$SPEAKER_ITERATION-spkno-$PHYSICAL_SPRAKER_NO/receivedEssSignal-$MICROPHONE_NO.wav.ir.wav.bz2 $SUMMARY_DIR/real.rir.$REF_METRIC_ROOM-micstep-$MICROPHONE_ITERATION-spkstep-$SPEAKER_ITERATION-spkno-$PHYSICAL_SPRAKER_NO-micno-$MICROPHONE_NO.wav.bz2
 	   bunzip2 $SUMMARY_DIR/real.rir.$REF_METRIC_ROOM-micstep-$MICROPHONE_ITERATION-spkstep-$SPEAKER_ITERATION-spkno-$PHYSICAL_SPRAKER_NO-micno-$MICROPHONE_NO.wav.bz2
 fi
-
 REAL_RIR=$(find $SUMMARY_DIR -name 'real.rir.*.wav' | grep -v reverbed| head -1)
 
 echo "REAL_RIR=$REAL_RIR"

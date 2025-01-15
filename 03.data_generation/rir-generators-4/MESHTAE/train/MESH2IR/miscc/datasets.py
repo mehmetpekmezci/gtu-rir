@@ -185,7 +185,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
     for i in range(len(obj_file_name_list)):
         graph_path= obj_file_name_list[i]
         full_graph_path = os.path.join(data_dir,graph_path)
-        if graph_path not in  mesh_embeddings:
+        if os.path.exists(full_graph_path):
+         if graph_path not in  mesh_embeddings:
            print(f"calculating mesh embedding of {graph_path}")
            triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
            triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
@@ -201,6 +202,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
            faceData=faceData.detach().cpu()
            faceData_predicted=faceData_predicted.detach().cpu()
            mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+        else:
+           print(f"full_graph_path={full_graph_path} does not exist")
 
  
     print("build_mesh_embeddings_for_evaluation_data finished...")

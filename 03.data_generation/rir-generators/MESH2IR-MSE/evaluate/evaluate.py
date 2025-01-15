@@ -145,7 +145,9 @@ def evaluate():
         graph_path,folder_name,wave_name,source_location,receiver_location = embeddings[0]
 
         full_graph_path = graph_directory + graph_path
-
+        if not os.path.exists(full_graph_path):
+            print(f"{full_graph_path} does not exist")
+            continue
         data_single = get_graph(full_graph_path)
         data_list=[data_single]*batch_size
         loader = DataLoader(data_list, batch_size=batch_size)

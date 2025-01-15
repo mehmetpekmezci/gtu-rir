@@ -155,7 +155,9 @@ def evaluate():
         print("embed_name   ",output_embed)
 
         mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
-
+        if mesh_obj not in mesh_embeddings:
+            print(f"{mesh_obj} does not exist in mesh_embeddings")
+            continue
         mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
 
         embed_sets = len(embeddings) /batch_size
