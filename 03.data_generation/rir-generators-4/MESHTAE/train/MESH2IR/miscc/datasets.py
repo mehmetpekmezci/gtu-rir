@@ -162,6 +162,8 @@ class TextDataset(data.Dataset):
 
 
 def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_directory,data_set_name,obj_file_name_list):
+    GENERATE_SAMPLES_FOR_DOCUMENTING=True
+
     print("build_mesh_embeddings_for_evaluation_data started...")
     from model_mesh import MESH_TRANSFORMER_AE
     gae_mesh_net=MESH_TRANSFORMER_AE()
@@ -182,13 +184,17 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
     gae_mesh_net.to(device='cuda:2')
     gae_mesh_net.eval()
 
+    loss_list_content=""
+
     for i in range(len(obj_file_name_list)):
         graph_path= obj_file_name_list[i]
         full_graph_path = os.path.join(data_dir,graph_path)
         if os.path.exists(full_graph_path):
          if graph_path not in  mesh_embeddings:
            print(f"calculating mesh embedding of {graph_path}")
+           full_mesh_path = full_graph_path.replace('.pickle','.obj')
            triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
+           real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
            triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
            triangle_coordinates=torch.from_numpy(triangle_coordinates).float()
            normals=torch.from_numpy(normals).float()
@@ -202,6 +208,36 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
            faceData=faceData.detach().cpu()
            faceData_predicted=faceData_predicted.detach().cpu()
            mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+
+           #triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
+           #normals=torch.autograd.Variable(torch.from_numpy(normals)).float()
+           #centers=torch.autograd.Variable(torch.from_numpy(centers)).float()
+           #areas=torch.autograd.Variable(torch.from_numpy(areas)).float()
+           #faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+           #faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
+           #faceData=faceData.unsqueeze(0).detach().cuda()
+           #faceData_predicted , latent_vector =  gae_mesh_net(faceData)
+           #mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+
+
+           if GENERATE_SAMPLES_FOR_DOCUMENTING :
+                    path=full_mesh_path
+                    print(f"Started to generate OBJ mesh sample : {path}.face.triangles.real.sample."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".obj")
+                    faceData_pred=faceData_predicted[0].cpu().detach().numpy()
+                    faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+                    faceData_pred=faceData_pred.reshape(cfg.MAX_FACE_COUNT,faceDataDim)
+                    predicted_triangle_coordinates=faceData_pred[:,0:9]
+                    predicted_normals=faceData_pred[:,9:12]
+                    predicted_centers=faceData_pred[:,12:15]
+                    predicted_areas=faceData_pred[:,15:16]
+                    predicted_areas=abs(predicted_areas.squeeze()+0.000001)
+                    predicted_triangle_coordinates,predicted_normals,predicted_centers,predicted_areas=denormalize_mesh_values(predicted_triangle_coordinates,predicted_normals,predicted_centers,predicted_areas)
+                    save_face_normal_center_area_as_obj(real_normals,real_centers,real_areas,path+".face.triangles.real.sample."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".obj")
+                    save_face_normal_center_area_as_obj(predicted_normals,predicted_centers,predicted_areas,path+".face.triangles.regenerated.sample."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".obj")
+                    loss = gae_mesh_net.loss(faceData_predicted,faceData)
+                    print(f"Finished to generate OBJ mesh sample : {path}.face.triangles.(real,regenerated).sample.obj with LOSS:{loss}")
+                    loss_list_content=loss_list_content+"\n"+path+"="+str(loss.cpu().detach().numpy())
+
         else:
            print(f"full_graph_path={full_graph_path} does not exist")
 
@@ -210,7 +246,12 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
     print(f"mesh_mbeddings size is : {len(mesh_embeddings)}")
 
     write_pickle(embedding_directory+"/"+data_set_name+".mesh_embeddings.pickle",mesh_embeddings)
-    
+
+    if GENERATE_SAMPLES_FOR_DOCUMENTING :
+       print(loss_list_content)
+       with open(data_dir+"/loss_records_for_mesh_reconstruction."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".txt","w") as loss_records:
+         loss_records.write(loss_list_content)
+
 
 
 def build_mesh_embeddings(data_dir,embeddings):
