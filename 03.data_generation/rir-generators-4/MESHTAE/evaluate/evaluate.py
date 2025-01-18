@@ -95,7 +95,9 @@ def evaluate():
     print("This file is found in "+SCRIPT_DIR)
     
     cfg_from_file(SCRIPT_DIR+'/cfg/RIR_s1.yml')
-    
+   
+    cfg.TRAIN.FLAG = False
+
     embedding_directory =metadata_dir+"/Embeddings/"
     mesh_directory = metadata_dir+"/Meshes"
     output_directory = generated_rirs_dir

@@ -441,7 +441,7 @@ def convert_to_trimesh(pos,faces):
     return mesh
 
 def save_mesh_as_obj(mesh,path):
-    with open(path) as meshfile:
+    with open(path,'w') as meshfile:
          meshfile.write(mesh.export(file_type='obj'))
     
 def save_pos_face_as_obj(pos,faces,path):

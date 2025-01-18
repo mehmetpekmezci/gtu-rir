@@ -75,10 +75,10 @@ def get_chair_mesh(chair,roomX,roomY,rotationAngle,roomDepth,roomWidth):
      mesh_array.append(get_box_mesh(chair["OTURAK"],"CHAIR_SEAT"))
      mesh_array.append(get_box_mesh(chair["ARKA"],"CHAIR_BACK"))
      mesh_array.append(get_box_mesh(chair["TABLA"],"CHAIR_TABLE"))
-     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],0,0,"CHAIR_LEG_1"))
-     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],chair["OTURAK"]["DEPTH"],0,"CHAIR_LEG_2"))
-     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],0,chair["OTURAK"]["WIDTH"],"CHAIR_LEG_3"))
-     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],chair["OTURAK"]["DEPTH"],chair["OTURAK"]["WIDTH"],"CHAIR_LEG_4"))
+#     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],0,0,"CHAIR_LEG_1"))
+#     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],chair["OTURAK"]["DEPTH"],0,"CHAIR_LEG_2"))
+#     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],0,chair["OTURAK"]["WIDTH"],"CHAIR_LEG_3"))
+#     mesh_array.append(get_cylinder_mesh(0.02,chair["OTURAK"]["HEIGHT_FROM_GROUND"],chair["OTURAK"]["DEPTH"],chair["OTURAK"]["WIDTH"],"CHAIR_LEG_4"))
 
      
      for i in range(len(mesh_array)):
@@ -97,10 +97,10 @@ def get_chair_mesh(chair,roomX,roomY,rotationAngle,roomDepth,roomWidth):
 def get_table_mesh(table,roomX,roomY,rotationAngle,roomDepth,roomWidth):
      mesh_array=[]
      mesh_array.append(get_box_mesh(table,"TABLE"))
-     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],0,0,"TABLE_LEG_1"))
-     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],table["DEPTH"],0,"TABLE_LEG_2"))
-     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],0,table["WIDTH"],"TABLE_LEG_3"))
-     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],table["DEPTH"],table["WIDTH"],"TABLE_LEG_4"))
+#     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],0,0,"TABLE_LEG_1"))
+#     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],table["DEPTH"],0,"TABLE_LEG_2"))
+#     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],0,table["WIDTH"],"TABLE_LEG_3"))
+#     mesh_array.append(get_cylinder_mesh(0.02,table["HEIGHT_FROM_GROUND"],table["DEPTH"],table["WIDTH"],"TABLE_LEG_4"))
 
      for mesh in mesh_array:
          direction=[0,0,1]

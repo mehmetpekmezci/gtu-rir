@@ -482,36 +482,49 @@ def load_mesh(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     mesh = trimesh.load_mesh(path, process=False)
 
-    random.shuffle(mesh.faces)
+    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+    #save_mesh_as_obj(mesh,path+".DECIMATED.0.obj")
 
 #    print('BEGINNING : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
     if mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES-100 :
         while mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES:
               mesh.vertices, mesh.faces = trimesh.remesh.subdivide(mesh.vertices, mesh.faces)
 
+    #save_mesh_as_obj(mesh,path+".DECIMATED.1.obj")
+
+    if cfg.TRAIN.FLAG :
+    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+       random.shuffle(mesh.faces)
+    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+    #   save_mesh_as_obj(mesh,path+".DECIMATED.2.obj")
 
 #    print(f"1.simplify_quadric_decimation TOTAL_NUMBER_OF_FACES={TOTAL_NUMBER_OF_FACES}")
 #    while mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES :
     if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES :
 # MP BURADA DONUYOR DATALOADER
-       mesh=mesh.simplify_quadric_decimation(TOTAL_NUMBER_OF_FACES)
+       mesh=mesh.simplify_quadric_decimation(face_count=TOTAL_NUMBER_OF_FACES)
 
 #       print('AFTER SUBDIVIDE/DECIMATION : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
 
 #    print("2.simplify_quadric_decimation")
 
+    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+    #save_mesh_as_obj(mesh,path+".DECIMATED.3.obj")
+
+                       
     
-    ## hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
+    ### hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
     if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and cfg.FORCE_DECIMATION :
          mesh.faces=mesh.faces[:TOTAL_NUMBER_OF_FACES]
            
        
 
-
        #mesh = trimesh.Trimesh(vertices=[[0, 0, 0], [0, 0, 1], [0, 1, 0]],faces=[[0, 1, 2]])
                        
                        
                        
+    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.1.obj'")
+    #save_mesh_as_obj(mesh,path+".DECIMATED.4.obj")
 
 #    print('AFTER SUBDIVIDE/DECIMATION : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
 
