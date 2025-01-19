@@ -17,7 +17,7 @@ fi
 if [ "$GANMODELS" = "" ]
 then
         #GANMODELS="MESHTAE MESH2IR"
-        GANMODELS="MESH2IR MESHTAE"
+        GANMODELS="MESHTAE"
 fi
 
 if [ "$RIR_GENERATORS_DIR" = "" ]

@@ -146,6 +146,11 @@ def generate_meshes(room_id):
     scene3.add_geometry(apartment_box)
     scene4.add_geometry(apartment_box)
 
+    base_wall_surface=GTU_ROOM[room_id]["DEPTH"]*GTU_ROOM[room_id]["WIDTH"]*2+GTU_ROOM[room_id]["WIDTH"]*GTU_ROOM[room_id]["HEIGHT"]*2+GTU_ROOM[room_id]["DEPTH"]*GTU_ROOM[room_id]["HEIGHT"]*2
+    total_obj_count=[0]*5
+    total_obj_surface_area_in_m2=[0]*5
+
+
  
     for key in room["FURNITURE_ARRAY"]:
        furniture_set=room["FURNITURE_ARRAY"][key]
@@ -157,26 +162,43 @@ def generate_meshes(room_id):
             roomY=furniture_set["Y"]
             rotationAngle=furniture_set["ORIENTATION"]
             mesh_array=None
+            object_surface_area=0
             if furniture_set["TYPE"] == "CHAIR" :
                mesh_array=get_chair_mesh(FURNITURE_TYPE["CHAIR"],roomX,roomY,rotationAngle,GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"])
+               object_surface_area=FURNITURE_TYPE["CHAIR"]["TOTAL_SURFACE_AREA"]
             if furniture_set["TYPE"] == "KONSOLE1" :
                mesh_array=get_konsol_mesh(FURNITURE_TYPE["KONSOLE1"],roomX,roomY,rotationAngle,GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"])
+               object_surface_area=FURNITURE_TYPE["KONSOLE1"]["TOTAL_SURFACE_AREA"]
             if furniture_set["TYPE"] == "KONSOLE2" :
                mesh_array=get_konsol_mesh(FURNITURE_TYPE["KONSOLE2"],roomX,roomY,rotationAngle,GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"])
+               object_surface_area=FURNITURE_TYPE["KONSOLE2"]["TOTAL_SURFACE_AREA"]
             if furniture_set["TYPE"] == "TABLE" :
                mesh_array=get_table_mesh(FURNITURE_TYPE["TABLE"],roomX,roomY,rotationAngle,GTU_ROOM[room_id]["DEPTH"],GTU_ROOM[room_id]["WIDTH"])
+               object_surface_area=FURNITURE_TYPE["TABLE"]["TOTAL_SURFACE_AREA"]
             
             for mesh in mesh_array:
                 mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, 0] )
                #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, GTU_ROOM[room_id]["HEIGHT"]/2] )
             if key % 1 == 0:
                 scene1.add_geometry(mesh_array)  
+                room_type=0
+                total_obj_count[room_type]=total_obj_count[room_type]+1
+                total_obj_surface_area_in_m2[room_type]=total_obj_surface_area_in_m2[room_type]+object_surface_area
             if key % 2 == 0:
                 scene2.add_geometry(mesh_array)  
+                room_type=1
+                total_obj_count[room_type]=total_obj_count[room_type]+1
+                total_obj_surface_area_in_m2[room_type]=total_obj_surface_area_in_m2[room_type]+object_surface_area
             if key % 3 == 0:
                 scene3.add_geometry(mesh_array)  
+                room_type=2
+                total_obj_count[room_type]=total_obj_count[room_type]+1
+                total_obj_surface_area_in_m2[room_type]=total_obj_surface_area_in_m2[room_type]+object_surface_area
             if key % 4 == 0:
                 scene4.add_geometry(mesh_array)  
+                room_type=3
+                total_obj_count[room_type]=total_obj_count[room_type]+1
+                total_obj_surface_area_in_m2[room_type]=total_obj_surface_area_in_m2[room_type]+object_surface_area
     mesh1 = trimesh.util.concatenate(scene1.dump())
     mesh2 = trimesh.util.concatenate(scene2.dump())
     mesh3 = trimesh.util.concatenate(scene3.dump())
@@ -188,14 +210,14 @@ def generate_meshes(room_id):
     rotateToMesh2IRNormal(mesh4)
     #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, -GTU_ROOM[room_id]["WIDTH"]/2, GTU_ROOM[room_id]["HEIGHT"]/2] )
     #mesh.apply_translation([GTU_ROOM[room_id]["DEPTH"]/2, GTU_ROOM[room_id]["WIDTH"]/2, 0] )
-    return [mesh1,mesh2,mesh3,mesh4]       
+    return [mesh1,mesh2,mesh3,mesh4],total_obj_count,total_obj_surface_area_in_m2,base_wall_surface       
 
 
 
 
     
     
-def save_mesh(DATA_DIR,room_id,mesh,i):
+def save_mesh(DATA_DIR,room_id,mesh,i,obj_count,area,base_wall_surface):
    
     file_path=DATA_DIR+f'/gtu-cs-room-{room_id}.mesh.{i}.obj'
     MESH2IR_VGAE_MESH_INPUT_FACE_SIZE=4000
@@ -225,12 +247,21 @@ def save_mesh(DATA_DIR,room_id,mesh,i):
     print('output mesh has ', m.vertex_number(), ' vertex and ', m.face_number(), ' faces')
     ms.save_current_mesh(file_path)
 
+    with open(f"{file_path}.obj_count",'w', encoding='utf8') as f:
+         f.write(str(obj_count))
+    with open(f"{file_path}.obj_surface_area",'w', encoding='utf8') as f:
+         f.write(str(area))
+    with open(f"{file_path}.base_wall_surface",'w', encoding='utf8') as f:
+         f.write(str(base_wall_surface))
 
 
 room_id="208"
-generated_meshes=generate_meshes(room_id)
+generated_meshes,total_obj_count,total_obj_surface_area_in_m2,base_wall_surface=generate_meshes(room_id)
 
 for i in range(len(generated_meshes)):
    generated_mesh=generated_meshes[i]
-   save_mesh(DATA_DIR,room_id,generated_mesh,i)
+   obj_count=total_obj_count[i]
+   area=total_obj_surface_area_in_m2[i]
+   save_mesh(DATA_DIR,room_id,generated_mesh,i,obj_count,area,base_wall_surface)
+
 
