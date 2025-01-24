@@ -154,12 +154,12 @@ class GAETrainer(object):
 
 
 
-               with torch.autocast(device_type="cuda"):
+    #           with torch.autocast(device_type="cuda"):
 
-                    faceData_predicted,latent_vector=nn.parallel.data_parallel(self.mesh_net, (faceData, ), self.gpus)
+               faceData_predicted,latent_vector=nn.parallel.data_parallel(self.mesh_net, (faceData, ), self.gpus)
     #               print(f"faceData_predicted.shape={faceData_predicted.shape}")
     #               print(f"faceData.shape={faceData.shape}")
-                    loss = self.mesh_net.loss(faceData_predicted,faceData)
+               loss = self.mesh_net.loss(faceData_predicted,faceData)
 
                loss.backward()
                optimizerM.step()
