@@ -1,1 +1,0 @@
-mesh_net_transformer_2500_nodes_8_heads.pth

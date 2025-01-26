@@ -16,6 +16,7 @@ sys.path.insert(1, ".")
 
 import torch
 import numpy as np
+#import subprocess
 
 from transformer.DecoderBlock import DecoderBlock
 
@@ -43,10 +44,23 @@ class TransformerDecoder(torch.nn.Module):
         self.decoder_output_to_logits_layer = torch.nn.Linear(in_features=self.d_model, out_features=self.vocab_size)
 
     def forward(self, tokenEmbedding, K, V):
+        #subprocess.run(["nvidia-smi"])
+        #print("TransformerDecoder_1############")
+
         currentResult = tokenEmbedding
 
+        #subprocess.run(["nvidia-smi"])
+        #print("TransformerDecoder_2############")
+        #i=0
         for decoderBlock in self.decoder_blocks:
-            currentResult = decoderBlock(embeddings=currentResult, K=K, V=V)
+             currentResult = decoderBlock(embeddings=currentResult, K=K, V=V)
+             #subprocess.run(["nvidia-smi"])
+             #print(f"TransformerDecoder_2.{i}############")
+             #i=i+1
             
+        #subprocess.run(["nvidia-smi"])
+        #print("TransformerDecoder_3############")
         logits = self.decoder_output_to_logits_layer(currentResult)
+        #subprocess.run(["nvidia-smi"])
+        #print("TransformerDecoder_4############")
         return logits

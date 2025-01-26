@@ -82,8 +82,8 @@ if __name__ == "__main__":
         mesh_only_train_data_loader=DataLoader(mesh_dataset, batch_size=cfg.TRAIN.GAE_BATCH_SIZE * num_gpu, num_workers=int(cfg.WORKERS),shuffle=True)
         gaeTrainer = GAETrainer(output_dir)
 
-        if not os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+"/"+cfg.MESH_NET_GAE_FILE):
-           print("GAE MESH NET PRETARINED MODEL DOES NOT EXISTS SO STARTING TO TRAIN THE GAE_MESH_NET MODEL ......")
+        if not os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+"/"+cfg.MESH_NET_ENCODER_FILE):
+           print("GAE MESH ENCODER NET PRETARINED MODEL DOES NOT EXISTS SO STARTING TO TRAIN THE GAE_MESH_NET MODEL ......")
            gaeTrainer.train(mesh_only_train_data_loader, cfg.STAGE)
            print("GAE training is finished, now we are training GAN for IR ......")
         else :

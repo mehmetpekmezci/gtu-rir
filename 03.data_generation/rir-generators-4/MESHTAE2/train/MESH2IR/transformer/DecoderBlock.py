@@ -15,6 +15,7 @@ sys.path.insert(1, ".")
 
 import torch
 import numpy as np
+#import subprocess
 
 from transformer.MultiHeadAttention import MultiHeadAttention
 from transformer.EncoderDecoderAttention import EncoderDecoderAttention
@@ -41,7 +42,22 @@ class DecoderBlock(torch.nn.Module):
 
     def forward(self, embeddings, K, V):
         # TODO: assert that V.shape[1] == self.d_v
-        first_subblock_output = self.add_and_norm_layer(embeddings + self.multi_head_attention_layer(embeddings))
+
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_1############")
+        multihead_attention_output=self.multi_head_attention_layer(embeddings)
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_1.0############")
+        sum1=embeddings + multihead_attention_output
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_1.1############")
+        first_subblock_output = self.add_and_norm_layer(sum1)
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_2############")
         second_subblock_output = self.add_and_norm_layer(first_subblock_output + self.encoder_decoder_attention_layer(embeddings, K, V))
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_3############")
         final_result = self.add_and_norm_layer(second_subblock_output + self.feed_forward_layer(second_subblock_output))
+        #subprocess.run(["nvidia-smi"])
+        #print("DecoderBlock_4############")
         return final_result

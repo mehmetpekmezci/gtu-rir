@@ -2,6 +2,7 @@ from __future__ import print_function
 #from six.moves import range
 from PIL import Image
 
+#import subprocess
 import torch.backends.cudnn as cudnn
 import torch
 import torch.nn as nn
@@ -24,7 +25,7 @@ from wavefile import WaveWriter, Format
 from miscc.config import cfg
 from miscc.utils import mkdir_p
 from miscc.utils import weights_init
-from miscc.utils import save_RIR_results, save_model, save_mesh_encoder_model,save_mesh_encoder_final_model, save_mesh_dencoder_model,save_mesh_decoder_final_model, convert_to_trimesh,plot_mesh , plot_points,edge_index_to_face
+from miscc.utils import save_RIR_results, save_model, save_mesh_encoder_model,save_mesh_encoder_final_model, save_mesh_decoder_model,save_mesh_decoder_final_model, convert_to_trimesh,plot_mesh , plot_points,edge_index_to_face
 from miscc.datasets import save_face_normal_center_area_as_obj,denormalize_mesh_values
 import time
 import torch_geometric.transforms as T
@@ -89,27 +90,42 @@ class GAETrainer(object):
 #                   weight=args.weight # 0.2
 #                  )
 
-
-        if cfg.MESH_NET != '':
+        if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE):
             state_dict = \
-                torch.load(cfg.MESH_NET,
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE,
                            map_location=lambda storage, loc: storage)
-            mesh_net.load_state_dict(state_dict)
-            print('Load from: ', cfg.MESH_NET)
+            mesh_net_encoder.load_state_dict(state_dict)
+            print('Load GAE MESH ENCODER NET from: ', mesh_net_path)
+
+        if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE):
+            state_dict = \
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE,
+                           map_location=lambda storage, loc: storage)
+            mesh_net_decoder.load_state_dict(state_dict)
+            print('Load GAE MESH DECODER NET from: ', mesh_net_decoder_path)
+
 
         #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,16).cuda()
         #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE).cuda()
-        faces_summary_encoder=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE)
-        faces_summary_decoder=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.LATENT_VECTOR_SIZE,self.EMBEDDING_DIM,self.EMBEDDING_DIM)
-        summary(mesh_net_encoder,input_data=[faces_summary] )
-        summary(mesh_net_decoder,input_data=[faces_summary] )
+        faces_summary_encoder_X=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE)
+        faces_summary_decoder_Y=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
+        faces_summary_decoder_K=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
+        faces_summary_decoder_V=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
+        summary(mesh_net_encoder,input_data=[faces_summary_encoder_X] )
+        summary(mesh_net_decoder,input_data=[faces_summary_decoder_Y,faces_summary_decoder_K,faces_summary_decoder_V] )
 
         return mesh_net_encoder,mesh_net_decoder
 
 
     def train(self, data_loader, stage=1):
-        self.mesh_net_encoder=self.mesh_net.to(device='cuda:'+self.gpus[0])
-        self.mesh_net_decoder=self.mesh_net.to(device='cuda:'+self.gpus[1])
+        #subprocess.run(["nvidia-smi"])
+        #print("-2############")
+        self.mesh_net_encoder=self.mesh_net_encoder.to(device='cuda:'+str(self.gpus[0]))
+        #subprocess.run(["nvidia-smi"])
+        #print("-1############")
+        self.mesh_net_decoder=self.mesh_net_decoder.to(device='cuda:'+str(self.gpus[1]))
+        #subprocess.run(["nvidia-smi"])
+        #print("0############")
         
         MAX_DIM=cfg.MAX_DIM
         #self.mesh_net_encoder.to(device='cuda:0')
@@ -157,26 +173,53 @@ class GAETrainer(object):
                
                #faceData=faceData.reshape(faceData.shape[0]*faceData.shape[1],faceData.shape[2])
 
-
+               #subprocess.run(["nvidia-smi"])
+               #print("1############")
                
                #if cfg.CUDA:
-               faceData = faceData.to(torch.float32).to(device='cuda:'+self.gpus[0])
+               faceData = faceData.to(torch.float32).to(device='cuda:'+str(self.gpus[0]))
+
+               #subprocess.run(["nvidia-smi"])
+               #print("2############")
 
 
+               #with torch.autocast(device_type="cuda",dtype=torch.float16):
+               Z,K,V,embeddings=self.mesh_net_encoder(faceData, )
 
-    #           with torch.autocast(device_type="cuda"):
-
-               Z,K,V=self.mesh_net_encoder(faceData, )
-               Z.to(device='cuda:'+self.gpus[1])
-               K.to(device='cuda:'+self.gpus[1])
-               V.to(device='cuda:'+self.gpus[1])
-               faceData_predicted=self.mesh_net_decoder(Z,K,V)
-               
+               #torch.cuda.set_device(self.gpus[0])
+               #Z.detach().to(device='cuda:'+str(self.gpus[1]))
+               #subprocess.run(["nvidia-smi"])
+               #print("3############")
+               embeddings=embeddings.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               Z=Z.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               K=K.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               V=V.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               #subprocess.run(["nvidia-smi"])
+               #print("4############")
+               #print(f'self.gpus={self.gpus} self.gpus[1]={self.gpus[1]} Z={Z}')
+               #with torch.autocast(device_type="cuda",dtype=torch.float16):
+               #with torch.cuda.amp.autocast(True):
+               faceData_predicted=self.mesh_net_decoder(embeddings,K,V)
+               #subprocess.run(["nvidia-smi"])
+               #print("5############")
                #faceData_predicted,latent_vector=nn.parallel.data_parallel(self.mesh_net, (faceData, ), self.gpus)
     #               print(f"faceData_predicted.shape={faceData_predicted.shape}")
     #               print(f"faceData.shape={faceData.shape}")
-               loss = self.mesh_net_decoder.loss(faceData_predicted,faceData)
 
+               #faceData_predicted=faceData_predicted.cpu()
+               #faceData=faceData.cpu()
+               #loss=nn.MSELoss()(faceData_predicted,faceData)
+
+               #subprocess.run(["nvidia-smi"])
+               #print("6############")
+               faceData=faceData.to(device='cuda:'+str(self.gpus[1]))
+               #subprocess.run(["nvidia-smi"])
+               #print("7############")
+               loss = self.mesh_net_decoder.loss(faceData_predicted,faceData)
+               #subprocess.run(["nvidia-smi"])
+               #print("8############")
+
+               ## MP: loss.backward hicbir zaman autocastin ucunde olmamalidir.
                loss.backward()
                optimizerMeshDecoder.step()
                optimizerMeshEncoder.step()
@@ -192,7 +235,11 @@ class GAETrainer(object):
                     print(f"saved_model : {i}")
                     if mesh_lr > 0.00000001:
                      mesh_lr *= 0.5#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
-                     for param_group in optimizerM.param_groups:
+                     for param_group in optimizerMeshEncoder.param_groups:
+                        print(param_group['lr'])
+                        param_group['lr'] = mesh_lr
+                        print(param_group['lr'])
+                     for param_group in optimizerMeshDecoder.param_groups:
                         print(param_group['lr'])
                         param_group['lr'] = mesh_lr
                         print(param_group['lr'])

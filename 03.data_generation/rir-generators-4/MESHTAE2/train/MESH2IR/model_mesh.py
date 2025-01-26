@@ -15,7 +15,7 @@ import scipy.sparse as sp
 import traceback
 from torchinfo import summary
 import math
-
+#import subprocess
 
 import torch.nn.functional as F
 from einops import repeat
@@ -38,7 +38,7 @@ from transformer.TransformerDecoder import TransformerDecoder
 
 class MESH_TRANSFORMER_ENCODER(nn.Module):
         def __init__(self):
-                super(MESH_TRANSFORMER_AE,self).__init__()
+                super(MESH_TRANSFORMER_ENCODER,self).__init__()
                 
                 #self.LATENT_VECTOR_SIZE=128
                 
@@ -57,22 +57,24 @@ class MESH_TRANSFORMER_ENCODER(nn.Module):
                                               d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=512, number_of_encoder_blocks=1,
                                               d_latent_vector=cfg.LATENT_VECTOR_SIZE 
                                               )
-                
+
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
         def encode(self,embeddings):
 
-#                 print(f"MESH_TRANSFORMER_AE.encoder.embeddings.shape={embeddings.shape}")
+#                 print(f"MESH_TRANSFORMER_ENCODER.embeddings.shape={embeddings.shape}")
                  
                  Z, K, V = self.transformer_encoder(embeddings)
  
                  return Z,K,V
 
 
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
         def normal_plus_positional_embeddings(self,X):
             
-               normal_embeddings=X[:,:,:9] ## first nine elements are v1.xyz, v2xyz, v3.xyz
+               normal_embeddings=X[:,:,:self.EMBEDDING_DIM] ## first nine elements are v1.xyz, v2xyz, v3.xyz
                
                ## last 7 elements are center.xyz, normal.xyz, and area, we convert it to 9 elements using neural network.
-               positional_embedding_0=torch.relu(self.positional_embedding_predictor_linear_layer_1(X[:,:,9:])) 
+               positional_embedding_0=torch.relu(self.positional_embedding_predictor_linear_layer_1(X[:,:,self.EMBEDDING_DIM:])) 
                positional_embeddings=torch.relu(self.positional_embedding_predictor_linear_layer_2(positional_embedding_0))            
             
 
@@ -82,27 +84,36 @@ class MESH_TRANSFORMER_ENCODER(nn.Module):
                
                return embeddings
                  
-                 
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
         def forward(self,X):
-#                print(f"MESH_TRANSFORMER_AE.forward.X.shape={X.shape}")
+#                print(f"MESH_TRANSFORMER_ENCODER.forward.X.shape={X.shape}")
                 embeddings=self.normal_plus_positional_embeddings(X)
                 Z, K, V = self.encode(embeddings)
-                return Z,K,V
+                return Z,K,V,embeddings
         
 
 class MESH_TRANSFORMER_DECODER(nn.Module):
         def __init__(self):
-                super(MESH_TRANSFORMER_AE,self).__init__()
+                super(MESH_TRANSFORMER_DECODER,self).__init__()
+                self.EMBEDDING_DIM=9 # triangle corners coordinates (9= v1.xyz, v2.xyz, v3.xyz) , 3+3+3=9
                 self.loss_fn = nn.MSELoss()#torch.nn.CrossEntropyLoss()
                 self.transformer_decoder = TransformerDecoder(
                                                vocab_size=cfg.TRANSFORMER_VOCAB_SIZE, 
                                                d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=512, number_of_decoder_blocks=1
                                             , masking=False)
                  
-        def forward(self,K,V):
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
+        def forward(self,Y,K,V):
+                #print(f'Y.shape={Y.shape} K.shape={K.shape} V.shape={V.shape}')
+                #subprocess.run(["nvidia-smi"])
+                #print("TRANSFORMER_DECODER_1############")
+
                 Y_PREDICTED  = self.transformer_decoder(Y, K, V)
+                #subprocess.run(["nvidia-smi"])
+                #print("TRANSFORMER_DECODER_2############")
                 return Y_PREDICTED
 
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
         def loss(self,Y_pred,Y) :
                 return self.loss_fn(Y_pred,Y)
 

@@ -14,6 +14,7 @@
 import torch
 import numpy as np
 import math
+#import subprocess
 
 class ScaledDotProductAttention(torch.nn.Module):
     def __init__(self, d_model=512, d_k=64, d_v=64, masking=False):
@@ -44,15 +45,45 @@ class ScaledDotProductAttention(torch.nn.Module):
 
 #        print(f"ScaledDotProductAttention.embeddings.shape={embeddings.shape}")
 #        print(f"self.embeddings_to_queries_layer={self.embeddings_to_queries_layer}")
+        #subprocess.run(["nvidia-smi"])
+        #print("ScaledDotProductAttention_1############")
         Q = self.embeddings_to_queries_layer(embeddings)
+        #subprocess.run(["nvidia-smi"])
+        #print("ScaledDotProductAttention_2############")
         K = self.embeddings_to_keys_layer(embeddings)
+        #subprocess.run(["nvidia-smi"])
+        #print("ScaledDotProductAttention_3############")
         V = self.embeddings_to_values_layer(embeddings)
+        #subprocess.run(["nvidia-smi"])
+        #print("ScaledDotProductAttention_4############")
 
         if (self.masking == False):
             if (self.is_matrix(K)):
-                return torch.matmul(self.softmax_fn(torch.div(torch.matmul(Q, torch.transpose(K, -2, -1)), math.sqrt(self.d_k))), V)
+                tK= torch.transpose(K, -2, -1)
+                result0= torch.matmul(Q, tK)
+                #subprocess.run(["nvidia-smi"])
+                #print(f"ScaledDotProductAttention_5.1.1############ Q.shape={Q.shape} K.shape={K.shape} tK.shape={tK.shape}")
+                result11= math.sqrt(self.d_k)
+                #subprocess.run(["nvidia-smi"])
+                #print(f"ScaledDotProductAttention_5.1.1.1############ result0.shape={result0.shape} result11={result11}")
+                result12= result0
+                #result12= torch.div(result0, result11)
+                #subprocess.run(["nvidia-smi"])
+                #print(f"ScaledDotProductAttention_5.1.1.2############")
+                result1= result12
+                #result1= self.softmax_fn(result12)
+                #subprocess.run(["nvidia-smi"])
+                #print(f"ScaledDotProductAttention_5.1.2############ result1.shape={result1.shape} V.shape={V.shape} ")
+                result= torch.matmul(result1, V)
+                #result= torch.matmul(self.softmax_fn(torch.div(torch.matmul(Q, torch.transpose(K, -2, -1)), math.sqrt(self.d_k))), V)
+                #subprocess.run(["nvidia-smi"])
+                #print(f"ScaledDotProductAttention_5.1.3############ result.shape={result.shape}")
+                return result
             else:
-                return torch.mul(self.softmax_fn(torch.div(torch.matmul(Q, K), math.sqrt(self.d_k))), V)
+                result= torch.mul(self.softmax_fn(torch.div(torch.matmul(Q, K), math.sqrt(self.d_k))), V)
+                #subprocess.run(["nvidia-smi"])
+                #print("ScaledDotProductAttention_5.2############")
+                return result
         else:
             # TODO: this could probably be written more efficiently
             first_dimension_of_M = Q.size(dim=0)

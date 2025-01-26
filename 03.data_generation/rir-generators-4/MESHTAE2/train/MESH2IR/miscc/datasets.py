@@ -177,7 +177,7 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_dec
                 torch.load( mesh_net_encoder_path,
                            map_location=lambda storage, loc: storage)
             gae_mesh_net_encoder.load_state_dict(state_dict)
-            print('Load GAE MESH ENCODER NET from: ', mesh_net_path)
+            print('Load GAE MESH ENCODER NET from: ', mesh_net_encoder_path)
     else:
         print(f"Could not find GAE MESH ENCODER NET pth file {mesh_net_encoder_path}")
         exit(1)
@@ -280,19 +280,9 @@ def build_mesh_embeddings(data_dir,embeddings):
     mesh_embeddings={}
   
 
-    if cfg.PRE_TRAINED_MODELS_DIR!= '' and cfg.MESH_NET_GAE_FILE != '' and os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE):
+    if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE):
             state_dict = \
-                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE,
-                           map_location=lambda storage, loc: storage)
-            gae_mesh_net.load_state_dict(state_dict)
-            print('Load GAE MESH NET from: ', cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE)
-    else:
-        print(f"Could not find GAE MESH NET pth file {cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE}")
-        exit(1)
-
-    if os.path.exists(mesh_net_encoder_path):
-            state_dict = \
-                torch.load( mesh_net_encoder_path,
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE,
                            map_location=lambda storage, loc: storage)
             gae_mesh_net_encoder.load_state_dict(state_dict)
             print('Load GAE MESH ENCODER NET from: ', mesh_net_path)
@@ -300,9 +290,9 @@ def build_mesh_embeddings(data_dir,embeddings):
         print(f"Could not find GAE MESH ENCODER NET pth file {mesh_net_encoder_path}")
         exit(1)
 
-    if os.path.exists(mesh_net_decoder_path):
+    if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE):
             state_dict = \
-                torch.load( mesh_net_decoder_path,
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE,
                            map_location=lambda storage, loc: storage)
             gae_mesh_net_decoder.load_state_dict(state_dict)
             print('Load GAE MESH DECODER NET from: ', mesh_net_decoder_path)
