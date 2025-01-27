@@ -55,7 +55,7 @@ fi
 
 cd $CURRENT_DIR/train/MESH2IR 
 
-GPU_NO="0,1"
+GPU_NO="0,1,2"
 
 #nvidia-smi | grep "NVIDIA GeForce 840M"
 #if [ $? = 0 ]

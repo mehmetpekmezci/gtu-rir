@@ -47,7 +47,7 @@ class MESH_TRANSFORMER_ENCODER(nn.Module):
                 self.positional_embedding_predictor_linear_layer_1=torch.nn.Linear(self.CENTER_NORMAL_AREA_DIM,cfg.LATENT_VECTOR_SIZE)
                 self.positional_embedding_predictor_linear_layer_2=torch.nn.Linear(cfg.LATENT_VECTOR_SIZE,self.EMBEDDING_DIM)
                 
-#                self.gaussian_matrix=torch.rand((self.EMBEDDING_DIM, self.D_K_V), dtype=torch.float).cuda()
+#                self.gaussian_matrix=torch.rand((self.EMBEDDING_DIM, self.EMBEDDING_DIM_V), dtype=torch.float).cuda()
                 
                 
                 self.loss_fn = nn.MSELoss()#torch.nn.CrossEntropyLoss()
@@ -92,32 +92,43 @@ class MESH_TRANSFORMER_ENCODER(nn.Module):
                 return Z,K,V,embeddings
         
 
-class MESH_TRANSFORMER_DECODER(nn.Module):
+class MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION(nn.Module):
         def __init__(self):
-                super(MESH_TRANSFORMER_DECODER,self).__init__()
+                super(MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION,self).__init__()
+                self.EMBEDDING_DIM=9 # triangle corners coordinates (9= v1.xyz, v2.xyz, v3.xyz) , 3+3+3=9
+                self.multi_head_attention_layer = MultiHeadAttention(d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, masking=False)
+
+        @torch.autocast(device_type="cuda",dtype=torch.float16)         
+        def forward(self,tokenEmbedding,K,V):
+            multi_head_output = self.add_and_norm_layer(tokenEmbedding + self.multi_head_attention_layer(tokenEmbedding))
+            return multi_head_output              
+
+
+class MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION(nn.Module):
+        def __init__(self):
+                super(MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION,self).__init__()
                 self.EMBEDDING_DIM=9 # triangle corners coordinates (9= v1.xyz, v2.xyz, v3.xyz) , 3+3+3=9
                 self.loss_fn = nn.MSELoss()#torch.nn.CrossEntropyLoss()
-                self.transformer_decoder = TransformerDecoder(
-                                               vocab_size=cfg.TRANSFORMER_VOCAB_SIZE, 
-                                               d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, d_ff=512, number_of_decoder_blocks=1
-                                            , masking=False)
+                self.encoder_decoder_attention_layer = EncoderDecoderAttention(d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, masking=False)
+                self.add_and_norm_layer = torch.nn.LayerNorm(normalized_shape=self.EMBEDDING_DIM)
+                self.feed_forward_layer = FeedForward(d_model=self.EMBEDDING_DIM, d_ff=512)
+                self.decoder_output_to_logits_layer = torch.nn.Linear(in_features=self.EMBEDDING_DIM, out_features=cfg.TRANSFORMER_VOCAB_SIZE)
+
                  
         @torch.autocast(device_type="cuda",dtype=torch.float16)         
-        def forward(self,Y,K,V):
-                #print(f'Y.shape={Y.shape} K.shape={K.shape} V.shape={V.shape}')
-                #subprocess.run(["nvidia-smi"])
-                #print("TRANSFORMER_DECODER_1############")
-
-                Y_PREDICTED  = self.transformer_decoder(Y, K, V)
-                #subprocess.run(["nvidia-smi"])
-                #print("TRANSFORMER_DECODER_2############")
-                return Y_PREDICTED
+        def forward(self,tokenEmbedding,multi_head_output):
+            encoder_decoder_attention_output = self.add_and_norm_layer(multi_head_output + self.encoder_decoder_attention_layer(tokenEmbedding, K, V))
+            norm = self.add_and_norm_layer(encoder_decoder_attention_output + self.feed_forward_layer(encoder_decoder_attention_output))
+            logits = self.decoder_output_to_logits_layer(norm)
+            return logits              
 
         @torch.autocast(device_type="cuda",dtype=torch.float16)         
         def loss(self,Y_pred,Y) :
                 return self.loss_fn(Y_pred,Y)
 
-              
+
+
+
 
 '''
 class MESH_TRANSFORMER_AE(nn.Module):
@@ -131,7 +142,7 @@ class MESH_TRANSFORMER_AE(nn.Module):
                 self.positional_embedding_predictor_linear_layer_1=torch.nn.Linear(self.CENTER_NORMAL_AREA_DIM,cfg.LATENT_VECTOR_SIZE)
                 self.positional_embedding_predictor_linear_layer_2=torch.nn.Linear(cfg.LATENT_VECTOR_SIZE,self.EMBEDDING_DIM)
                 
-#                self.gaussian_matrix=torch.rand((self.EMBEDDING_DIM, self.D_K_V), dtype=torch.float).cuda()
+#                self.gaussian_matrix=torch.rand((self.EMBEDDING_DIM, self.EMBEDDING_DIM_V), dtype=torch.float).cuda()
                 
                 
                 self.loss_fn = nn.MSELoss()#torch.nn.CrossEntropyLoss()

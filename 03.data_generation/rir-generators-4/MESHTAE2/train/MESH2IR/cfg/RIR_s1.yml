@@ -11,7 +11,8 @@ SYNTHETIC_GEOMETRIC_DATA_DIR: '../dataset'
 
 PRE_TRAINED_MODELS_DIR: '../pre-trained-models/'
 MESH_NET_ENCODER_FILE: 'gae_mesh_net_encoder_trained_model.pth'
-MESH_NET_DECODER_FILE: 'gae_mesh_net_decoder_trained_model.pth'
+MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE: 'gae_mesh_net_decoder_multihead_attention_trained_model.pth'
+MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE: 'gae_mesh_net_decoder_encoder_decoder_attention_trained_model.pth'
 #MESH_NET_GAE_FILE: 'gae_mesh_net_trained_model.pth'
 
 #MAX_FACE_COUNT: 1500

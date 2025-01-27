@@ -161,13 +161,14 @@ class TextDataset(data.Dataset):
 
 
 
-def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_decoder_path,data_dir,embedding_directory,data_set_name,obj_file_name_list):
+def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_decoder_multihead_attention_path,mesh_net_decoder_encoderdecoder_attention_path,data_dir,embedding_directory,data_set_name,obj_file_name_list):
     GENERATE_SAMPLES_FOR_DOCUMENTING=True
 
     print("build_mesh_embeddings_for_evaluation_data started...")
-    from model_mesh import MESH_TRANSFORMER_ENCODER,MESH_TRANSFORMER_DECODER
+    from model_mesh import MESH_TRANSFORMER_ENCODER,MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION,MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION
     gae_mesh_net_encoder=MESH_TRANSFORMER_ENCODER()
-    gae_mesh_net_decoder=MESH_TRANSFORMER_DECODER()
+    gae_mesh_net_decoder_multi_head_attention =MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION() 
+    gae_mesh_net_decoder_encoder_decoder_attention =MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION() 
 
     mesh_embeddings={}
   
@@ -182,21 +183,35 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_dec
         print(f"Could not find GAE MESH ENCODER NET pth file {mesh_net_encoder_path}")
         exit(1)
 
-    if os.path.exists(mesh_net_decoder_path):
+    if os.path.exists(mesh_net_decoder_multihead_attention_path):
             state_dict = \
-                torch.load( mesh_net_decoder_path,
+                torch.load( mesh_net_decoder_multihead_attention_path,
                            map_location=lambda storage, loc: storage)
-            gae_mesh_net_decoder.load_state_dict(state_dict)
-            print('Load GAE MESH DECODER NET from: ', mesh_net_decoder_path)
+            gae_mesh_net_decoder_multi_head_attention.load_state_dict(state_dict)
+            print('Load GAE MESH DECODER MULTIHEAD NET from: ', mesh_net_decoder_multihead_attention_path)
     else:
-        print(f"Could not find GAE MESH DECODER NET pth file {mesh_net_decoder_path}")
+        print(f"Could not find GAE MESH DECODER NET pth file {mesh_net_decoder_multihead_attention_path}")
         exit(1)
 
-    gae_mesh_net_encoder.to(device='cuda:0')
+    if os.path.exists(mesh_net_decoder_encoderdecoder_attention_path):
+            state_dict = \
+                torch.load( mesh_net_decoder_encoderdecoder_attention_path,
+                           map_location=lambda storage, loc: storage)
+            gae_mesh_net_decoder_encoder_decoder_attention.load_state_dict(state_dict)
+            print('Load GAE MESH DECODER ENCODERDECODER ATTENTION NET from: ', mesh_net_decoder_encoderdecoder_attention_path)
+    else:
+        print(f"Could not find GAE MESH DECODER NET pth file {mesh_net_decoder_encoderdecoder_attention_path}")
+        exit(1)
+
+    gae_mesh_net_encoder.to(device='cuda:2')
     gae_mesh_net_encoder.eval()
 
-    gae_mesh_net_decoder.to(device='cuda:1')
-    gae_mesh_net_decoder.eval()
+    gae_mesh_net_decoder_multi_head_attention.to(device='cuda:0')
+    gae_mesh_net_decoder_multi_head_attention.eval()
+
+    gae_mesh_net_decoder_encoder_decoder_attention.to(device='cuda:1')
+    gae_mesh_net_decoder_encoder_decoder_attention.eval()
+
 
     loss_list_content=""
 
@@ -216,15 +231,32 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_dec
            areas=torch.from_numpy(areas).float()
            faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
            faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
-           faceData=faceData.unsqueeze(0).detach().to(device='cuda:0')
-           #time.sleep(10)
-           latent_vector,K,V =  gae_mesh_net_encoder.forward(faceData)
-           K.to(device='cuda:1')
-           V.to(device='cuda:1')
-           faceData_predicted  =  gae_mesh_net_decoder.forward(K,V)
+           
+        
+           faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           
+           faceData_predicted , latent_vector =  gae_mesh_net_encoder(faceData)
+           
+           
+           Z,K,V,embeddings =  gae_mesh_net_encoder.forward(faceData)
+           embeddings=embeddings.to(torch.float16).to(device='cuda:0')
+           Z=Z.to(torch.float16).to(device='cuda:0')
+           K=K.to(torch.float16).to(device='cuda:0')
+           V=V.to(torch.float16).to(device='cuda:0')
+           
+           multihead_output=gae_mesh_net_decoder_multi_head_attention(embeddings,K,V)
+               
+           embeddings=embeddings.to(torch.float16).to(device='cuda:1')
+           multihead_output=multihead_output.to(torch.float16).to(device='cuda:1')
+               
+           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,multihead_output)
+           loss = gae_mesh_net_decoder.loss(faceData_predicted,faceData)
+
            faceData=faceData.detach().cpu()
            faceData_predicted=faceData_predicted.detach().cpu()
-           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+           mesh_embeddings[graph_path]=Z.squeeze().detach().cpu()
+
+
 
            #triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
            #normals=torch.autograd.Variable(torch.from_numpy(normals)).float()
@@ -273,9 +305,10 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_dec
 
 def build_mesh_embeddings(data_dir,embeddings):
     GENERATE_SAMPLES_FOR_DOCUMENTING=True
-    from model_mesh import MESH_TRANSFORMER_ENCODER,MESH_TRANSFORMER_DECODER
+    from model_mesh import MESH_TRANSFORMER_ENCODER,MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION,MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION
     gae_mesh_net_encoder=MESH_TRANSFORMER_ENCODER()
-    gae_mesh_net_decoder=MESH_TRANSFORMER_DECODER()
+    gae_mesh_net_decoder_multi_head_attention =MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION() 
+    gae_mesh_net_decoder_encoder_decoder_attention =MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION() 
     
     mesh_embeddings={}
   
@@ -287,24 +320,37 @@ def build_mesh_embeddings(data_dir,embeddings):
             gae_mesh_net_encoder.load_state_dict(state_dict)
             print('Load GAE MESH ENCODER NET from: ', mesh_net_path)
     else:
-        print(f"Could not find GAE MESH ENCODER NET pth file {mesh_net_encoder_path}")
+        print(f"Could not find GAE MESH ENCODER NET pth file {cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE}")
         exit(1)
 
-    if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE):
+    if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE):
             state_dict = \
-                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE,
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE,
                            map_location=lambda storage, loc: storage)
-            gae_mesh_net_decoder.load_state_dict(state_dict)
-            print('Load GAE MESH DECODER NET from: ', mesh_net_decoder_path)
+            gae_mesh_net_decoder_multi_head_attention.load_state_dict(state_dict)
+            print('Load GAE MESH MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE NET from: ', cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE)
     else:
-        print(f"Could not find GAE MESH DECODER NET pth file {mesh_net_decoder_path}")
+        print(f"Could not find MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE pth file {mesh_net_decoder_path}")
         exit(1)
 
-    gae_mesh_net_encoder.to(device='cuda:0')
+    if os.path.exists(cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE):
+            state_dict = \
+                torch.load( cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE,
+                           map_location=lambda storage, loc: storage)
+            gae_mesh_net_decoder_encoder_decoder_attention.load_state_dict(state_dict)
+            print('Load GAE MESH MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE NET from: ', mesh_net_decoder_path)
+    else:
+        print(f"Could not find MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE pth file {cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE}")
+        exit(1)
+
+    gae_mesh_net_encoder.to(device='cuda:2')
     gae_mesh_net_encoder.eval()
 
-    gae_mesh_net_decoder.to(device='cuda:1')
-    gae_mesh_net_decoder.eval()
+    gae_mesh_net_decoder_multi_head_attention.to(device='cuda:0')
+    gae_mesh_net_decoder_multi_head_attention.eval()
+
+    gae_mesh_net_decoder_encoder_decoder_attention.to(device='cuda:1')
+    gae_mesh_net_decoder_encoder_decoder_attention.eval()
 
 
 
@@ -326,24 +372,32 @@ def build_mesh_embeddings(data_dir,embeddings):
            areas=torch.autograd.Variable(torch.from_numpy(areas)).float()
            faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
            faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
+
+          
+           
+           faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           
+           faceData_predicted , latent_vector =  gae_mesh_net_encoder(faceData)
            
            
-           faceData=faceData.unsqueeze(0).detach().to(device='cuda:0')
+           Z,K,V,embeddings =  gae_mesh_net_encoder.forward(faceData)
+           embeddings=embeddings.to(torch.float16).to(device='cuda:0')
+           Z=Z.to(torch.float16).to(device='cuda:0')
+           K=K.to(torch.float16).to(device='cuda:0')
+           V=V.to(torch.float16).to(device='cuda:0')
            
-           faceData_predicted , latent_vector =  gae_mesh_net(faceData)
-           
-           
-           latent_vector,K,V =  gae_mesh_net_encoder.forward(faceData)
-           K.to(device='cuda:1')
-           V.to(device='cuda:1')
-           faceData_predicted  =  gae_mesh_net_decoder.forward(K,V)
+           multihead_output=gae_mesh_net_decoder_multi_head_attention(embeddings,K,V)
+               
+           embeddings=embeddings.to(torch.float16).to(device='cuda:1')
+           multihead_output=multihead_output.to(torch.float16).to(device='cuda:1')
+               
+           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,multihead_output)
+           loss = gae_mesh_net_decoder.loss(faceData_predicted,faceData)
+
            faceData=faceData.detach().cpu()
            faceData_predicted=faceData_predicted.detach().cpu()
-           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+           mesh_embeddings[graph_path]=Z.squeeze().detach().cpu()
 
-           
-           
-           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
  
            if GENERATE_SAMPLES_FOR_DOCUMENTING :
                     path=full_mesh_path
@@ -359,7 +413,7 @@ def build_mesh_embeddings(data_dir,embeddings):
                     predicted_triangle_coordinates,predicted_normals,predicted_centers,predicted_areas=denormalize_mesh_values(predicted_triangle_coordinates,predicted_normals,predicted_centers,predicted_areas)
                     save_face_normal_center_area_as_obj(real_normals,real_centers,real_areas,path+".face.triangles.real.sample."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".obj")
                     save_face_normal_center_area_as_obj(predicted_normals,predicted_centers,predicted_areas,path+".face.triangles.regenerated.sample."+str(cfg.MAX_FACE_COUNT)+"."+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+".obj")
-                    loss = gae_mesh_net_decoder.loss(faceData_predicted,faceData)
+                    
                     print(f"Finished to generate OBJ mesh sample : {path}.face.triangles.(real,regenerated).sample.obj with LOSS:{loss}")
                     loss_list_content=loss_list_content+"\n"+path+"="+str(loss.cpu().detach().numpy())
 

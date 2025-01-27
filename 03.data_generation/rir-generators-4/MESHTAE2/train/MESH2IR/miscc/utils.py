@@ -335,20 +335,28 @@ def save_mesh_encoder_model(mesh_net_encoder, epoch, model_dir):
         mesh_net_encoder.state_dict(),
         '%s/mesh_net_encoder_epoch_%d.pth' % (model_dir, epoch))
 
-
 def save_mesh_encoder_final_model(mesh_net_encoder):
     mkdir_p(cfg.PRE_TRAINED_MODELS_DIR)
     torch.save(mesh_net_encoder.state_dict(),cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_ENCODER_FILE)
 
-def save_mesh_decoder_model(mesh_net_decoder, epoch, model_dir):
+def save_mesh_decoder_multihead_attention_model(mesh_net_decoder_multi_head_attention, epoch, model_dir):
     torch.save(
-        mesh_net_decoder.state_dict(),
-        '%s/mesh_net_decoder_epoch_%d.pth' % (model_dir, epoch))
+        mesh_net_decoder_multi_head_attention.state_dict(),
+        '%s/mesh_net_decoder_multihead_attention_epoch_%d.pth' % (model_dir, epoch))
 
-
-def save_mesh_decoder_final_model(mesh_net_decoder):
+def save_mesh_decoder_multihead_attention_final_model(mesh_net_decoder_multi_head_attention):
     mkdir_p(cfg.PRE_TRAINED_MODELS_DIR)
-    torch.save(mesh_net_decoder.state_dict(),cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_FILE)
+    torch.save(mesh_net_decoder_multi_head_attention.state_dict(),cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_MULTIHEAD_ATTENTION_FILE)
+
+def save_mesh_decoder_encoder_decoder_attention_model(mesh_net_decoder_encoder_decoder_attention, epoch, model_dir):
+    torch.save(
+        mesh_net_decoder_encoder_decoder_attention.state_dict(),
+        '%s/mesh_net_decoder_encoder_decoder_attention_epoch_%d.pth' % (model_dir, epoch))
+        
+def save_mesh_decoder_encoder_decoder_attention_final_model(mesh_net_decoder_encoder_decoder_attention):
+    mkdir_p(cfg.PRE_TRAINED_MODELS_DIR)
+    torch.save(mesh_net_decoder_encoder_decoder_attention.state_dict(),cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_DECODER_ENCODER_DECODER_ATTENTION_FILE)
+
 
 
 def mkdir_p(path):
