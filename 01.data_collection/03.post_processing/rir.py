@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+
+### https://dsp.stackexchange.com/questions/41696/calculating-the-inverse-filter-for-the-exponential-sine-sweep-method
+
 from __future__ import division
 import matplotlib
 from matplotlib import pyplot as plt
