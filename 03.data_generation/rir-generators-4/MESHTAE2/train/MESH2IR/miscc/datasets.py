@@ -248,8 +248,10 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_encoder_path,mesh_net_dec
                
            embeddings=embeddings.to(torch.float16).to(device='cuda:1')
            multihead_output=multihead_output.to(torch.float16).to(device='cuda:1')
+           K=K.to(torch.float16).to(device='cuda:1')
+           V=V.to(torch.float16).to(device='cuda:1')
                
-           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,multihead_output)
+           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,K,V,multihead_output)
            loss = gae_mesh_net_decoder.loss(faceData_predicted,faceData)
 
            faceData=faceData.detach().cpu()
@@ -390,8 +392,10 @@ def build_mesh_embeddings(data_dir,embeddings):
                
            embeddings=embeddings.to(torch.float16).to(device='cuda:1')
            multihead_output=multihead_output.to(torch.float16).to(device='cuda:1')
+           K=K.to(torch.float16).to(device='cuda:1')
+           V=V.to(torch.float16).to(device='cuda:1')
                
-           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,multihead_output)
+           faceData_predicted=gae_mesh_net_decoder_encoder_decoder_attention(embeddings,K,V,multihead_output)
            loss = gae_mesh_net_decoder.loss(faceData_predicted,faceData)
 
            faceData=faceData.detach().cpu()

@@ -34,7 +34,10 @@ import timm.models.vision_transformer
 from timm.models.vision_transformer import PatchEmbed, Block
 
 from transformer.TransformerEncoder import TransformerEncoder
-from transformer.TransformerDecoder import TransformerDecoder
+#from transformer.TransformerDecoder import TransformerDecoder
+from transformer.MultiHeadAttention import MultiHeadAttention
+from transformer.EncoderDecoderAttention import EncoderDecoderAttention
+from transformer.FeedForward import FeedForward
 
 class MESH_TRANSFORMER_ENCODER(nn.Module):
         def __init__(self):
@@ -96,6 +99,7 @@ class MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION(nn.Module):
         def __init__(self):
                 super(MESH_TRANSFORMER_DECODER_MULTI_HEAD_ATTENTION,self).__init__()
                 self.EMBEDDING_DIM=9 # triangle corners coordinates (9= v1.xyz, v2.xyz, v3.xyz) , 3+3+3=9
+                self.add_and_norm_layer = torch.nn.LayerNorm(normalized_shape=self.EMBEDDING_DIM)
                 self.multi_head_attention_layer = MultiHeadAttention(d_model=self.EMBEDDING_DIM, h=cfg.NUMBER_OF_TRANSFORMER_HEADS, d_k=self.EMBEDDING_DIM, d_v=self.EMBEDDING_DIM, masking=False)
 
         @torch.autocast(device_type="cuda",dtype=torch.float16)         
@@ -116,7 +120,7 @@ class MESH_TRANSFORMER_DECODER_ENCODER_DECODER_ATTENTION(nn.Module):
 
                  
         @torch.autocast(device_type="cuda",dtype=torch.float16)         
-        def forward(self,tokenEmbedding,multi_head_output):
+        def forward(self,tokenEmbedding,K,V,multi_head_output):
             encoder_decoder_attention_output = self.add_and_norm_layer(multi_head_output + self.encoder_decoder_attention_layer(tokenEmbedding, K, V))
             norm = self.add_and_norm_layer(encoder_decoder_attention_output + self.feed_forward_layer(encoder_decoder_attention_output))
             logits = self.decoder_output_to_logits_layer(norm)

@@ -91,10 +91,14 @@ class MESH_TRANSFORMER_AE(nn.Module):
                  
         def forward(self,X):
 #                print(f"MESH_TRANSFORMER_AE.forward.X.shape={X.shape}")
+                
                 embeddings=self.normal_plus_positional_embeddings(X)
+               
                 Z, K, V = self.encode(embeddings)
+                
+#                print(f"Z.shape={Z.shape} K.shape={K.shape}")
+
                 Y=embeddings ## AUTOENCODER
-                #print(f"Z.shape={Z.shape} Y.shape={Y.shape}  K.shape={K.shape} V.shape={V.shape} ")
                 Y_PREDICTED  = self.decode(Y, K, V)
                 return Y_PREDICTED,Z
 

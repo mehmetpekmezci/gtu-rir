@@ -1,0 +1,71 @@
+CONFIG_NAME: 'stageI'
+
+DATASET_NAME: 'RIR'
+EMBEDDING_TYPE: 'cnn-rnn'
+GPU_ID: '0,1'
+DATA_DIR: '../dataset'
+SYNTHETIC_GEOMETRIC_DATA_DIR: '../dataset'
+
+# NET_G: '../generate/netG_epoch_20.pth'
+# NET_D: '../generate/netD_epoch_last.pth'
+
+PRE_TRAINED_MODELS_DIR: '../pre-trained-models/'
+MESH_NET_GAE_FILE: 'gae_mesh_net_trained_model.pth'
+
+#MAX_FACE_COUNT: 1500
+NUMBER_OF_TRANSFORMER_HEADS: 51
+MAX_FACE_COUNT: 500
+FORCE_DECIMATION: True
+
+## BUNU DEGISTIRINCE TEXT.DIMENSION'i da degistir.
+LATENT_VECTOR_SIZE: 10
+##
+TRANSFORMER_VOCAB_SIZE: 16
+MESH_FACE_DATA_SIZE: 16 
+## MESH FACE DATA : V1.x, V1.y, V1.z, V2.x, V2.y, V2.z, V3.x, V3.y, V3.z, Center.x, Center.y, Center.z, Normal.z, Normal.y,  Normal.z, Area == 16 Float nnumbers  , last 7 will be used as positional embedding, 7 is given to a neural network that will augment it to 9 numbers ,
+GWA_MESH_EMBEDDINGS_FILE: 'mesh_embeddings.pickle'
+MAX_DIM: 30
+# EVAL_DIR: '../generate/embeddings/'
+RIRSIZE: 4096
+WORKERS: 0
+STAGE: 1
+TRAIN:
+    FLAG: True
+    BATCH_SIZE: 8
+    GAE_BATCH_SIZE: 24
+    MAX_EPOCH: 100
+    MAX_MESHNET_GAE_EPOCH: 100
+    LR_DECAY_EPOCH: 7
+    SNAPSHOT_INTERVAL: 25
+    # DISCRIMINATOR_LR: 0.000004
+    # GENERATOR_LR: 0.000004
+    # MESH_LR: 0.000004
+    DISCRIMINATOR_LR: 0.01
+    GENERATOR_LR: 0.0001
+    # MESH_LR: 0.001
+    #DISCRIMINATOR_LR: 0.0000008
+    #GENERATOR_LR: 0.0000008
+    ## MESH_LR : BUNU YUKSELTINCE CUDA CORE ATIYOR, BINARY_CROSS_ENTROPY OLAN A lossunda
+    ## ../aten/src/ATen/native/cuda/Loss.cu:92: operator(): block: [80,0,0], thread: [127,0,0] Assertion `input_val >= zero && input_val <= one` failed.
+    ## https://github.com/Megvii-BaseDetection/YOLOX/issues/813
+
+    ##MESH_LR: 0.00001
+    MESH_LR: 0.00001
+    
+    # DISCRIMINATOR_LR: 0.00008
+    # GENERATOR_LR: 0.00008
+    # MESH_LR: 0.00008
+    COEFF:
+      KL: 2.0
+
+GAN:
+    CONDITION_DIM: 10
+    DF_DIM: 96
+    GF_DIM: 256
+
+TEXT:
+    #DIMENSION: 14
+    #DIMENSION: 10   
+    DIMENSION: 16 # LATENT_VECTOR_SIZE+6
+    
+    

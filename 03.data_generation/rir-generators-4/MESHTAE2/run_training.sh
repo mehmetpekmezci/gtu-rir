@@ -4,6 +4,9 @@ CURRENT_DIR=$(pwd)
 
 DEFAULT_MAIN_DATA_DIR=$HOME/RIR_DATA
 
+mkdir -p train/pre-trained-models
+mkdir -p train/output
+
 if [ "$MESH2IR_TRAINING_DATA" = "" ]
 then
 	echo "MESH2IR_TRAINING_DATA env. var. is not defined"

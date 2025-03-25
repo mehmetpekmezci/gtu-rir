@@ -25,7 +25,7 @@ from wavefile import WaveWriter, Format
 from miscc.config import cfg
 from miscc.utils import mkdir_p
 from miscc.utils import weights_init
-from miscc.utils import save_RIR_results, save_model, save_mesh_encoder_model,save_mesh_encoder_final_model, save_mesh_decoder_model,save_mesh_decoder_final_model, convert_to_trimesh,plot_mesh , plot_points,edge_index_to_face
+from miscc.utils import save_RIR_results, save_model, save_mesh_encoder_model,save_mesh_encoder_final_model, save_mesh_decoder_multihead_attention_model,save_mesh_decoder_encoder_decoder_attention_model, save_mesh_decoder_multihead_attention_final_model,save_mesh_decoder_encoder_decoder_attention_final_model,convert_to_trimesh,plot_mesh , plot_points,edge_index_to_face
 from miscc.datasets import save_face_normal_center_area_as_obj,denormalize_mesh_values
 import time
 import torch_geometric.transforms as T
@@ -68,7 +68,7 @@ class GAETrainer(object):
         print(f"torch.cuda.is_available()={torch.cuda.is_available()}")
         torch.cuda.set_device(self.gpus[2])
         cudnn.benchmark = True
-        self.mesh_net_encoder,self.mesh_net_decoder = self.load_network()
+        self.mesh_net_encoder,self.mesh_net_decoder_multi_head_attention, self.mesh_net_decoder_encoder_decoder_attention = self.load_network()
        
     # ############# For training stageI GAN #############
     def load_network(self):
@@ -117,13 +117,13 @@ class GAETrainer(object):
         #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,16).cuda()
         #faces_summary=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE).cuda()
         faces_summary_encoder_X=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,cfg.MESH_FACE_DATA_SIZE)
-        faces_summary_decoder_Y=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
-        faces_summary_decoder_K=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
-        faces_summary_decoder_V=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
-        faces_summary_decoder_multihead_output=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder.EMBEDDING_DIM)
+        faces_summary_decoder_Y=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder_multi_head_attention.EMBEDDING_DIM)
+        faces_summary_decoder_K=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder_multi_head_attention.EMBEDDING_DIM)
+        faces_summary_decoder_V=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder_multi_head_attention.EMBEDDING_DIM)
+        faces_summary_decoder_multihead_output=torch.rand(cfg.TRAIN.GAE_BATCH_SIZE,cfg.MAX_FACE_COUNT,mesh_net_decoder_multi_head_attention.EMBEDDING_DIM)
         summary(mesh_net_encoder,input_data=[faces_summary_encoder_X] )
         summary(mesh_net_decoder_multi_head_attention,input_data=[faces_summary_decoder_Y,faces_summary_decoder_K,faces_summary_decoder_V] )
-        summary(mesh_net_decoder_encoder_decoder_attention,input_data=[faces_summary_decoder_Y,faces_summary_decoder_multihead_output] )
+        summary(mesh_net_decoder_encoder_decoder_attention,input_data=[faces_summary_decoder_Y,faces_summary_decoder_K,faces_summary_decoder_V,faces_summary_decoder_multihead_output] )
 
         return mesh_net_encoder,mesh_net_decoder_multi_head_attention,mesh_net_decoder_encoder_decoder_attention
 
@@ -219,12 +219,14 @@ class GAETrainer(object):
                
                embeddings=embeddings.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
                multihead_output=multihead_output.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               K=K.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
+               V=V.to(torch.float16).to(device='cuda:'+str(self.gpus[1]))
                
-               faceData_predicted=self.mesh_net_decoder_multi_head_attention(embeddings,multihead_output)
+               faceData_predicted=self.mesh_net_decoder_encoder_decoder_attention(embeddings,K,V,multihead_output)
 
-               faceData=faceData.to(device='cuda:'+str(self.gpus[2]))
+               faceData=faceData.to(device='cuda:'+str(self.gpus[1]))
 
-               loss = self.mesh_net_decoder.loss(faceData_predicted,faceData)
+               loss = self.mesh_net_decoder_encoder_decoder_attention.loss(faceData_predicted,faceData)
 
                ## MP: loss.backward hicbir zaman autocastin icinde olMAmalidir.
                loss.backward()
