@@ -482,6 +482,14 @@ def load_mesh(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     mesh = trimesh.load_mesh(path, process=False)
 
+    if cfg.TRAIN.FLAG :
+       print("TRAIN.FLAG is set")
+    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+       random.shuffle(mesh.faces)
+    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
+    #   save_mesh_as_obj(mesh,path+".DECIMATED.2.obj")
+
+
     #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
     #save_mesh_as_obj(mesh,path+".DECIMATED.0.obj")
 
@@ -492,11 +500,6 @@ def load_mesh(path, augments=[], request=[], seed=None):
 
     #save_mesh_as_obj(mesh,path+".DECIMATED.1.obj")
 
-    if cfg.TRAIN.FLAG :
-    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-       random.shuffle(mesh.faces)
-    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-    #   save_mesh_as_obj(mesh,path+".DECIMATED.2.obj")
 
 #    print(f"1.simplify_quadric_decimation TOTAL_NUMBER_OF_FACES={TOTAL_NUMBER_OF_FACES}")
 #    while mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES :
