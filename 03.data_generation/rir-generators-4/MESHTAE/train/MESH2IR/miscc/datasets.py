@@ -70,20 +70,21 @@ class MeshDataset(data.Dataset):
     def __getitem__(self, index):
 
         label = 0
-        pickle_file_path=os.path.join(self.data_dir,self.mesh_paths[index])
-        mesh_pickle_file_path = pickle_file_path.replace('.pickle',f'.facecount-{cfg.MAX_FACE_COUNT}.pickle')
-        full_mesh_path = pickle_file_path.replace('.pickle','.obj')
-        pickle_file_content=None
-        if(os.path.exists(mesh_pickle_file_path)):
-            pickle_file_content=load_pickle(mesh_pickle_file_path)
-        else:
-            pickle_file_content=None
+        full_mesh_path=os.path.join(self.data_dir,self.mesh_paths[index])
+        #mesh_pickle_file_path = pickle_file_path.replace('.pickle',f'.facecount-{cfg.MAX_FACE_COUNT}.pickle')
+        #full_mesh_path = pickle_file_path.replace('.pickle','.obj')
+        #pickle_file_content=None
+        #if(os.path.exists(mesh_pickle_file_path)):
+        #    pickle_file_content=load_pickle(mesh_pickle_file_path)
+        #else:
+        #    pickle_file_content=None
 
-        if pickle_file_content is not None:
-             (tirangle_coordinates,normals,centers,areas)=pickle_file_content
-        else:
-            tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path, augments=self.augments,request=self.feats)
-            tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
+        #if pickle_file_content is not None:
+        #     (tirangle_coordinates,normals,centers,areas)=pickle_file_content
+        #else:
+            #tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path, augments=self.augments,request=self.feats)
+        tirangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path, augments=self.augments,request=self.feats)
+        tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
             #write_pickle(mesh_pickle_file_path,(tirangle_coordinates,normals,centers,areas))
 
         return   tirangle_coordinates, normals,centers,areas, full_mesh_path
@@ -194,7 +195,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
          if graph_path not in  mesh_embeddings:
            print(f"calculating mesh embedding of {graph_path}")
            full_mesh_path = full_graph_path.replace('.pickle','.obj')
-           triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
+           #triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
+           triangle_coordinates,normals,centers,areas = load_mesh2(full_graph_path)
            real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
            triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
            triangle_coordinates=torch.from_numpy(triangle_coordinates).float()
@@ -285,7 +287,8 @@ def build_mesh_embeddings(data_dir,embeddings):
         full_graph_path = os.path.join(data_dir,graph_path)
         if graph_path not in  mesh_embeddings:
            full_mesh_path = full_graph_path.replace('.pickle','.obj')
-           triangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
+           #triangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
+           triangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path)
            real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
            triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
            triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
@@ -580,18 +583,18 @@ def load_mesh(path, augments=[], request=[], seed=None):
 def load_mesh2(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     #mesh = trimesh.load_mesh(path, process=False)
-
+    nanosecs=time.time_ns()
+    tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
     pymeshlab_mesh = ml.MeshSet()
     pymeshlab_mesh.load_new_mesh(path)
     pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
-    pymeshlab_mesh.save_current_mesh(path+"."+TOTAL_NUMBER_OF_FACES)
+    pymeshlab_mesh.save_current_mesh(tempfile)
     
     
-    mesh = trimesh.load_mesh(path+"."+TOTAL_NUMBER_OF_FACES, process=False)
+    mesh = trimesh.load_mesh(tempfile, process=False)
 
             
     if cfg.TRAIN.FLAG :
-       print("TRAIN.FLAG is set")
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
        random.shuffle(mesh.faces)
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
@@ -681,6 +684,7 @@ def load_mesh2(path, augments=[], request=[], seed=None):
     centers=np.array(centers)
     areas=np.array(areas).reshape(-1,1)
     #areas=torch.Tensor(np.array(areas))
+    os.remove(tempfile)
     return tirangle_coordinates,normals,centers,areas
 
 

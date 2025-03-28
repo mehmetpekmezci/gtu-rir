@@ -14,7 +14,8 @@ embedding_list=[]
 #path = "dataset/"
 path = str(sys.argv[1]).strip()
 
-embedding_list = glob.glob(path+"/*/floor_plan-*.pickle", recursive=True)
+#embedding_list = glob.glob(path+"/*/floor_plan-*.pickle", recursive=True)
+embedding_list = glob.glob(path+"/*/floor_plan-*.obj", recursive=True)
 
 print("embedding_list", len(embedding_list))
 filler = 128  - (len(embedding_list) % 128)
