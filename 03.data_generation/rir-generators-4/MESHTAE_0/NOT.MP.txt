@@ -1,4 +1,0 @@
-50/10000][0/64] loss: 0.00007182 Total Time: 1.77855873sec
-
-Sekil olarak yakin bir sekil cikariyor, bundan yuksek losslar icin cok duzgun degil.
-

@@ -583,22 +583,28 @@ def load_mesh(path, augments=[], request=[], seed=None):
 def load_mesh2(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     #mesh = trimesh.load_mesh(path, process=False)
-    nanosecs=time.time_ns()
-    tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
     pymeshlab_mesh = ml.MeshSet()
     pymeshlab_mesh.load_new_mesh(path)
     pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
-    pymeshlab_mesh.save_current_mesh(tempfile)
-    
-    
-    mesh = trimesh.load_mesh(tempfile, process=False)
+
+    try :
+        nanosecs=time.time_ns()
+        tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
+        pymeshlab_mesh.save_current_mesh(tempfile)
+        #pymeshlab_mesh.save_current_mesh(path+".DECIMATED.BY.PYMESHLAB.obj")
+        mesh = trimesh.load_mesh(tempfile, process=False)
+        os.remove(tempfile)
+    except:
+        print(f"{path} file is imported by pymeshlab but thrown an error while saving as {tempfile}")
+        mesh = trimesh.load_mesh(path, process=False)
 
             
     if cfg.TRAIN.FLAG :
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
        random.shuffle(mesh.faces)
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-    #   save_mesh_as_obj(mesh,path+".DECIMATED.2.obj")
+    #save_mesh_as_obj(mesh,path+".SHUFFLED.obj")
+    #print(path+".SHUFFLED.obj")
 
 
     #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
@@ -609,7 +615,7 @@ def load_mesh2(path, augments=[], request=[], seed=None):
         while mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES:
               mesh.vertices, mesh.faces = trimesh.remesh.subdivide(mesh.vertices, mesh.faces)
 
-    #save_mesh_as_obj(mesh,path+".DECIMATED.1.obj")
+    #save_mesh_as_obj(mesh,path+".SUBDIVIDED.obj")
 
 
 ##    print(f"1.simplify_quadric_decimation TOTAL_NUMBER_OF_FACES={TOTAL_NUMBER_OF_FACES}")
@@ -639,7 +645,7 @@ def load_mesh2(path, augments=[], request=[], seed=None):
                        
                        
     #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.1.obj'")
-    #save_mesh_as_obj(mesh,path+".DECIMATED.4.obj")
+    #save_mesh_as_obj(mesh,path+".NUMBER_OF_FACES_LIMITED.TRIMESH.obj")
 
 #    print('AFTER SUBDIVIDE/DECIMATION : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
 
@@ -684,7 +690,6 @@ def load_mesh2(path, augments=[], request=[], seed=None):
     centers=np.array(centers)
     areas=np.array(areas).reshape(-1,1)
     #areas=torch.Tensor(np.array(areas))
-    os.remove(tempfile)
     return tirangle_coordinates,normals,centers,areas
 
 

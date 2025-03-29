@@ -1,1 +1,0 @@
-../train/MESH2IR/model_mesh.py
