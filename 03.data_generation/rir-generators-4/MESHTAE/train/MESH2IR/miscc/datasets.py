@@ -583,11 +583,11 @@ def load_mesh(path, augments=[], request=[], seed=None):
 def load_mesh2(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     #mesh = trimesh.load_mesh(path, process=False)
-    pymeshlab_mesh = ml.MeshSet()
-    pymeshlab_mesh.load_new_mesh(path)
-    pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
 
     try :
+        pymeshlab_mesh = ml.MeshSet()
+        pymeshlab_mesh.load_new_mesh(path)
+        pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
         nanosecs=time.time_ns()
         tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
         pymeshlab_mesh.save_current_mesh(tempfile)
