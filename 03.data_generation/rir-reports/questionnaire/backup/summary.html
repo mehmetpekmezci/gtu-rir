@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<body>
+<table border='1'>
+<tr>         <td colspan='7'>            <table>                <tr>                    <td><b>TRANSMITTED SONG IT SELF:</b></td>                   <td>                      <table>                        <tr>                          <td><img src='transmittedSongSignal.wav.single.png'   width='200' /></td>                        </tr>                        <tr>                          <td><audio controls style='width: 200px;'><source src='transmittedSongSignal.wav' type='audio/wav'></audio></td>                        </tr>                      </table>                    </td>                </tr>           </table>          </td>      </tr>
+<tr bgcolor='black'><td height='10' colspan='7'></td></tr>
+<tr bgcolor='#adb9c8'>             <td >DATASET</td>             <td >MICROPHONE RECORED SONG</td>             <td>REAL RIR CONVOLUTION</td>             <td>(MSE Loss Fn. FAST-RIR) GENERATED RIR CONVOLUTION</td>             <td>(SSIM Loss Fn. FAST-RIR) GENERATED RIR CONVOLUTION</td>             <td>(MSE Loss Fn. MESH2IR) GENERATED RIR CONVOLUTION</td>             <td>(SSIM Loss Fn. MESH2IR) GENERATED RIR CONVOLUTION</td>        </tr>
+<tr bgcolor='#7f8183'>
+<td align='left' valign='top'  width='200'>MAX-MSE-GTURIR<hr><br/>ROOM_ID=room-z02<br/>ROOM_DIMENS.=[5.15,8.25,3.29]<br/>VOLUME=139.75<br/>AREA=173.13<br/>Microhpone Pos.=[1.43,2.81,1.60]<br/>Speaker Pos.=[3.02,6.06,1.99]<br/>RT60=1.40<br/>Microphone-Speaker Distance =3.63</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> NO RIR </td></tr>
+<tr><td align='center' ><a href='plot0.png' target='_blank' ><img src='plot0.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/real.song.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED/TRANSMITTED SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/real.song.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/real.song.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-GTURIR/real.rir.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.single.png' target='_blank' ><img src='MAX-MSE-GTURIR/real.rir.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/real.rir.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/real.rir.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/real.rir.room-z02-micstep-3-spkstep-3-spkno-2-micno-2.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-GTURIR/1-fastrir-mse.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wave.png' target='_blank' ><img src='MAX-MSE-GTURIR/1-fastrir-mse.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/1-fastrir-mse.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/1-fastrir-mse.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/1-fastrir-mse.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-GTURIR/2-fastrir-ssim.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wave.png' target='_blank' ><img src='MAX-MSE-GTURIR/2-fastrir-ssim.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/2-fastrir-ssim.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/2-fastrir-ssim.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/2-fastrir-ssim.room-z02.RIR-DEPTH-5.15-WIDTH-8.25-HEIGHT-3.29-RT60-1.4023761117962208-MX-1.4337503671745981-MY-2.8171424401333445-MZ-1.6000000000000003-SX-3.020543905981702-SY-6.063294358040777-SZ-1.9900000000000002-7756.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-GTURIR/3-mesh2ir-mse.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wave.png' target='_blank' ><img src='MAX-MSE-GTURIR/3-mesh2ir-mse.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/3-mesh2ir-mse.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/3-mesh2ir-mse.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/3-mesh2ir-mse.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-GTURIR/4-mesh2ir-ssim.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wave.png' target='_blank' ><img src='MAX-MSE-GTURIR/4-mesh2ir-ssim.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-GTURIR/4-mesh2ir-ssim.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-GTURIR/4-mesh2ir-ssim.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-GTURIR/4-mesh2ir-ssim.room-z02.SPEAKER_ITERATION-3-MICROPHONE_ITERATION-3-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-2.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+<tr bgcolor='#adb9c8'>
+<td align='left' valign='top'  width='200'>AVG-MSE-GTURIR<hr><br/>ROOM_ID=room-conferrence01<br/>ROOM_DIMENS.=[6.0,11.8,2.95]<br/>VOLUME=208.86<br/>AREA=246.62<br/>Microhpone Pos.=[1.93,6.96,2.0]<br/>Speaker Pos.=[2.84,10.4,1.60]<br/>RT60=1.54<br/>Microphone-Speaker Distance =3.57</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> NO RIR </td></tr>
+<tr><td align='center' ><a href='plot0.png' target='_blank' ><img src='plot0.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/real.song.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED/TRANSMITTED SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/real.song.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/real.song.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-GTURIR/real.rir.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.single.png' target='_blank' ><img src='AVG-MSE-GTURIR/real.rir.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/real.rir.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/real.rir.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/real.rir.room-conferrence01-micstep-4-spkstep-6-spkno-0-micno-0.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-GTURIR/1-fastrir-mse.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wave.png' target='_blank' ><img src='AVG-MSE-GTURIR/1-fastrir-mse.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/1-fastrir-mse.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/1-fastrir-mse.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/1-fastrir-mse.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-GTURIR/2-fastrir-ssim.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wave.png' target='_blank' ><img src='AVG-MSE-GTURIR/2-fastrir-ssim.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/2-fastrir-ssim.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/2-fastrir-ssim.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/2-fastrir-ssim.room-conferrence01.RIR-DEPTH-6.0-WIDTH-11.850000000000001-HEIGHT-2.95-RT60-1.5464009157967096-MX-1.9371006467905372-MY-6.962623792124926-MZ-2.0-SX-2.8491389536562837-SY-10.428186735591849-SZ-1.6000000000000003-3541.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-GTURIR/3-mesh2ir-mse.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png' target='_blank' ><img src='AVG-MSE-GTURIR/3-mesh2ir-mse.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/3-mesh2ir-mse.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/3-mesh2ir-mse.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/3-mesh2ir-mse.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-GTURIR/4-mesh2ir-ssim.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png' target='_blank' ><img src='AVG-MSE-GTURIR/4-mesh2ir-ssim.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-GTURIR/4-mesh2ir-ssim.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-GTURIR/4-mesh2ir-ssim.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-GTURIR/4-mesh2ir-ssim.room-conferrence01.SPEAKER_ITERATION-6-MICROPHONE_ITERATION-4-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+<tr bgcolor='#7f8183'>
+<td align='left' valign='top'  width='200'>MIN-MSE-GTURIR<hr><br/>ROOM_ID=room-z23<br/>ROOM_DIMENS.=[12.3,11.5,2.9]<br/>VOLUME=410.0<br/>AREA=420.9<br/>Microhpone Pos.=[4.01,7.53,2.57]<br/>Speaker Pos.=[11.0,4.83,1.67]<br/>RT60=1.18<br/>Microphone-Speaker Distance =7.54</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> NO RIR </td></tr>
+<tr><td align='center' ><a href='plot0.png' target='_blank' ><img src='plot0.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/real.song.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RECORDED/TRANSMITTED SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/real.song.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/real.song.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-GTURIR/real.rir.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.single.png' target='_blank' ><img src='MIN-MSE-GTURIR/real.rir.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/real.rir.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/real.rir.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/real.rir.room-z23-micstep-2-spkstep-5-spkno-0-micno-1.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-GTURIR/1-fastrir-mse.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wave.png' target='_blank' ><img src='MIN-MSE-GTURIR/1-fastrir-mse.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/1-fastrir-mse.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/1-fastrir-mse.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/1-fastrir-mse.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-GTURIR/2-fastrir-ssim.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wave.png' target='_blank' ><img src='MIN-MSE-GTURIR/2-fastrir-ssim.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/2-fastrir-ssim.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/2-fastrir-ssim.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/2-fastrir-ssim.room-z23.RIR-DEPTH-12.3-WIDTH-11.5-HEIGHT-2.9-RT60-1.180868505528091-MX-4.01160196114912-MY-7.537335554781295-MZ-2.5700000000000003-SX-11.015761504129774-SY-4.830889372040401-SZ-1.67-14452.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-GTURIR/3-mesh2ir-mse.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wave.png' target='_blank' ><img src='MIN-MSE-GTURIR/3-mesh2ir-mse.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/3-mesh2ir-mse.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/3-mesh2ir-mse.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/3-mesh2ir-mse.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-GTURIR/4-mesh2ir-ssim.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wave.png' target='_blank' ><img src='MIN-MSE-GTURIR/4-mesh2ir-ssim.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-GTURIR/4-mesh2ir-ssim.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-GTURIR/4-mesh2ir-ssim.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-GTURIR/4-mesh2ir-ssim.room-z23.SPEAKER_ITERATION-5-MICROPHONE_ITERATION-2-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-1.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+<tr bgcolor='#adb9c8'>
+<td align='left' valign='top'  width='200'>MAX-MSE-BUT_REVERBDB<hr><br/>ROOM_ID=Hotel_ConferenceRoom2<br/>ROOM_DIMENS.=[28.2,11.0,3.33]<br/>VOLUME=1032.96<br/>AREA=881.47<br/>Microhpone Pos.=[7.38,10.5,0.87]<br/>Speaker Pos.=[17.3,6.08,1.82]<br/>RT60=1.40<br/>Microphone-Speaker Distance =10.90</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center' width='200'> </td></tr>
+<tr><td width='200' align='center' > NO MICROPHONE RECORDED SONG  </td></tr>
+<tr><td align='center'  width='200'> </td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-3-micno-30.wav.single.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-3-micno-30.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-3-micno-30.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-3-micno-30.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-3-micno-30.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wave.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wave.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.RIR-DEPTH-28.201-WIDTH-11.051-HEIGHT-3.331-RT60-1.401801790396311-MX-7.389735193331305-MY-10.58932819334533-MZ-0.8740645168316152-SX-17.37-SY-6.087-SZ-1.8290000000000002-90.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wave.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MAX-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wave.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MAX-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MAX-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.r.a.g.png' target='_blank' ><img src='MAX-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_ConferenceRoom2.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-30.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+<tr bgcolor='#7f8183'>
+<td align='left' valign='top'  width='200'>AVG-MSE-BUT_REVERBDB<hr><br/>ROOM_ID=Hotel_Room112<br/>ROOM_DIMENS.=[4.43,2.83,2.63]<br/>VOLUME=32.95<br/>AREA=63.25<br/>Microhpone Pos.=[1.38,2.68,1.27]<br/>Speaker Pos.=[3.15,2.52,0.85]<br/>RT60=0.90<br/>Microphone-Speaker Distance =1.82</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center' width='200'> </td></tr>
+<tr><td width='200' align='center' > NO MICROPHONE RECORDED SONG  </td></tr>
+<tr><td align='center'  width='200'> </td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-10.wav.single.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-10.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-10.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wave.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/1-fastrir-mse.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wave.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/2-fastrir-ssim.Hotel_SkalskyDvur_Room112.RIR-DEPTH-4.433-WIDTH-2.838-HEIGHT-2.637-RT60-0.905559761310073-MX-1.3839387251933362-MY-2.687697809330243-MZ-1.279280968228026-SX-3.159-SY-2.521-SZ-0.8510000000000001-163.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wave.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/3-mesh2ir-mse.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='AVG-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wave.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='AVG-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='AVG-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.r.a.g.png' target='_blank' ><img src='AVG-MSE-BUT_REVERBDB/4-mesh2ir-ssim.Hotel_SkalskyDvur_Room112.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+<tr bgcolor='#adb9c8'>
+<td align='left' valign='top'  width='200'>MIN-MSE-BUT_REVERBDB<hr><br/>ROOM_ID=VUT_FIT_Q301<br/>ROOM_DIMENS.=[10.7,6.94,2.59]<br/>VOLUME=192.30<br/>AREA=239.87<br/>Microhpone Pos.=[1.74,4.12,1.22]<br/>Speaker Pos.=[0.98,4.52,1.45]<br/>RT60=1.08<br/>Microphone-Speaker Distance =.88</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center' width='200'> </td></tr>
+<tr><td width='200' align='center' > NO MICROPHONE RECORDED SONG  </td></tr>
+<tr><td align='center'  width='200'> </td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-BUT_REVERBDB/real.rir.VUT_FIT_Q301-micstep-0-spkstep-0-spkno-1-micno-10.wav.single.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/real.rir.VUT_FIT_Q301-micstep-0-spkstep-0-spkno-1-micno-10.wav.single.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-BUT_REVERBDB/real.rir.VUT_FIT_Q301-micstep-0-spkstep-0-spkno-1-micno-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-BUT_REVERBDB/real.rir.VUT_FIT_Q301-micstep-0-spkstep-0-spkno-1-micno-10.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/real.rir.VUT_FIT_Q301-micstep-0-spkstep-0-spkno-1-micno-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-BUT_REVERBDB/1-fastrir-mse.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wave.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/1-fastrir-mse.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-BUT_REVERBDB/1-fastrir-mse.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-BUT_REVERBDB/1-fastrir-mse.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/1-fastrir-mse.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-BUT_REVERBDB/2-fastrir-ssim.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wave.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/2-fastrir-ssim.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-BUT_REVERBDB/2-fastrir-ssim.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-BUT_REVERBDB/2-fastrir-ssim.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/2-fastrir-ssim.VUT_FIT_Q301.RIR-DEPTH-10.776-WIDTH-6.94-HEIGHT-2.598-RT60-1.0869355532655693-MX-1.7470470760499608-MY-4.1234075105891685-MZ-1.2286510498587566-SX-0.988-SY-4.527-SZ-1.4590000000000003-1406.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-BUT_REVERBDB/3-mesh2ir-mse.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wave.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/3-mesh2ir-mse.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-BUT_REVERBDB/3-mesh2ir-mse.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-BUT_REVERBDB/3-mesh2ir-mse.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/3-mesh2ir-mse.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+<td align='center' width='250'>
+<table>
+<tr><td align='center'> RIR DIFF </td></tr>
+<tr><td align='center' ><a href='MIN-MSE-BUT_REVERBDB/4-mesh2ir-ssim.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wave.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/4-mesh2ir-ssim.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wave.png'   width='200' /></a> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG AUDIO </td></tr>
+<tr><td align='center' > <audio controls style='width: 200px;'><source src='MIN-MSE-BUT_REVERBDB/4-mesh2ir-ssim.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.reverbed.wav' type='audio/wav'></audio> </td></tr>
+<tr><td align='center' ><hr> </td></tr>
+<tr><td align='center'> RIR*SONG GRAPH </td></tr>
+<tr><td align='center' > <a href='MIN-MSE-BUT_REVERBDB/4-mesh2ir-ssim.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.r.a.g.png' target='_blank' ><img src='MIN-MSE-BUT_REVERBDB/4-mesh2ir-ssim.VUT_FIT_Q301.SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-10.wav.r.a.g.png'   width='200' /></a></td></tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>

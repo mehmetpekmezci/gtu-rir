@@ -1,0 +1,114 @@
+#!/usr/bin/env python
+
+from __future__ import division
+import matplotlib
+from matplotlib import pyplot as plt
+import numpy as np
+from scipy import fft
+from scipy.io import wavfile
+import scipy.signal as sig
+import tempfile
+import os
+import pathlib
+import sys
+import pyaudio
+import librosa
+import wave
+
+sr=16000
+
+def pcm2float(sig, dtype='float32'):
+    """Convert PCM signal to floating point with a range from -1 to 1.
+    Use dtype='float32' for single precision.
+    Parameters
+    ----------
+    sig : array_like
+        Input array, must have integral type.
+    dtype : data type, optional
+        Desired (floating point) data type.
+    Returns
+    -------
+    numpy.ndarray
+        Normalized floating point data.
+    See Also
+    --------
+    float2pcm, dtype
+    """
+    sig = np.asarray(sig)
+    if sig.dtype.kind not in 'iu':
+        raise TypeError("'sig' must be an array of integers")
+    dtype = np.dtype(dtype)
+    if dtype.kind != 'f':
+        raise TypeError("'dtype' must be a floating point type")
+
+    i = np.iinfo(sig.dtype)
+    abs_max = 2 ** (i.bits - 1)
+    offset = i.min + abs_max
+    return (sig.astype(dtype) - offset) / abs_max
+
+def saveRealAndGeneratedPlots(real_data,generated_data,saveToPath):
+     #plt.clf()
+
+     plt.subplot(1,1,1)
+     plt.plot(real_data,color='r', label='real_data')
+     if generated_data is not None:
+        plt.plot(generated_data,color='b', label='generated_data')
+     #plt.title(title)
+     plt.xlabel('Time')
+     plt.ylabel('Amlpitude')
+     plt.legend(loc = "upper right")
+
+     plt.savefig(saveToPath)
+
+     plt.close()
+
+padsize=1000
+
+
+if len(sys.argv) < 2 :
+    saveRealAndGeneratedPlots(np.zeros((4096,)),None,'plot0.png')
+    exit(0)
+
+first_sound_file=sys.argv[1]
+
+second_sound_file=None
+if len(sys.argv) > 2 :
+    second_sound_file=sys.argv[2]
+
+
+
+rate,first_sound_file_data=wavfile.read(first_sound_file)
+if len(first_sound_file_data.shape) > 1:
+   first_sound_file_data=first_sound_file_data[:,0]+first_sound_file_data[:,1]
+#print(np.max(first_sound_file_data))
+#print(type(first_sound_file_data[0]))
+
+if np.max(first_sound_file_data)>10 :
+    first_sound_file_data=pcm2float(first_sound_file_data)
+#print(first_sound_file_data)
+first_sound_file_data=librosa.resample(first_sound_file_data, orig_sr=44100, target_sr=16000)# transmit_data_1d[SILENCE_SECONDS_TRANSMITTER*rate:-SILENCE_SECONDS_TRANSMITTER*rate]
+
+second_sound_file_data=None
+if second_sound_file is not None:
+   rate,second_sound_file_data=wavfile.read(second_sound_file)
+   if rate > 16000 :
+      second_sound_file_data=librosa.resample(second_sound_file_data, orig_sr=rate, target_sr=16000)# transmit_data_1d[SILENCE_SECONDS_TRANSMITTER*rate:-SILENCE_SECONDS_TRANSMITTER*rate]
+
+if second_sound_file is not None:
+    saveRealAndGeneratedPlots(first_sound_file_data,second_sound_file_data,second_sound_file+'.r.a.g.png')
+else :
+    if not first_sound_file.startswith('real.song') :
+       first_sound_file_data=first_sound_file_data[:4096]
+    saveRealAndGeneratedPlots(first_sound_file_data,second_sound_file_data,first_sound_file+'.single.png')
+
+
+#writer = wave.open(rir_fname+'.reverbed.wav', 'wb')
+#writer.setnchannels(1) # 1 channel, mono (one channel is active at an instance)
+#writer.setsampwidth(2) # 16bit
+#writer.setframerate(rate) # sample rate
+##writer.writeframes(ir_receive_data.astype(np.int16).tostring())
+##writer.writeframes(receive_data.astype(np.int16).tostring())
+#writer.writeframes(receive_data.tostring())
+#print(rir_fname+'.reverbed.wav')
+#writer.close()
+

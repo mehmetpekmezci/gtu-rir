@@ -9,3 +9,10 @@ done
 cd $CURRENT_DIR/summary
 
 ./prepare_summary_html.sh
+
+cd $CURRENT_DIR/questionnaire
+
+./prepare_questionnaire.sh
+
+
+
