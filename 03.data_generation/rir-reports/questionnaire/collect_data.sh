@@ -12,9 +12,24 @@ for i in $(cat combinations.txt); do   filename=$(echo $i| sed -e 's#/micx-./#-#
 fi
 
 
-#combinations=$(cat combinations.txt| sed -e 's#/micx-./micstep##'| sed -e 's#/receivedEssSignal##'| sed -e 's#room-##'|sed -e 's#spkstep-##'| sed -e 's#spkno-##'| sed -e 's#\..*##' | tr '\n' ' ')
+combinations=$(cat combinations.txt| sed -e 's#/micx-./micstep##'| sed -e 's#/receivedEssSignal##'| sed -e 's#room-##'|sed -e 's#spkstep-##'| sed -e 's#spkno-##'| sed -e 's#\..*##' | tr '\n' ' ')
 #python3 extract_mic_spk_coordinates.py ~/RIR_DATA/GTU-RIR/RIR.pickle.dat $combinatons
 
 
 
+GENERATED_RIR_HOME=~/RIR_REPORT/GTURIR/
+for model in $(ls $GENERATED_RIR_HOME)
+do
+    mkdir -p data/$model/
+    for combination in $combinations
+    do
+	    ROOM_ID=$(echo $combination | cut -d- -f1)
+	    MIC_ITR=$(echo $combination | cut -d- -f2)
+	    SPK_ITR=$(echo $combination | cut -d- -f3)
+	    SPK_NO=$(echo $combination | cut -d- -f4)
+	    MIC_NO=$(echo $combination | cut -d- -f5)
+            cp -f $GENERATED_RIR_HOME/$model/room-$ROOM_ID/mic*/SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.wav data/$model/room-$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav 1>/dev/null
+            cp -f $GENERATED_RIR_HOME/$model/room-$ROOM_ID/mic*/SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.wave.png data/$model/room-$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png 1>/dev/null
+    done
+done
 
