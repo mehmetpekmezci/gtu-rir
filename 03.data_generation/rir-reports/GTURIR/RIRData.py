@@ -118,7 +118,8 @@ class RIRData :
         minValue=minValue2
 
      pt2=time.time() 
-     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}\nMFCC_MSE={float(MFCC_MSE):.4f}\nMFCC_SSIM={float(MFCC_SSIM):.4f}\nMFCC_CROSS_ENTROPY={float(MFCC_CROSS_ENTROPY):.4f}", style='italic',
+     #plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}\nMFCC_MSE={float(MFCC_MSE):.4f}\nMFCC_SSIM={float(MFCC_SSIM):.4f}\nMFCC_CROSS_ENTROPY={float(MFCC_CROSS_ENTROPY):.4f}", style='italic',
+     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
         bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
 
         

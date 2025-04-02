@@ -129,10 +129,11 @@ class GAETrainer(object):
 #            
 
             for i, data in enumerate(data_loader, 0):
-               
                # optimizerM.zero_grad() https://discuss.pytorch.org/t/model-zero-grad-or-optimizer-zero-grad/28426/7
                self.mesh_net.zero_grad()   
                (triangle_coordinates,normals,centers,areas, full_mesh_path)=data
+               if triangle_coordinates is None:
+                   continue
                #print(f"full_mesh_path[0]={full_mesh_path[0]}")
                triangle_coordinates=Variable(triangle_coordinates).float()
                normals=Variable(normals).float()
