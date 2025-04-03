@@ -83,12 +83,13 @@ class MeshDataset(data.Dataset):
         #     (tirangle_coordinates,normals,centers,areas)=pickle_file_content
         #else:
             #tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path, augments=self.augments,request=self.feats)
+
         try:
           tirangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path, augments=self.augments,request=self.feats)
           tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
             #write_pickle(mesh_pickle_file_path,(tirangle_coordinates,normals,centers,areas))
         except:
-          return None,None,None,None,None
+          return np.zeros(1),np.zeros(1),np.zeros(1),np.zeros(1),np.zeros(1)
 
         return   tirangle_coordinates, normals,centers,areas, full_mesh_path
 
