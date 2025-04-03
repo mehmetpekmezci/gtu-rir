@@ -13,13 +13,15 @@ do
 	    SPK_ITR=$(echo $combination | cut -d- -f3)
 	    SPK_NO=$(echo $combination | cut -d- -f4)
 	    MIC_NO=$(echo $combination | cut -d- -f5)
-            python3 convolve.py data/referenceSong.wav data/$model/room-$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav 
+            python3 convolve.py data/referenceSong.wav data/$model/room-$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav data/real-song/room-$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-*.wav
     done
 done
 
 for realrir in  data/real-rir/*.rir.wav
 do
         echo $realrir
-	python3 convolve.py data/referenceSong.wav $realrir
+	realsongbase=$(basename $realrir| sed -e 's/\.rir//')
+	ls  data/real-song/$realsongbase
+	python3 convolve.py data/referenceSong.wav $realrir data/real-song/$realsongbase
 done
 

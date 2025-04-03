@@ -28,7 +28,7 @@ sr=16000
 
 
 def saveRealAndGeneratedPlots(real_data,generated_data,saveToPath,real_front=False):
-     
+     generated_data=generated_data[:int(real_data.shape[0])] 
 
      MSE=np.square(np.subtract(real_data,generated_data)).mean()
 
@@ -58,12 +58,12 @@ def saveRealAndGeneratedPlots(real_data,generated_data,saveToPath,real_front=Fal
         minValue=minValue2
 
      if real_front:
-        plt.plot(real_data,color='#101010', label='song_recored_by_microphone')
+        plt.plot(real_data,color='#101010', label='transmitted_song')
         plt.plot(generated_data,color='#909090', label='rir_convolved_with_transmitted_song')
 
      else:
         plt.plot(generated_data,color='#909090', label='rir_convolved_with_transmitted_song')
-        plt.plot(real_data,color='#101010', label='song_recorded_by_microphone')
+        plt.plot(real_data,color='#101010', label='transmitted_song')
 
      plt.text(3300, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
         bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})
@@ -108,75 +108,40 @@ if len(transmit_data.shape) > 1 :
 rir_data,sampling_rate=librosa.load(rir_fname,sr=16000)
 real_song,sampling_rate=librosa.load(real_song_fname,sr=16000)
 
-rir_data=rir_data*1/np.max(rir_data)
+
 #print(rir_data.shape)
 #print(rir_data)
+#print(transmit_data.shape)
 #print(np.max(rir_data))
 #print(transmit_data)
 
-## our reference is real_song
-#transmit_data=transmit_data[:-int(transmit_data.shape[0]-real_song.shape[0])]
 
 reverbed_data=sig.fftconvolve(transmit_data,rir_data,'full')
 log_reverbed_data_power=np.log(np.sum(np.abs(reverbed_data)))
 #print(log_reverbed_data_power)
 reverbed_data=reverbed_data/((9/4)*log_reverbed_data_power).astype(np.float32)
 
-#reverbed_data=reverbed_data[:-int(reverbed_data.shape[0]-real_song.shape[0])]
-
-print(transmit_data.shape)
-print(real_song.shape)
-print(reverbed_data.shape)
 
 
 
-
-
-
-max_point_index_real_song=np.argmax(real_song)
+max_point_index_transmit_data=np.argmax(transmit_data)
 max_point_index_reverbed_data=np.argmax(reverbed_data)
 
-diff=int(max_point_index_reverbed_data-max_point_index_real_song)
+diff=int(abs(max_point_index_transmit_data-max_point_index_reverbed_data))
 
-print(max_point_index_real_song)
-print(max_point_index_reverbed_data)
+
 
 print(f"diff={diff}")
 
 if diff > 0 :
-   new_reverbed_data=np.zeros(real_song.shape[0])
-   new_reverbed_data[:max_point_index_real_song]=reverbed_data[diff:max_point_index_reverbed_data]
-   print(f"max_point_index_real_song={max_point_index_real_song}")
-   print(f"max_point_index_reverbed_data={max_point_index_reverbed_data}")
-   print(f"real_song.shape[0]={real_song.shape[0]}")
-   print(f"max_point_index_reverbed_data+int(real_song.shape[0]-max_point_index_real_song)={max_point_index_reverbed_data+int(real_song.shape[0]-max_point_index_real_song)}")
-   print(f"new_reverbed_data.shape={new_reverbed_data.shape}")
-   if max_point_index_reverbed_data+int(real_song.shape[0]-max_point_index_real_song) < reverbed_data.shape[0]:
-      new_reverbed_data[max_point_index_real_song:]=reverbed_data[max_point_index_reverbed_data:max_point_index_reverbed_data+int(new_reverbed_data.shape[0]-max_point_index_real_song)]
-   else:
-     new_reverbed_data[max_point_index_real_song:max_point_index_real_song+int(reverbed_data.shape[0]-max_point_index_reverbed_data)]=reverbed_data[max_point_index_reverbed_data:]
+   new_reverbed_data=np.zeros(reverbed_data.shape[0]+diff)
+   new_reverbed_data[:-diff]=reverbed_data
    reverbed_data=new_reverbed_data
-else:
-   #diff=-diff
-   new_reverbed_data=np.zeros(real_song.shape[0])
-   new_reverbed_data[-diff:max_point_index_real_song]=reverbed_data[:max_point_index_reverbed_data]
-   new_reverbed_data[max_point_index_real_song:max_point_index_real_song+int(reverbed_data.shape[0]-max_point_index_reverbed_data)]=reverbed_data[max_point_index_reverbed_data:]
-   reverbed_data=new_reverbed_data
-
-
-
-#reverbed_data=reverbed_data[int(reverbed_data.shape[0]-real_song.shape[0]):]
 
 reverbed_data=reverbed_data.astype(np.float32)
 
-#####ONEMLI
-#reverbed_data=reverbed_data* 1/np.max(reverbed_data)
-#real_song=real_song* 1/np.max(real_song)
-#####ONEMLI
-
-
-
-
+reverbed_data=reverbed_data* 1/np.max(reverbed_data)
+real_song=real_song* 1/np.max(real_song)
 #receive_data=receive_data/3000000
 #play_sound(receive_data,rate)
 #plot_freqs(receive_data,rate)
