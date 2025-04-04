@@ -1,0 +1,2 @@
+mic_coords_xyz=2.00,5.77,1.55
+spk_coords_xyz=3.43,2.37,2.10
