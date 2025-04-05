@@ -104,80 +104,88 @@ echo "
 "> user_form.html
  
 
+combinations=$(cat combinations.txt| sed -e 's#/micx-./micstep##'| sed -e 's#/receivedEssSignal##'| sed -e 's#room-##'|sed -e 's#spkstep-##'| sed -e 's#spkno-##'| sed -e 's#\..*##' | tr '\n' ' ')
 
-
-
-
-for dataset in $(echo GTURIR BUT_REVERBDB)
+for combination in $combinations
 do
-   for sample in $(echo MAX-MSE AVG-MSE MIN-MSE)
-   do
-      if [ "$color" = "#adb9c8" ]
-      then
-          color="#7f8183"
-      else
-          color="#adb9c8"
-      fi
-      echo "<tr bgcolor='$color'>" >> user_form.html
-      INFO="$sample-$dataset"
-      SAMPLE_WAV_FILE=$(find $sample-$dataset/ -name *fastrir-ssim*RIR-DEPTH-*wav | head -1)
-      ROOM_ID=$(echo $SAMPLE_WAV_FILE| sed -e 's/.RIR-DEPTH.*//'|sed -e 's/.*astrir-ssim.//'| sed -e 's/SkalskyDvur_//') 
-      ROOM_DEPTH=$(echo $SAMPLE_WAV_FILE| sed -e 's/.*RIR-DEPTH-//'| cut -d- -f1| cut -c1-4)
-      ROOM_WIDTH=$(echo $SAMPLE_WAV_FILE| sed -e 's/.*-WIDTH-//'| cut -d- -f1| cut -c1-4)
-      ROOM_HEIGHT=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-HEIGHT-//'| cut -d- -f1| cut -c1-4)
-      ROOM_VOLUME=$(expr $ROOM_DEPTH*$ROOM_WIDTH*$ROOM_HEIGHT | bc)
-      ROOM_FACE_AREA=$(expr 2*$ROOM_DEPTH*$ROOM_WIDTH+2*$ROOM_DEPTH*$ROOM_HEIGHT+2*$ROOM_WIDTH*$ROOM_HEIGHT | bc)
-      MX=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-MX-//'|cut -d- -f1| cut -c1-4)
-      MY=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-MY-//'|cut -d- -f1| cut -c1-4)
-      MZ=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-MZ-//'|cut -d- -f1| cut -c1-4)
-      SX=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-SX-//'|cut -d- -f1| cut -c1-4)
-      SY=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-SY-//'|cut -d- -f1| cut -c1-4)
-      SZ=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-SZ-//'|cut -d- -f1| cut -c1-4)
-      RT60=$(echo $SAMPLE_WAV_FILE| head -1| sed -e 's/.*-RT60-//'| cut -c1-4)
-      DIST=$(echo "sqrt(($MX-$SX)^2+($MY-$SY)^2+($MZ-$SZ)^2)"| bc)
-      INFO="$INFO<hr><br/>ROOM_ID=$ROOM_ID<br/>ROOM_DIMENS.=[$ROOM_DEPTH,$ROOM_WIDTH,$ROOM_HEIGHT]<br/>VOLUME=$ROOM_VOLUME<br/>AREA=$ROOM_FACE_AREA<br/>Microhpone Pos.=[$MX,$MY,$MZ]<br/>Speaker Pos.=[$SX,$SY,$SZ]<br/>RT60=$RT60<br/>Microphone-Speaker Distance =$DIST"
-      echo "<td align='left' valign='top'  width='200'>$INFO</td>" >> user_form.html
+  ROOM_ID=$(echo $combination | cut -d- -f1)
+  MIC_ITR=$(echo $combination | cut -d- -f2)
+  SPK_ITR=$(echo $combination | cut -d- -f3)
+  SPK_NO=$(echo $combination | cut -d- -f4)
+  MIC_NO=$(echo $combination | cut -d- -f5)
 
-      if [ "$dataset" = "GTURIR" ]
-      then
-          SONG=$(find $sample-$dataset/ -name real.song.*wav | head -1) 
-          SONGGRAPH=$(find $sample-$dataset/ -name real.song.*.r.a.g.png)
-	  RIRGRAPH='plot0.png'
-          print_to_summary $RIRGRAPH $SONG $SONGGRAPH
-      else
-          print_to_summary '' '' ''
-      fi
+  ROOM_PROPERTIES=$(cat data/properties/room-$ROOM_ID-$MIC_ITR-$SPK_ITR-$SPK_NO-$MIC_NO.room.properties.txt)
 
-      SONG=$(find $sample-$dataset/ -name real.rir.*reverbed.wav) 
-      RIRGRAPH=$(find $sample-$dataset/ -name real.rir*.single.png) 
-      SONGGRAPH=$(find $sample-$dataset/ -name real.rir.*.r.a.g.png) 
-      print_to_summary $RIRGRAPH $SONG $SONGGRAPH
+  ROOM_DIMENSIONS=$(echo $ROOM_PROPERTIES| cut -d, -f1,2,3 | sed -e 's/,/x/g')
 
-      SONG=$(find $sample-$dataset/ -name 1-*reverbed.wav) 
-      RIRGRAPH=$(find $sample-$dataset/ -name 1-*.wave.png) 
-      SONGGRAPH=$(find $sample-$dataset/ -name 1-*.r.a.g.png) 
-      print_to_summary $RIRGRAPH $SONG $SONGGRAPH
-      
-      SONG=$(find $sample-$dataset/ -name 2-*reverbed.wav) 
-      RIRGRAPH=$(find $sample-$dataset/ -name 2-*.wave.png) 
-      SONGGRAPH=$(find $sample-$dataset/ -name 2-*.r.a.g.png) 
-      print_to_summary $RIRGRAPH $SONG $SONGGRAPH
-      
-      SONG=$(find $sample-$dataset/ -name 3-*reverbed.wav) 
-      RIRGRAPH=$(find $sample-$dataset/ -name 3-*.wave.png) 
-      SONGGRAPH=$(find $sample-$dataset/ -name 3-*.r.a.g.png) 
-      print_to_summary $RIRGRAPH $SONG $SONGGRAPH
-      
-      SONG=$(find $sample-$dataset/ -name 4-*reverbed.wav) 
-      RIRGRAPH=$(find $sample-$dataset/ -name 4-*.wave.png) 
-      SONGGRAPH=$(find $sample-$dataset/ -name 4-*.r.a.g.png) 
-      print_to_summary $RIRGRAPH $SONG $SONGGRAPH
-      
-      echo "</tr>" >> user_form.html
-   done
+  ROOM_TOTAL_VOLUME=$(echo $ROOM_PROPERTIES| cut -d, -f4)
+
+  ROOM_TOTAL_AREA=$(echo $ROOM_PROPERTIES| cut -d, -f5)
+
+  SPEAKER_COORDS=$(cat data/properties/room-$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.spk_mic.coordinates.txt| grep spk_coords_xyz | cut -d\= -f2| sed -e 's/,/x/g')
+
+  MIC_COORDS=$(cat data/properties/room-$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.spk_mic.coordinates.txt| grep mic_coords_xyz | cut -d\= -f2| sed -e 's/,/x/g')
+  
+
+  #INFO="$INFO<hr><br/>ROOM_ID=$ROOM_ID<br/>ROOM_DIMENS.=[$ROOM_DEPTH,$ROOM_WIDTH,$ROOM_HEIGHT]<br/>VOLUME=$ROOM_VOLUME<br/>AREA=$ROOM_FACE_AREA<br/>Microhpone Pos.=[$MX,$MY,$MZ]<br/>Speaker Pos.=[$SX,$SY,$SZ]<br/>RT60=$RT60<br/>Microphone-Speaker Distance =$DIST"
+
+
+  SONG_REAL=data/real-song/$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.wav
+  SONG_REAL_RIR=data/real-rir/$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.wav.reverbed_song.wav
+  SONG_REAL_COHERENCE_PLOT=data/real-rir/$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.wav.reverbed_song.wav.reverbed_song_cherence_plot.png
+  SONG_REAL_COHERENCE_PLOT_FRON_REAL=data/real-rir/$ROOM_ID-micstep-$MIC_ITR-spkstep-$SPK_ITR-spkno-$SPK_NO-micno-$MIC_NO.wav.reverbed_song.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=FASTRIR-MSE
+  SONG_FASTRIR_MSE=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_FASTRIR_MSE_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_FASTRIR_MSE_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_FASTRIR_MSE_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=FASTRIR-SSIM
+  SONG_FASTRIR_SSIM=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_FASTRIR_SSIM_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_FASTRIR_SSIM_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_FASTRIR_SSIM_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=FASTRIR-SSIM_PLUS_MSE
+  SONG_FASTRIR_SSIM_PLUS_MSE=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_FASTRIR_SSIM_PLUS_MSE_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_FASTRIR_SSIM_PLUS_MSE_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_FASTRIR_SSIM_PLUS_MSE_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=MESH2IR-MSE
+  SONG_MESH2IR_MSE=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_MESH2IR_MSE_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_MESH2IR_MSE_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_MESH2IR_MSE_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=MESH2IR-SSIM
+  SONG_MESH2IR_SSIM=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_MESH2IR_SSIM_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_MESH2IR_SSIM_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_MESH2IR_SSIM_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=MESH2IR-SSIM_PLUS_MSE
+  SONG_MESH2IR_SSIM_PLUS_MSE=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_MESH2IR_SSIM_PLUS_MSE_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_MESH2IR_SSIM_PLUS_MSE_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_MESH2IR_SSIM_PLUS_MSE_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+  MODEL=MESHTAE
+  SONG_MESHTAE=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song.wav
+  SONG_MESHTAE_RIR_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.coherence.plot.png
+  SONG_MESHTAE_SONG_COHERENCE_PLOT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.png
+  SONG_MESHTAE_SONG_COHERENCE_PLOT_REAL_FRONT=data/$MODEL/$ROOM_ID-SPEAKER_ITERATION-$SPK_ITR-MICROPHONE_ITERATION-$MIC_ITR-PHYSICAL_SPEAKER_NO-$SPK_NO-MICROPHONE_NO-$MIC_NO.rir.wav.reverbed_song_cherence_plot.real_front.png
+
+
+  print_room $ROOM_ID $ROOM_DIMENSIONS $ROOM_TOTAL_VOLUME $ROOM_TOTAL_AREA $SPEAKER_COORDS $MIC_COORDS $SONG_REAL $SONG_REAL_RIR $SONG_FASTRIR_MSE $SONG_FASTRIR_SSIM $SONG_FASTRIR_SSIM_PLUS_MSE $SONG_MESH2IR_MSE $SONG_MESH2IR_SSIM $SONG_MESH2IR_SSIM_PLUS_MSE $SONG_MESHTAE
+
+
 done
 
-echo "</table>" >> user_form.html
-echo "</body>" >> user_form.html
-echo "</html>" >> user_form.html
+echo "
+</table>
+</body>
+</html>
+" >> user_form.html
 
