@@ -140,7 +140,7 @@ echo "
 
 <tr> 
    <td colspan='5' border='0' align='center'>  <h2>
-         Table 6.1: RIR Human Evaluation Questionnaire
+         Table A.1: RIR Human Evaluation Questionnaire
     </h2>
    </td>
 </tr>
