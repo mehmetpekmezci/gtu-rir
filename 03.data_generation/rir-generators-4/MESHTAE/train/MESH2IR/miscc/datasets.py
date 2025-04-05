@@ -81,7 +81,7 @@ class MeshDataset(data.Dataset):
 
         #if pickle_file_content is not None:
         #     (tirangle_coordinates,normals,centers,areas)=pickle_file_content
-        #else:
+       #else:
             #tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path, augments=self.augments,request=self.feats)
 
         try:
@@ -89,7 +89,7 @@ class MeshDataset(data.Dataset):
           tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
             #write_pickle(mesh_pickle_file_path,(tirangle_coordinates,normals,centers,areas))
         except:
-          return np.zeros(1),np.zeros(1),np.zeros(1),np.zeros(1),np.zeros(1)
+          tirangle_coordinates,normals,centers,areas,full_mesh_path =  np.zeros((cfg.MAX_FACE_COUNT,9)),np.zeros((cfg.MAX_FACE_COUNT,3)),np.zeros((cfg.MAX_FACE_COUNT,3)),np.zeros((cfg.MAX_FACE_COUNT,1)),"ERRONOUS_MESH"
 
         return   tirangle_coordinates, normals,centers,areas, full_mesh_path
 

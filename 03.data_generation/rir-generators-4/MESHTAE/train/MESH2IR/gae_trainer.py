@@ -132,7 +132,8 @@ class GAETrainer(object):
                # optimizerM.zero_grad() https://discuss.pytorch.org/t/model-zero-grad-or-optimizer-zero-grad/28426/7
                self.mesh_net.zero_grad()   
                (triangle_coordinates,normals,centers,areas, full_mesh_path)=data
-               if len(triangle_coordinates.shape) == 2 and triangle_coordinates.shape[0]==2 and triangle_coordinates.shape[1]==1 and triangle_coordinates[0][0]==0 :
+               if "ERRONOUS_MESH" in full_mesh_path:
+                   print("MESH is ERRONOUS , we ommit this input")
                    continue
                #print(f"full_mesh_path[0]={full_mesh_path[0]}")
                triangle_coordinates=Variable(triangle_coordinates).float()
