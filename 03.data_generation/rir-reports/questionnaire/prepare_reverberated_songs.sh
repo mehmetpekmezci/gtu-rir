@@ -23,5 +23,6 @@ do
 	realsongbase=$(basename $realrir| sed -e 's/\.rir//')
 	ls  data/real-song/$realsongbase
 	python3 convolve.py data/referenceSong.wav $realrir data/real-song/$realsongbase
+	python3 real-rir-plot.py $realrir 
 done
 
