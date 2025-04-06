@@ -59,7 +59,7 @@ echo "
    </td>
   </tr>
   <tr> 
-   <td bgcolor='#909090' style='width: 250px;' ><h2>TYPE</h2></td><td><h2>RIR COHERENCE PLOT</h2></td><td><h2>SONG COHERENCE PLOT</h2></td><td><h2>AUDIO</h2></td><td style='width: 50px;'><h2>RATING</h2></td>
+   <td bgcolor='#909090' style='width: 250px;' ><h2>TYPE</h2></td><td align='center'><h2>RIR COHERENCE PLOT</h2></td><td align='center'><h2>SONG COHERENCE PLOT</h2></td><td align='center'><h2>AUDIO</h2></td><td style='width: 50px;' align='center'><h2>RATING</h2></td>
   </tr>
   <tr>   
     <td bgcolor='#909090' > Real Reverberated Song Recorded Using Microphone</td>
