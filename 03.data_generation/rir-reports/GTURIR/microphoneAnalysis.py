@@ -19,7 +19,7 @@ from scipy import stats
 import librosa.display
 import librosa
 
-
+import random
 
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -65,6 +65,71 @@ def getGlitchPoints(generated,real):
              glitchPoints.append(i)
      return glitchPoints
 
+def getLocalArgMax(limit,data):
+     maximum_value=np.max(data[:limit])*4/5 # 20% error threshold for max
+     return np.argmax(data[:limit]>=maximum_value)
+
+
+def allignVertically(self,generated_data,real_data):
+#         return generated_data,real_data
+         generated_data_max=np.max(np.abs(generated_data))
+         real_data_max=np.max(np.abs(real_data))
+         generated_data=generated_data/generated_data_max
+         real_data=real_data/real_data_max
+         return generated_data,real_data
+
+
+def allignHorizontally(generated_data,real_data):
+         max_point_index_within_first_1000_points_real_data=getLocalArgMax(1000,real_data) #np.argmax(real_data[0:1000])
+         max_point_index_within_first_1000_points_generated_data=getLocalArgMax(1000,generated_data)#np.argmax(generated_data[0:1000])
+         diff=int(abs(max_point_index_within_first_1000_points_real_data-max_point_index_within_first_1000_points_generated_data)/2)
+
+         if diff > 0 :
+           if    max_point_index_within_first_1000_points_real_data > max_point_index_within_first_1000_points_generated_data :
+                 new_generated_data=np.zeros(generated_data.shape)
+                 new_generated_data[diff:]=generated_data[:-diff]
+                 generated_data=new_generated_data
+
+                 new_real_data=np.zeros(real_data.shape)
+                 new_real_data[:-diff]=real_data[diff:]
+                 real_data=new_real_data
+           else :
+                 new_generated_data=np.zeros(generated_data.shape)
+                 #new_generated_data[diff:]=generated_data[:-diff]
+                 new_generated_data[:-diff]=generated_data[diff:]
+                 generated_data=new_generated_data
+
+                 new_real_data=np.zeros(real_data.shape)
+                 #new_real_data[:-diff]=real_data[diff:]
+                 new_real_data[diff:]=real_data[:-diff]
+                 real_data=new_real_data
+         
+         localArgMaxReal=getLocalArgMax(1000,real_data)
+         localArgMaxGenerted=getLocalArgMax(1000,generated_data)
+         diff=1
+         if localArgMaxReal ==localArgMaxGenerted+diff :
+                  new_generated_data=np.zeros(generated_data.shape)
+                  new_generated_data[diff:]=generated_data[:-diff]
+                  generated_data=new_generated_data
+
+         elif  localArgMaxGenerted == localArgMaxReal+diff:
+                  new_generated_data=np.zeros(generated_data.shape)
+                  #new_generated_data[diff:]=generated_data[:-diff]
+                  new_generated_data[:-diff]=generated_data[diff:]
+                  generated_data=new_generated_data
+
+                  
+         #print("1.MAX ALLIGNMENT : np.argmax(real_data[0:1000]):"+str(getLocalArgMax(1000,real_data)))
+         #print("1.MAX ALLIGNMENT : np.argmax(generated_data[0:1000]):"+str(getLocalArgMax(1000,generated_data)))
+         #real_data1=librosa.resample(rir_data[i][-1], orig_sr=44100, target_sr=sr)
+         #real_data1=real_data1[:generated_data.shape[0]]
+         #print("1.MAX ALLIGNMENT : np.argmax(real_data1[0:1000]):"+str(getLocalArgMax(1000,real_data1)))
+         # test edildi problem yok :)
+         return generated_data,real_data
+         
+
+         
+         
 
 rir_data_field_numbers={"timestamp":0,"speakerMotorIterationNo":1,"microphoneMotorIterationNo":2,"speakerMotorIterationDirection":3,"currentActiveSpeakerNo":4,"currentActiveSpeakerChannelNo":5,
                                 "physicalSpeakerNo":6,"microphoneStandInitialCoordinateX":7,"microphoneStandInitialCoordinateY":8,"microphoneStandInitialCoordinateZ":9,"speakerStandInitialCoordinateX":10,
@@ -91,7 +156,6 @@ for selectedRoomId in list_of_room_ids:
     #print("DENEME START")
     #for key,value in micPairSimilarities.items():
     #   print(f"{key} : MSE: {np.mean(np.array(value['MSE']))} , SSIM: {np.mean(np.array(value['SSIM']))}, GLITCH: {np.mean(np.array(value['GLITCH']))}")
-    #
     #print("DENEME END")
 
     for dataline1 in room_data:
@@ -132,8 +196,8 @@ for selectedRoomId in list_of_room_ids:
                       abs(speakerCoordinatesY_1-speakerCoordinatesY_2)<DELTA and
                       abs(speakerCoordinatesZ_1-speakerCoordinatesZ_2)<DELTA 
                   ):
-                 # print (f"(spkItrNo-micItrNo-SpkNo-micNo)  {speakerMotorIterationNo_1}-{microphoneMotorIterationNo_1}-{physicalSpeakerNo_1}-{micNo_1}  and {speakerMotorIterationNo_2}-{microphoneMotorIterationNo_2}-{physicalSpeakerNo_2}-{micNo_2} are close : ")
-                 # print (f"mic_XYZ_Diff={abs(microphoneCoordinatesX_1-microphoneCoordinatesX_2)}-{abs(microphoneCoordinatesY_1-microphoneCoordinatesY_2)}-{abs(microphoneCoordinatesZ_1-microphoneCoordinatesZ_2)}  spk_XYZ_Diff={abs(speakerCoordinatesX_1-speakerCoordinatesX_2)}-{abs(speakerCoordinatesY_1-speakerCoordinatesY_2)}-{abs(speakerCoordinatesZ_1-speakerCoordinatesZ_2)}")
+                  print (f"(spkItrNo-micItrNo-SpkNo-micNo)  {speakerMotorIterationNo_1}-{microphoneMotorIterationNo_1}-{physicalSpeakerNo_1}-{micNo_1}  and {speakerMotorIterationNo_2}-{microphoneMotorIterationNo_2}-{physicalSpeakerNo_2}-{micNo_2} are close : ")
+                  print (f"mic_XYZ_Diff={abs(microphoneCoordinatesX_1-microphoneCoordinatesX_2)}-{abs(microphoneCoordinatesY_1-microphoneCoordinatesY_2)}-{abs(microphoneCoordinatesZ_1-microphoneCoordinatesZ_2)}  spk_XYZ_Diff={abs(speakerCoordinatesX_1-speakerCoordinatesX_2)}-{abs(speakerCoordinatesY_1-speakerCoordinatesY_2)}-{abs(speakerCoordinatesZ_1-speakerCoordinatesZ_2)}")
 
                   mD ={}
                   #micDiff[f"{selectedRoomId}-{speakerMotorIterationNo_1}-{microphoneMotorIterationNo_1}-{physicalSpeakerNo_1}-{micNo_1}-{speakerMotorIterationNo_2}-{microphoneMotorIterationNo_2}-{physicalSpeakerNo_2}-{micNo_2}"]={}
@@ -142,7 +206,7 @@ for selectedRoomId in list_of_room_ids:
                   rir_data_1=dataline1[rir_data_field_numbers['rirData']]
                   rir_data_2=dataline2[rir_data_field_numbers['rirData']]
 
-                  #generated_data,real_data=self.allignHorizontally(generated_data,real_data)         
+                  #rir_data_1,rir_data_2=allignHorizontally(rir_data_1,rir_data_2)         
 
                   #generated_data,real_data=self.allignVertically(generated_data,real_data)         
                   ######### BEGIN : YATAY ESITLEME (dikey esitleme zaten maksimum noktalarini esitliyerek yapilmisti)
@@ -179,69 +243,8 @@ for selectedRoomId in list_of_room_ids:
                   micPairSimilarities[mD["mics"]]["SSIM"].append(mD["ssim"])
                   micPairSimilarities[mD["mics"]]["GLITCH"].append(mD["glitch_point_count"])
 
+                  print(mD)
+
 for key,value in micPairSimilarities.items():
        print(f"{key} : MSE: {np.mean(np.array(value['MSE']))} , SSIM: {np.mean(np.array(value['SSIM']))}, GLITCH: {np.mean(np.array(value['GLITCH']))}")
 
-
-def allignVertically(self,generated_data,real_data):
-#         return generated_data,real_data
-         generated_data_max=np.max(np.abs(generated_data))
-         real_data_max=np.max(np.abs(real_data))
-         generated_data=generated_data/generated_data_max
-         real_data=real_data/real_data_max
-         return generated_data,real_data
-
-
-def allignHorizontally(self,generated_data,real_data):
-         max_point_index_within_first_1000_points_real_data=self.getLocalArgMax(1000,real_data) #np.argmax(real_data[0:1000])
-         max_point_index_within_first_1000_points_generated_data=self.getLocalArgMax(1000,generated_data)#np.argmax(generated_data[0:1000])
-         diff=int(abs(max_point_index_within_first_1000_points_real_data-max_point_index_within_first_1000_points_generated_data)/2)
-
-         if diff > 0 :
-           if    max_point_index_within_first_1000_points_real_data > max_point_index_within_first_1000_points_generated_data :
-                 new_generated_data=np.zeros(generated_data.shape)
-                 new_generated_data[diff:]=generated_data[:-diff]
-                 generated_data=new_generated_data
-
-                 new_real_data=np.zeros(real_data.shape)
-                 new_real_data[:-diff]=real_data[diff:]
-                 real_data=new_real_data
-           else :
-                 new_generated_data=np.zeros(generated_data.shape)
-                 #new_generated_data[diff:]=generated_data[:-diff]
-                 new_generated_data[:-diff]=generated_data[diff:]
-                 generated_data=new_generated_data
-
-                 new_real_data=np.zeros(real_data.shape)
-                 #new_real_data[:-diff]=real_data[diff:]
-                 new_real_data[diff:]=real_data[:-diff]
-                 real_data=new_real_data
-         
-         localArgMaxReal=self.getLocalArgMax(1000,real_data)
-         localArgMaxGenerted=self.getLocalArgMax(1000,generated_data)
-         diff=1
-         if localArgMaxReal ==localArgMaxGenerted+diff :
-                  new_generated_data=np.zeros(generated_data.shape)
-                  new_generated_data[diff:]=generated_data[:-diff]
-                  generated_data=new_generated_data
-
-         elif  localArgMaxGenerted == localArgMaxReal+diff:
-                  new_generated_data=np.zeros(generated_data.shape)
-                  #new_generated_data[diff:]=generated_data[:-diff]
-                  new_generated_data[:-diff]=generated_data[diff:]
-                  generated_data=new_generated_data
-
-                  
-         t2=time.time() 
-         print(f"DeltaT.allignHorizontally={t2-t1}")
-         print("1.MAX ALLIGNMENT : np.argmax(real_data[0:1000]):"+str(self.getLocalArgMax(1000,real_data)))
-         print("1.MAX ALLIGNMENT : np.argmax(generated_data[0:1000]):"+str(self.getLocalArgMax(1000,generated_data)))
-         #real_data1=librosa.resample(self.rir_data[i][-1], orig_sr=44100, target_sr=sr)
-         #real_data1=real_data1[:generated_data.shape[0]]
-         #print("1.MAX ALLIGNMENT : np.argmax(real_data1[0:1000]):"+str(self.getLocalArgMax(1000,real_data1)))
-         # test edildi problem yok :)
-         return generated_data,real_data
-         
-
-         
-         
