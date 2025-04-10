@@ -183,11 +183,11 @@ for selectedRoomId in list_of_room_ids:
     #   print(f"{key} : MSE: {np.mean(np.array(value['MSE']))} ({len(value['MSE'])}), SSIM: {np.mean(np.array(value['SSIM']))}, GLITCH: {np.mean(np.array(value['GLITCH']))}")
     #print("DENEME END")
 
-    maxSSIM=-100
+    maxSSIM=-1
     maxSSIMRecord=[]
-    minSSIM=100
+    minSSIM=1
     minSSIMRecord=[]
-    maxMSE=-100
+    maxMSE=0
     maxMSERecord=[]
     minMSE=100
     minMSERecord=[]
@@ -298,7 +298,7 @@ for selectedRoomId in list_of_room_ids:
                      #print("maxSSIM")
                      #print(own_record)
 
-                  elif minSSIM > mD["ssim"]:
+                  if minSSIM > mD["ssim"]:
                      minSSIM=mD["ssim"]
                      minSSIMRecord=own_record
                      #print("minSSIM")
@@ -310,7 +310,7 @@ for selectedRoomId in list_of_room_ids:
                      #print("maxMSE")
                      #print(own_record)
 
-                  elif minMSE > mD["mse"]:
+                  if minMSE > mD["mse"]:
                      minMSE=mD["mse"]
                      minMSERecord=own_record
                      #print("minMSE")
@@ -322,7 +322,7 @@ for selectedRoomId in list_of_room_ids:
                      #print("maxGlitch")
                      #print(own_record)
 
-                  elif minMSE > mD["glitch_point_count"]:
+                  if minGlitch > mD["glitch_point_count"]:
                      minGlitch=mD["glitch_point_count"]
                      minGlitchRecord=own_record
                      #print("minGlitch")
@@ -343,27 +343,12 @@ print(output)
 
 
 
-records=[]
-maxSSIMRecord.append("maxSSIM.png")
-records.append(maxSSIMRecord)
-minSSIMRecord.append("minSSIM.png")
-records.append(minSSIMRecord)
-maxMSERecord.append("maxMSE.png")
-records.append(maxMSERecord)
-minMSERecord.append("minMSE.png")
-records.append(minMSERecord)
-maxGlitchRecord.append("maxGlitch.png")
-records.append(maxGlitchRecord)
-minGlitchRecord.append("minGlitch.png")
-records.append(minGlitchRecord)
-
-for record_to_plot in records:
-    if len(record_to_plot)>5 :
-       print(record_to_plot[5])
-       print(record_to_plot[6])
-       plotWav(record_to_plot[0],record_to_plot[1],record_to_plot[2],record_to_plot[3],record_to_plot[4],record_to_plot[5],saveToPath=record_to_plot[6])
-    else:
-       print(record_to_plot[0])
+plotWav(maxSSIMRecord[0],maxSSIMRecord[1],maxSSIMRecord[2],maxSSIMRecord[3],maxSSIMRecord[4],maxSSIMRecord[5],saveToPath="maxSSIM.png")
+plotWav(minSSIMRecord[0],minSSIMRecord[1],minSSIMRecord[2],minSSIMRecord[3],minSSIMRecord[4],minSSIMRecord[5],saveToPath="minSSIM.png")
+plotWav(maxMSERecord[0],maxMSERecord[1],maxMSERecord[2],maxMSERecord[3],maxMSERecord[4],maxMSERecord[5],saveToPath="maxMSE.png")
+plotWav(minMSERecord[0],minMSERecord[1],minMSERecord[2],minMSERecord[3],minMSERecord[4],minMSERecord[5],saveToPath="minMSE.png")
+plotWav(maxGlitchRecord[0],maxGlitchRecord[1],maxGlitchRecord[2],maxGlitchRecord[3],maxGlitchRecord[4],maxGlitchRecord[5],saveToPath="maxGlitch.png")
+plotWav(minGlitchRecord[0],minGlitchRecord[1],minGlitchRecord[2],minGlitchRecord[3],minGlitchRecord[4],minGlitchRecord[5],saveToPath="minGlitch.png")
 
 
 
