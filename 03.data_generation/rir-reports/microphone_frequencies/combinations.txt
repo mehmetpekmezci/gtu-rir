@@ -1,0 +1,6 @@
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-5.wav
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-4.wav
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-3.wav
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-2.wav
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-1.wav
+room-208/micx-*/micstep-0-spkstep-0-spkno-1/receivedEssSignal-0.wav
