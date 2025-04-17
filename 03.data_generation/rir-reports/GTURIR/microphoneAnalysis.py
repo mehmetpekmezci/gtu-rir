@@ -128,19 +128,19 @@ def allignHorizontally(generated_data,real_data):
          # test edildi problem yok :)
          return generated_data,real_data
          
-def plotWav(real_data,generated_data,MSE,SSIM,glitch_points,mics,show=False,saveToPath=None):
+def plotWav(real_data,generated_data,MSE,SSIM,glitch_points,mics,spks,show=False,saveToPath=None):
      plt.clf()
      minValue=np.min(real_data)
      minValue2=np.min(generated_data)
      if minValue2 < minValue:
         minValue=minValue2
 
-     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}\nMICS={mics}", style='italic',
+     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
         bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
 
 
-     plt.plot(real_data,color='#101010', label='real_data')
-     plt.plot(generated_data,color='#909090', label='generated_data')
+     plt.plot(real_data,color='#303030', label='RIR Microphone-'+mics.split("-")[0]+" Speaker-"+spks.split("-")[0])
+     plt.plot(generated_data,color='#909090', label='RIR Microphone-'+mics.split("-")[1]+" Speaker-"+spks.split("-")[1])
      plt.xlabel('Time')
      plt.ylabel('Amlpitude')
      plt.legend(loc = "upper right")
@@ -276,10 +276,13 @@ for selectedRoomId in list_of_room_ids:
                   glitch_points=getGlitchPoints(rir_data_1,rir_data_2)
                   mD["glitch_point_count"]=len(glitch_points)
                   if micNo_1 < micNo_2:
-                     mD["mics"]=f"{micNo_1}-{micNo_2}"
+                     mD["mics"]=f"{int(micNo_1)+1}-{int(micNo_2)+1}"
+                     mD["spks"]=f"{int(physicalSpeakerNo_1)+1}-{int(physicalSpeakerNo_2)+1}"
                   else:
-                     mD["mics"]=f"{micNo_2}-{micNo_1}"
- 
+                     mD["mics"]=f"{int(micNo_2)+1}-{int(micNo_1)+1}"
+                     mD["spks"]=f"{int(physicalSpeakerNo_2)+1}-{int(physicalSpeakerNo_1)+1}"
+
+
                   if mD["mics"] not in micPairSimilarities:
                      micPairSimilarities[mD["mics"]]={}
                      micPairSimilarities[mD["mics"]]["MSE"]=[]
@@ -290,7 +293,7 @@ for selectedRoomId in list_of_room_ids:
                   micPairSimilarities[mD["mics"]]["SSIM"].append(mD["ssim"])
                   micPairSimilarities[mD["mics"]]["GLITCH"].append(mD["glitch_point_count"])
 
-                  own_record=[rir_data_1,rir_data_2,MSE,SSIM,glitch_points,mD["mics"]]
+                  own_record=[rir_data_1,rir_data_2,MSE,SSIM,glitch_points,mD["mics"],mD["spks"]]
 
                   if maxSSIM < mD["ssim"]:
                      maxSSIM=mD["ssim"]
@@ -343,12 +346,12 @@ print(output)
 
 
 
-plotWav(maxSSIMRecord[0],maxSSIMRecord[1],maxSSIMRecord[2],maxSSIMRecord[3],maxSSIMRecord[4],maxSSIMRecord[5],saveToPath="maxSSIM.png")
-plotWav(minSSIMRecord[0],minSSIMRecord[1],minSSIMRecord[2],minSSIMRecord[3],minSSIMRecord[4],minSSIMRecord[5],saveToPath="minSSIM.png")
-plotWav(maxMSERecord[0],maxMSERecord[1],maxMSERecord[2],maxMSERecord[3],maxMSERecord[4],maxMSERecord[5],saveToPath="maxMSE.png")
-plotWav(minMSERecord[0],minMSERecord[1],minMSERecord[2],minMSERecord[3],minMSERecord[4],minMSERecord[5],saveToPath="minMSE.png")
-plotWav(maxGlitchRecord[0],maxGlitchRecord[1],maxGlitchRecord[2],maxGlitchRecord[3],maxGlitchRecord[4],maxGlitchRecord[5],saveToPath="maxGlitch.png")
-plotWav(minGlitchRecord[0],minGlitchRecord[1],minGlitchRecord[2],minGlitchRecord[3],minGlitchRecord[4],minGlitchRecord[5],saveToPath="minGlitch.png")
+plotWav(maxSSIMRecord[0],maxSSIMRecord[1],maxSSIMRecord[2],maxSSIMRecord[3],maxSSIMRecord[4],maxSSIMRecord[5],maxSSIMRecord[6],saveToPath="maxSSIM.png")
+plotWav(minSSIMRecord[0],minSSIMRecord[1],minSSIMRecord[2],minSSIMRecord[3],minSSIMRecord[4],minSSIMRecord[5],minSSIMRecord[6],saveToPath="minSSIM.png")
+plotWav(maxMSERecord[0],maxMSERecord[1],maxMSERecord[2],maxMSERecord[3],maxMSERecord[4],maxMSERecord[5],maxMSERecord[6],saveToPath="maxMSE.png")
+plotWav(minMSERecord[0],minMSERecord[1],minMSERecord[2],minMSERecord[3],minMSERecord[4],minMSERecord[5],minMSERecord[6],saveToPath="minMSE.png")
+plotWav(maxGlitchRecord[0],maxGlitchRecord[1],maxGlitchRecord[2],maxGlitchRecord[3],maxGlitchRecord[4],maxGlitchRecord[5],maxGlitchRecord[6],saveToPath="maxGlitch.png")
+plotWav(minGlitchRecord[0],minGlitchRecord[1],minGlitchRecord[2],minGlitchRecord[3],minGlitchRecord[4],minGlitchRecord[5],minGlitchRecord[6],saveToPath="minGlitch.png")
 
 
 
