@@ -1,5 +1,12 @@
 #!/bin/bash
 
+
+echo rm train/pre-trained-models/mesh_embeddings.pickle
+ls -alrt   train/pre-trained-models/
+rm train/pre-trained-models/mesh_embeddings.pickle
+
+
+
 CURRENT_DIR=$(pwd)
 
 DEFAULT_MAIN_DATA_DIR=$HOME/RIR_DATA
@@ -63,8 +70,6 @@ if [ $? = 0 ]
 then
 	GPU_NO=0
 fi
-
-rm train/pre-trained-models/mesh_embeddings.pickle
 
 mkdir -p /fastdisk/mpekmezci/temp
 
