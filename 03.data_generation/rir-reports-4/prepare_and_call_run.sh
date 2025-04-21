@@ -56,9 +56,9 @@ do
   ls -l ~/workspace-python/gtu-rir/03.data_generation/rir-generators-4/EVALUATION_DATA-PREPARE-MESH2IR/ROOM_MESHES/GTURIR/
 
 
-  for node in 1500 2000 2500
+  for node in 50 500 1500 2000 2500 3000
   do
-	for head in 8 21 51
+	for head in 8 21 51 71
 	do
 		if [ -f stop ]
 		then

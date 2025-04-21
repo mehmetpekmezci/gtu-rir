@@ -71,11 +71,19 @@ then
 	            find $REPORT_DIR/$MODEL/ -name *.db.txt| xargs rm -f
 	            find $REPORT_DIR/$MODEL/ -name *.wavesAndSpectrogramsGenerated| xargs rm -f
 	       fi
+	       counter=0
 	       for roomId in $(echo room-207 room-208 room-conferrence01 room-sport01 room-sport02 room-z02 room-z04 room-z06 room-z10 room-z11 room-z23)
 	       do
 		   echo $roomId
-                   python3 mainData.py $GTURIR_DATA $REPORT_DIR/$MODEL $roomId 
+                   python3 mainData.py $GTURIR_DATA $REPORT_DIR/$MODEL $roomId &
+		   counter=$((counter+1))
+		   if [ $counter -gt 5 ]
+		   then
+			   wait
+			   counter=0
+		   fi
 	       done
+	       wait
                echo "Finished to generate report data for $MODEL model"
 	       echo "Starting to generate report table with $MODEL model"
                python3 mainReport.py $GTURIR_DATA $REPORT_DIR/$MODEL 

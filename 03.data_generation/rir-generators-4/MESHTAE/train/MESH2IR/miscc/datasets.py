@@ -187,7 +187,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
         print(f"Could not find GAE MESH NET pth file {mesh_net_path}")
         exit(1)
 
-    gae_mesh_net.to(device='cuda:2')
+    #gae_mesh_net.to(device='cuda:2')
+    gae_mesh_net.cuda()
     gae_mesh_net.eval()
 
     loss_list_content=""
@@ -209,7 +210,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
            areas=torch.from_numpy(areas).float()
            faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
            faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
-           faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           #faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           faceData=faceData.unsqueeze(0).detach().cuda()
            #time.sleep(10)
            faceData_predicted , latent_vector =  gae_mesh_net.forward(faceData)
            faceData=faceData.detach().cpu()

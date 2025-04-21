@@ -68,7 +68,7 @@ then
 	       for roomId in $(echo Hotel_SkalskyDvur_ConferenceRoom2 Hotel_SkalskyDvur_Room112 VUT_FIT_C236 VUT_FIT_D105 VUT_FIT_E112 VUT_FIT_L207 VUT_FIT_L212 VUT_FIT_L227 VUT_FIT_Q301)
 	       do
 		   echo $roomId
-                   python3 mainData.py $BUTReverbDB_DATA $REPORT_DIR/$MODEL $roomId 
+                   python3 mainData.py $BUTReverbDB_DATA $REPORT_DIR/$MODEL $roomId &
 	       done
 	       wait
                echo "Finished to generate report data for $MODEL model"

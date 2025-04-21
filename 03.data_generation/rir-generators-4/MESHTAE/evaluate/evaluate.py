@@ -75,7 +75,8 @@ def load_network_stageI(netG_path):
             netG.load_state_dict(state_dict)
             print('Load from: ', netG_path)
        
-        netG.to(device='cuda:2')
+        #netG.to(device='cuda:2')
+        netG.cuda()
         return netG
 
 
@@ -89,7 +90,14 @@ def load_embedding(data_dir):
 def evaluate():
     print(f"metadata_dir={metadata_dir}") 
     mesh_embeddings={}
+    gpus = cfg.GPU_ID.split(',')
+    gpus = [int(ix) for ix in gpus]
+        #self.gpus=[0]
+    num_gpus = len(gpus)
 
+    torch.cuda.set_device(gpus[0]) 
+
+    
     SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
     
     print("This file is found in "+SCRIPT_DIR)
@@ -122,7 +130,7 @@ def evaluate():
     netG = load_network_stageI(netG_path)
     netG.eval()
 
-
+    
     #netG.to(device='cuda')
     #mesh_net.to(device='cuda')
  
@@ -160,7 +168,8 @@ def evaluate():
         if mesh_obj not in mesh_embeddings:
             print(f"{mesh_obj} does not exist in mesh_embeddings")
             continue
-        mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
+        #mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
+        mesh_embed=mesh_embeddings[mesh_obj].detach().cuda()
 
         embed_sets = len(embeddings) /batch_size
         embed_sets = int(embed_sets)
@@ -180,7 +189,8 @@ def evaluate():
                 wave_name_list.append(wave_name)
 
             txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
-            txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
+            #txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
+            txt_embedding = Variable(txt_embedding).detach().cuda()
             #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
             lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
 
