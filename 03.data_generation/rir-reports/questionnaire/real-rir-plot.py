@@ -65,8 +65,9 @@ def saveRealAndGeneratedPlots(real_data,generated_data,saveToPath,real_front=Fal
         plt.plot(generated_data,color='#909090', label='rir_convolved_with_transmitted_song')
         plt.plot(real_data,color='#101010', label='song_recorded_by_microphone')
 
-     plt.text(3300, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
-        bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 10})
+     plt.text(2600, minValue+abs(minValue)/11, f"MSE={float(MSE):.4f}\nSSIM={float(SSIM):.4f}\nGLITCH={int(len(glitch_points))}", style='italic',
+        bbox={'facecolor': 'gray', 'alpha': 0.5, 'pad': 10})
+
 
      #plt.title(title)
      plt.xlabel('Time')
@@ -99,6 +100,7 @@ rir_fname=sys.argv[1]
 rir_data,sampling_rate=librosa.load(rir_fname,sr=16000)
 
 rir_data=rir_data*1/np.max(rir_data)
+rir_data=rir_data[0:3500]
 
 saveRealAndGeneratedPlots(rir_data,rir_data,rir_fname+'.rir.coherence.plot.png')
 
