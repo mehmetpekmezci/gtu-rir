@@ -15,7 +15,7 @@ do
 	    exit 1
 	fi
 	echo "Running run.sh in directory $CURRENT_DIR/$i"
-	./run.sh &
+	./run.sh 
 done
 wait
 

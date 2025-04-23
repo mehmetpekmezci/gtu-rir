@@ -6,10 +6,10 @@ ln -sf ~/RIR_REPORT.backup.default/GTURIR/MESH2IR ~/RIR_REPORT/GTURIR/MESH2IR
 ln -sf ~/RIR_REPORT.backup.default/BUTReverbDB/MESH2IR ~/RIR_REPORT/BUTReverbDB/MESH2IR
 
 #for node in 3000 2500 2000 1500 500 50
-for node in 3000 2500 2000 
+for node in 10
 do
 	#for head in 8 21 51 71
-	for head in 51 71
+	for head in 8
 	do
 		if [ -f stop ]
 		then
