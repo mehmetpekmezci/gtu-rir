@@ -56,7 +56,7 @@ do
   ls -l ~/workspace-python/gtu-rir/03.data_generation/rir-generators-4/EVALUATION_DATA-PREPARE-MESH2IR/ROOM_MESHES/GTURIR/
 
 
-  for node in 50 500 1500 2000 2500 3000
+  for node in 10 50 500 1500 2000 2500 3000
   do
 	for head in 8 21 51 71
 	do
@@ -65,6 +65,10 @@ do
 			echo "STOPPING"
 			rm -f stop
 			exit 1
+		fi
+		if [ ! -f /fastdisk/mpekmezci/models/netG_GAN_${node}_nodes_${head}_heads.pth ]
+		then
+			continue
 		fi
 		rm -f  ~/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/train/pre-trained-models/mesh_embeddings.pickle
 		ls -l ~/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/train/pre-trained-models/mesh_embeddings.pickle

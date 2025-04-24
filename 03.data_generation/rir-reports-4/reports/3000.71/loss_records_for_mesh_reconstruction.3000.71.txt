@@ -1,0 +1,2 @@
+
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj=2.69502e-05
