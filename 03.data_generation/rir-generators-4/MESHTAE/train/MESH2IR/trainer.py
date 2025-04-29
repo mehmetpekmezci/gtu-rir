@@ -193,21 +193,24 @@ class GANTrainer(object):
                 
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
                 txt_embedding = torch.from_numpy(np.array(data['embeddings']))
-                mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings']))
+                mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings'])) 
                 
                 #data.pop('RIR')
                 #data.pop('embeddings')
-                
+                #print("ORAN") 
+                #print(txt_embedding)
+                #print(mesh_embed)
+
                 real_RIRs = Variable(real_RIR_cpu)
-                txt_embedding = Variable(txt_embedding)
-                mesh_embed = Variable(mesh_embed)
+                txt_embedding = Variable(txt_embedding) 
+                mesh_embed = Variable(mesh_embed) 
 
                 
                 if cfg.CUDA:
                     real_RIRs = real_RIRs.cuda()
                     txt_embedding = txt_embedding.cuda()
                     mesh_embed = mesh_embed.cuda()
-                
+               
                 #######################################################
                 # (2) Generate fake images (have to modify)
                 ######################################################

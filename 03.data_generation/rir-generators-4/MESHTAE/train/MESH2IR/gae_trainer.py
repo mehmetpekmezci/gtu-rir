@@ -72,6 +72,7 @@ class GAETrainer(object):
         from model_mesh import MESH_TRANSFORMER_AE
 
         mesh_net =MESH_TRANSFORMER_AE() 
+        mesh_net.apply(weights_init)
         
         
 #            mesh_net = Mesh_mae(
@@ -144,7 +145,7 @@ class GAETrainer(object):
                faceDataDim=triangle_coordinates.shape[2]+centers.shape[2]+normals.shape[2]+areas.shape[2]
                faceData=torch.cat((triangle_coordinates,normals,centers,areas),2)
 
-
+               #print(f"faceData={faceData}")
                #print(f"1 faceData.shape={faceData.shape}")
                
                #faceData=faceData.reshape(faceData.shape[0]*faceData.shape[1],faceData.shape[2])
@@ -159,7 +160,8 @@ class GAETrainer(object):
 
 #               print(f"faceData_predicted.shape={faceData_predicted.shape}")
 #               print(f"faceData.shape={faceData.shape}")
-               
+              
+               #print(f"latent_vector={latent_vector/1000}")
                loss = self.mesh_net.loss(faceData_predicted,faceData)
 
                loss.backward()
@@ -179,7 +181,7 @@ class GAETrainer(object):
                         print(param_group['lr'])
                         param_group['lr'] = mesh_lr
                         print(param_group['lr'])
-               if  (epoch>0 and epoch%10 == 0 and i==0) or (i>0 and i % 10000 == 0) :
+               if  (epoch>0 and epoch%10 == 0 and i==0) or (i>0 and i % 1000 == 0) :
 #                 try :
                     path=full_mesh_path[0]
                     print(f"Generating example mesh STARTED : {path}.face.regenerated.1.obj")

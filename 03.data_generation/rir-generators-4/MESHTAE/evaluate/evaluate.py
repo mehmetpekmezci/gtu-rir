@@ -114,6 +114,7 @@ def evaluate():
     #mesh_net_path = "Models/MESH2IR/mesh_net_epoch_175.pth"
     #netG_path = "Models/netG.pth"
     netG_path = "Models/netG_GAN_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
+    #netG_path = "Models/netG_GAN_3000_nodes_71_heads.pth"
     mesh_net_path = "Models/mesh_net_transformer_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
     #mesh_net_path = "Models/gae_mesh_net_trained_model.pth"
     #gpus =[0,1]
@@ -148,7 +149,7 @@ def evaluate():
            print(f"MESH EMBEDDINGS FILE  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle DOES NOT EXISTS SO STARTING TO GENERATE ......")
            build_mesh_embeddings_for_evaluation_data(mesh_net_path,mesh_directory,embedding_directory,metadata_dirname,obj_file_name_list)
            print("FINISHED MESH EMBEDDINGS FILE  ......")
-    
+
     print(f"load  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle")
     mesh_embeddings = load_embedding(embedding_directory+'/'+metadata_dirname+".mesh_embeddings.pickle")
 
@@ -169,7 +170,9 @@ def evaluate():
             print(f"{mesh_obj} does not exist in mesh_embeddings")
             continue
         #mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
-        mesh_embed=mesh_embeddings[mesh_obj].detach().cuda()
+        #mesh_embed=mesh_embeddings[mesh_obj].detach().cuda()
+        mesh_embed=mesh_embeddings[mesh_obj]
+        mesh_embed=mesh_embed.detach().cuda()
 
         embed_sets = len(embeddings) /batch_size
         embed_sets = int(embed_sets)

@@ -5,7 +5,7 @@
 
 if [ $# -lt 2 ]
 then
-	echo "Usage $0 <MESH2IR_INPUT_DATA_DIR>  <GENERATED_RIRS_DIR>  <GTURIR|BUTReverbDB>"
+	echo "Usage $0 <MESH2IR_INPUT_DATA_DIR>  <GENERATED_RIRS_DIR>  <GTURIR|BUTReverbDB> "
 	exit 1
 fi
 
@@ -70,8 +70,8 @@ echo " Set the MAX_FACE_COUNT and NUMBER_OF_TRANSFORMER_HEADS in RIR_s1.yml corr
 
 if [ ! -f $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.rirs_are_generated_for_$DATASET_NAME ]
 then
-     echo python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME
-     python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME
+     echo python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME 
+     python3 evaluate.py $GENERATED_RIRS_DIR $METADATA_DIR_NAME 
      if [ $? = 0 ]
      then
          touch  $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.rirs_are_generated_for_$DATASET_NAME
