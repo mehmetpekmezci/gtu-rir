@@ -1,0 +1,897 @@
+mkdir: cannot create directory ‘/home/mpekmezci/RIR_REPORT/summary.node.3000.head.51’: File exists
+setting RIR_GENERATORS_DIR=../../rir-generators-4
+Running run.sh in directory /home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-reports-3/BUTReverbDB
+BUTReverbDB_DATA=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+Data directory /home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only already exists , no need to recreate .
+reverdb.csv file already exists .
+BUTReverbDB_DATA=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+MESHTAE STARTED :
+Prş 01 May 2025 10:34:41 +03
+Starting to generate RIR signals using MESHTAE model
+./run_eval.sh /home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE BUTReverbDB
+python3 embed_generator.py /home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only/RIR.pickle.dat /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE BUTReverbDB METADATA_BUTReverbDB
+Loading pickle file : /home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only/RIR.pickle.dat
+Generating embeddings for rir_data od length 1489
+total_number_of_records=1489
+ Set the MAX_FACE_COUNT and NUMBER_OF_TRANSFORMER_HEADS in RIR_s1.yml corresponding your model file !
+python3 evaluate.py /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE METADATA_BUTReverbDB
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:31: UserWarning: An issue occurred while importing 'torch-scatter'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-scatter'. "
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:42: UserWarning: An issue occurred while importing 'torch-sparse'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-sparse'. "
+/usr/local/lib/python3.10/dist-packages/cupyx/jit/_interface.py:173: FutureWarning: cupyx.jit.rawkernel is experimental. The interface can change in the future.
+  cupy._util.experimental('cupyx.jit.rawkernel')
+/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/evaluate/miscc/datasets.py:598: UserWarning: Deprecated Filter Warning: You should use 'meshing_decimation_quadric_edge_collapse' instead of 'simplification_quadric_edge_collapse_decimation'. See https://pymeshlab.readthedocs.io/en/latest/index.html#filters-renaming
+  pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
+metadata_dir=/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB
+This file is found in /home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/evaluate
+STAGE1_G(
+  (cond_net): COND_NET(
+    (fc): Linear(in_features=56, out_features=10, bias=True)
+    (relu): PReLU(num_parameters=1)
+  )
+  (fc): Sequential(
+    (0): Linear(in_features=10, out_features=32768, bias=False)
+    (1): BatchNorm1d(32768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample1): Sequential(
+    (0): ConvTranspose1d(2048, 1024, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample2): Sequential(
+    (0): ConvTranspose1d(1024, 512, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample3): Sequential(
+    (0): ConvTranspose1d(512, 256, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample4): Sequential(
+    (0): ConvTranspose1d(256, 128, kernel_size=(41,), stride=(2,), padding=(20,), output_padding=(1,))
+    (1): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample5): Sequential(
+    (0): ConvTranspose1d(128, 128, kernel_size=(41,), stride=(2,), padding=(20,), output_padding=(1,))
+    (1): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (RIR): Sequential(
+    (0): ConvTranspose1d(128, 1, kernel_size=(41,), stride=(1,), padding=(20,))
+    (1): Tanh()
+  )
+)
+Load from:  Models/netG_GAN_3000_nodes_51_heads.pth
+MESH EMBEDDINGS FILE  /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Embeddings//METADATA_BUTReverbDB.mesh_embeddings.pickle DOES NOT EXISTS SO STARTING TO GENERATE ......
+build_mesh_embeddings_for_evaluation_data started...
+Load GAE MESH NET from:  Models/mesh_net_transformer_3000_nodes_51_heads.pth
+calculating mesh embedding of VUT_FIT_Q301-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_Q301-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_Q301-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_Q301-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_Q301-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.782556687947363e-05
+calculating mesh embedding of VUT_FIT_L207-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L207-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L207-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L207-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L207-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.293888822663575e-05
+calculating mesh embedding of Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:6.631630822084844e-05
+calculating mesh embedding of VUT_FIT_E112-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_E112-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_E112-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_E112-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_E112-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.0004082082014065236
+calculating mesh embedding of Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.002064598025754094
+calculating mesh embedding of VUT_FIT_L212-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L212-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L212-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L212-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L212-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.49548596306704e-05
+calculating mesh embedding of VUT_FIT_C236-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_C236-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_C236-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_C236-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_C236-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:9.145907824859023e-05
+calculating mesh embedding of VUT_FIT_L227-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L227-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L227-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L227-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L227-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.001972281141206622
+calculating mesh embedding of VUT_FIT_D105-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_D105-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_D105-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_D105-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_D105-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.0011515351943671703
+build_mesh_embeddings_for_evaluation_data finished...
+mesh_mbeddings size is : 9
+
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_Q301-freecad-mesh-Body.obj=8.782557e-05
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L207-freecad-mesh-Body.obj=8.293889e-05
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_Room112-freecad-mesh-Body.obj=6.631631e-05
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_E112-freecad-mesh-Body.obj=0.0004082082
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/Hotel_SkalskyDvur_ConferenceRoom2-freecad-mesh-Body.obj=0.002064598
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L212-freecad-mesh-Body.obj=8.495486e-05
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_C236-freecad-mesh-Body.obj=9.145908e-05
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_L227-freecad-mesh-Body.obj=0.0019722811
+/home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Meshes/VUT_FIT_D105-freecad-mesh-Body.obj=0.0011515352
+FINISHED MESH EMBEDDINGS FILE  ......
+load  /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/METADATA_BUTReverbDB/Embeddings//METADATA_BUTReverbDB.mesh_embeddings.pickle
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_Q301
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_L207
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/Hotel_SkalskyDvur_Room112
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_E112
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/Hotel_SkalskyDvur_ConferenceRoom2
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_L212
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_C236
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_L227
+embed_name    /home/mpekmezci/RIR_REPORT/BUTReverbDB//MESHTAE/VUT_FIT_D105
+Finished to generate RIR signals using MESHTAE model
+Starting to generate report data with MESHTAE model
+Hotel_SkalskyDvur_ConferenceRoom2
+Hotel_SkalskyDvur_Room112
+VUT_FIT_C236
+VUT_FIT_D105
+VUT_FIT_E112
+VUT_FIT_L207
+VUT_FIT_L212
+VUT_FIT_L227
+VUT_FIT_Q301
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_E112
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_Q301
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_L227
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=Hotel_SkalskyDvur_ConferenceRoom2
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=Hotel_SkalskyDvur_Room112
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_L212
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_D105
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_L207
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+self.selected_room_id=VUT_FIT_C236
+SCRIPT IS FINISHED
+Finished to generate report data for MESHTAE model
+Starting to generate report table with MESHTAE model
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/BUTReverbDB/BUT_ReverbDB_rel_19_06_RIR-Only
+rirData Length =1489
+-5------------------------------------------------------------
+
+
+
+
+-------------------------------------------------------------------------------
+SUMMARY TABLE :
+        ROOM	MSE		SSIM		GLITCH_COUNT	
+Hotel_Skalsk	0.0190		0.5154		134.4918		
+Hotel_Skalsk	0.0137		0.7498		81.8052		
+VUT_FIT_C236	0.0182		0.5502		103.2806		
+VUT_FIT_D105	0.0107		0.7232		89.9839		
+VUT_FIT_E112	0.0097		0.7410		91.3548		
+VUT_FIT_L207	0.0118		0.7707		86.8746		
+VUT_FIT_L212	0.0138		0.7363		89.6688		
+VUT_FIT_L227	0.0288		0.3772		121.2937		
+VUT_FIT_Q301	0.0129		0.7687		93.9457		
+SCRIPT IS FINISHED
+Finished to generate report table for MESHTAE model
+MESHTAE ENDED :
+Prş 01 May 2025 10:37:01 +03
+Running run.sh in directory /home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-reports-3/GTURIR
+GTURIR_DATA=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+grep #MESHTAE# ignore_models.conf
+MESHTAE STARTED :
+Prş 01 May 2025 10:37:01 +03
+Starting to generate RIR signals using MESHTAE model
+./run_eval.sh /home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/ /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE GTURIR
+python3 embed_generator.py /home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker//RIR.pickle.dat /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE GTURIR METADATA_GTURIR
+Loading pickle file : /home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker//RIR.pickle.dat
+Generating embeddings for rir_data od length 18084
+total_number_of_records=18084
+ Set the MAX_FACE_COUNT and NUMBER_OF_TRANSFORMER_HEADS in RIR_s1.yml corresponding your model file !
+python3 evaluate.py /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE METADATA_GTURIR
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:31: UserWarning: An issue occurred while importing 'torch-scatter'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-scatter'. "
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:42: UserWarning: An issue occurred while importing 'torch-sparse'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-sparse'. "
+/usr/local/lib/python3.10/dist-packages/cupyx/jit/_interface.py:173: FutureWarning: cupyx.jit.rawkernel is experimental. The interface can change in the future.
+  cupy._util.experimental('cupyx.jit.rawkernel')
+/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/evaluate/miscc/datasets.py:598: UserWarning: Deprecated Filter Warning: You should use 'meshing_decimation_quadric_edge_collapse' instead of 'simplification_quadric_edge_collapse_decimation'. See https://pymeshlab.readthedocs.io/en/latest/index.html#filters-renaming
+  pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
+metadata_dir=/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR
+This file is found in /home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/evaluate
+STAGE1_G(
+  (cond_net): COND_NET(
+    (fc): Linear(in_features=56, out_features=10, bias=True)
+    (relu): PReLU(num_parameters=1)
+  )
+  (fc): Sequential(
+    (0): Linear(in_features=10, out_features=32768, bias=False)
+    (1): BatchNorm1d(32768, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample1): Sequential(
+    (0): ConvTranspose1d(2048, 1024, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(1024, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample2): Sequential(
+    (0): ConvTranspose1d(1024, 512, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample3): Sequential(
+    (0): ConvTranspose1d(512, 256, kernel_size=(41,), stride=(4,), padding=(19,), output_padding=(1,))
+    (1): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample4): Sequential(
+    (0): ConvTranspose1d(256, 128, kernel_size=(41,), stride=(2,), padding=(20,), output_padding=(1,))
+    (1): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (upsample5): Sequential(
+    (0): ConvTranspose1d(128, 128, kernel_size=(41,), stride=(2,), padding=(20,), output_padding=(1,))
+    (1): BatchNorm1d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): PReLU(num_parameters=1)
+  )
+  (RIR): Sequential(
+    (0): ConvTranspose1d(128, 1, kernel_size=(41,), stride=(1,), padding=(20,))
+    (1): Tanh()
+  )
+)
+Load from:  Models/netG_GAN_3000_nodes_51_heads.pth
+MESH EMBEDDINGS FILE  /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Embeddings//METADATA_GTURIR.mesh_embeddings.pickle DOES NOT EXISTS SO STARTING TO GENERATE ......
+build_mesh_embeddings_for_evaluation_data started...
+Load GAE MESH NET from:  Models/mesh_net_transformer_3000_nodes_51_heads.pth
+calculating mesh embedding of room-conferrence01-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:9.057333227247e-05
+calculating mesh embedding of room-z23-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.0001269442291231826
+calculating mesh embedding of room-z06-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.00010521258809603751
+calculating mesh embedding of room-z04-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.972805517259985e-05
+calculating mesh embedding of room-207-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.586897456552833e-05
+calculating mesh embedding of room-208-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:6.577940803254023e-05
+calculating mesh embedding of room-z10-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.00010389505041530356
+calculating mesh embedding of room-sport01-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:0.00013066214160062373
+calculating mesh embedding of room-sport02-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.618013089289889e-05
+calculating mesh embedding of room-z02-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:8.988855552161112e-05
+calculating mesh embedding of room-z11-freecad-mesh-Body.obj
+Started to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj.face.triangles.real.sample.3000.51.obj is written
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj.face.triangles.regenerated.sample.3000.51.obj is written
+Finished to generate OBJ mesh sample : /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj.face.triangles.(real,regenerated).sample.obj with LOSS:9.907986532198265e-05
+build_mesh_embeddings_for_evaluation_data finished...
+mesh_mbeddings size is : 11
+
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj=9.057333e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj=0.00012694423
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj=0.00010521259
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj=8.9728055e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj=8.5868975e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj=6.577941e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj=0.00010389505
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj=0.00013066214
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj=8.618013e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj=8.9888556e-05
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj=9.9079865e-05
+FINISHED MESH EMBEDDINGS FILE  ......
+load  /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Embeddings//METADATA_GTURIR.mesh_embeddings.pickle
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-conferrence01
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z23
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z06
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z04
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-207
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-208
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z10
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-sport01
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-sport02
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z02
+embed_name    /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/room-z11
+Finished to generate RIR signals using MESHTAE model
+Starting to generate report data with MESHTAE model
+room-207
+room-208
+room-conferrence01
+room-sport01
+room-sport02
+room-z02
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-207
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-sport02
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-208
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z02
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-sport01
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-conferrence01
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+room-z04
+room-z06
+room-z10
+room-z11
+room-z23
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 2, 3500]) and win size: 11
+  warnings.warn(
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z11
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z23
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z10
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z04
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-4------------------------------------------------------------
+len(self.rir_data):{len(self.rir_data)}
+selected_room_id=room-z06
+ THERE WAS 1 FILES THAT WERE NOT FOUND
+SCRIPT IS FINISHED
+Finished to generate report data for MESHTAE model
+Starting to generate report table with MESHTAE model
+-1------------------------------------------------------------
+self.data_dir=/home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/
+rirData Length =18084
+-5------------------------------------------------------------
+
+
+
+
+-------------------------------------------------------------------------------
+SUMMARY TABLE :
+        ROOM	MSE		SSIM		GLITCH_COUNT	
+    room-207	0.0333		0.3829		135.7929		
+    room-208	0.0338		0.3733		124.1209		
+room-conferr	0.0239		0.4690		125.9275		
+room-sport01	0.0264		0.4230		129.5386		
+room-sport02	0.0309		0.3732		137.3109		
+    room-z02	0.0373		0.3220		144.0589		
+    room-z04	0.0373		0.3225		145.6247		
+    room-z06	0.0322		0.3511		140.4230		
+    room-z10	0.0378		0.3104		144.2060		
+    room-z11	0.0373		0.3102		135.5275		
+    room-z23	0.0274		0.4396		131.7000		
+SCRIPT IS FINISHED
+Finished to generate report table for MESHTAE model
+MESHTAE ENDED :
+Prş 01 May 2025 10:50:56 +03
+bunzip2: Output file /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav already exists.
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX BUTReverbDB STARTED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN BUTReverbDB STARTED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX GTURIR STARTED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG BUTReverbDB STARTED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG GTURIR STARTED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN GTURIR STARTED
+ROOM=VUT_FIT_D105
+ROOM=Hotel_SkalskyDvur_ConferenceRoom2
+RECORD=SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10
+RECORD=SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01
+ROOM=Hotel_SkalskyDvur_Room112
+RECORD=SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25
+SPEAKER_ITERATION=0
+MICROPHONE_ITERATION=0
+PHYSICAL_SPRAKER_NO=3
+MICROPHONE_NO=10
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB
+SPEAKER_ITERATION=0
+MICROPHONE_ITERATION=0
+PHYSICAL_SPRAKER_NO=2
+MICROPHONE_NO=01
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB
+SPEAKER_ITERATION=0
+MICROPHONE_ITERATION=0
+PHYSICAL_SPRAKER_NO=2
+MICROPHONE_NO=25
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB
+ROOM=room-207
+RECORD=SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0
+ROOM=room-sport01
+RECORD=SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3
+SPEAKER_ITERATION=5
+MICROPHONE_ITERATION=1
+PHYSICAL_SPRAKER_NO=0
+MICROPHONE_NO=0
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR
+SPEAKER_ITERATION=1
+MICROPHONE_ITERATION=5
+PHYSICAL_SPRAKER_NO=3
+MICROPHONE_NO=3
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR
+ROOM=room-207
+RECORD=SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0
+SPEAKER_ITERATION=1
+MICROPHONE_ITERATION=0
+PHYSICAL_SPRAKER_NO=1
+MICROPHONE_NO=0
+SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav
+REAL_RIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+10.9444275
+diff=13588
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav.Example
+9.454392
+diff=1330
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav.Example
+11.46609
+diff=4220
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav.Example
+11.614418
+diff=5113
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav.Example
+10.976326
+diff=4428
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav.Example
+10.52336
+diff=118
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav.Example
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/VUT_FIT_D105/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/VUT_FIT_D105/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wave.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav MESH2IR /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/VUT_FIT_D105/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/VUT_FIT_D105/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wave.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-sport01/micx-527.0-micy-438.0-spkx-260.0-spky-392.0-2022.06.16_17.54.08/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-sport01/micx-527.0-micy-438.0-spkx-260.0-spky-392.0-2022.06.16_17.54.08/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wave.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wave.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav MESHTAE /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/real.rir.VUT_FIT_D105-micstep-0-spkstep-0-spkno-3-micno-10.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav MESH2IR MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav MESH2IR /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-sport01/micx-527.0-micy-438.0-spkx-260.0-spky-392.0-2022.06.16_17.54.08/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-sport01/micx-527.0-micy-438.0-spkx-260.0-spky-392.0-2022.06.16_17.54.08/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wave.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav MESHTAE /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE GLITCH_COUNT
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav MESH2IR MESHTAE
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/real.rir.room-sport01-micstep-5-spkstep-1-spkno-3-micno-3.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav MESH2IR /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wave.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav MESH2IR /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR GLITCH_COUNT
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav MESHTAE /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav MESH2IR MESHTAE
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-0-spkstep-1-spkno-1-micno-0.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav
+cp /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/room-207/micx-175.0-micy-922.0-spkx-344.0-spky-365.0-2022.08.01_13.43.15/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wave.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav MESHTAE /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/GTURIR/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/real.rir.room-207-micstep-1-spkstep-5-spkno-0-micno-0.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav MESH2IR MESHTAE
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/Hotel_SkalskyDvur_ConferenceRoom2/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/Hotel_SkalskyDvur_ConferenceRoom2/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wave.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/Hotel_SkalskyDvur_Room112/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/Hotel_SkalskyDvur_Room112/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wave.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav MESH2IR /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/Hotel_SkalskyDvur_ConferenceRoom2/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/Hotel_SkalskyDvur_ConferenceRoom2/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wave.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav MESH2IR /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 MESH2IR STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESH2IR/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav
+cp /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/Hotel_SkalskyDvur_Room112/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/Hotel_SkalskyDvur_Room112/MicID01/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wave.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav MESHTAE /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE GLITCH_COUNT
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav MESH2IR MESHTAE
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_ConferenceRoom2-micstep-0-spkstep-0-spkno-2-micno-01.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav
+./coherence_plot.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav MESHTAE /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE GLITCH_COUNT
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 MESHTAE STARTED
+i/summary = /home/mpekmezci/RIR_REPORT/BUTReverbDB/MESHTAE/summary
+python3 coherence_plot.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/real.rir.Hotel_SkalskyDvur_Room112-micstep-0-spkstep-0-spkno-2-micno-25.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 MESH2IR MESHTAE STARTED
+python3 coherence_plot_model1_vs_model2.py /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav MESH2IR MESHTAE
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/home/mpekmezci/.local/lib/python3.10/site-packages/torchaudio/functional/functional.py:584: UserWarning: At least one mel filterbank has all zero values. The value for `n_mels` (4096) may be set too high. Or, the value for `n_freqs` (201) may be set too low.
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+/usr/local/lib/python3.10/dist-packages/pytorch_msssim/ssim.py:50: UserWarning: Skipping Gaussian Smoothing at dimension 2+0 for input: torch.Size([1, 1, 3, 3500]) and win size: 11
+  warnings.warn(
+diff=288
+diff=59
+diff=59
+diff=64
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0  FINISHED
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav
+diff=58
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav
+diff=49
+diff=204
+diff=377
+diff=5
+diff=366
+diff=66
+diff=115
+diff=162
+diff=121
+diff=327
+diff=7
+diff=347
+diff=6
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3  FINISHED
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0  FINISHED
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10  FINISHED
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01  FINISHED
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav
+python3 convolve.py /home/mpekmezci/RIR_REPORT/transmittedSongSignal.wav /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav
+./coherence_plot_model1_vs_model2.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25  FINISHED
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+7.9966288
+diff=79818
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.Example
+9.458554
+diff=2698
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.Example
+7.724031
+diff=507
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.Example
+7.5937357
+diff=1403
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.Example
+8.58655
+diff=79
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.Example
+8.113427
+diff=506
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.Example
+6.081744
+diff=178
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.Example
+5.308061
+diff=2421
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.Example
+6.695842
+diff=178
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.Example
+6.739491
+diff=79231
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.Example
+6.5856557
+diff=1474
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.Example
+9.87869
+diff=164
+saveToPath=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.Example
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 MESH2IR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 MESHTAE FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 MESH2IR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 MESH2IR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25 MESH2IR FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN BUTReverbDB FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3 MESHTAE FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX GTURIR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 MESHTAE FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10 MESHTAE FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MAX BUTReverbDB FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 MESH2IR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0 MESHTAE FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG GTURIR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0 MESHTAE FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT MIN GTURIR FINISHED
+./coherence_plot.sh : SUMMARY_DIR=/home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01 MESH2IR FINISHED
+./find_and_copy_by_glitch_count.sh /home/mpekmezci/RIR_DATA /home/mpekmezci/RIR_REPORT AVG BUTReverbDB FINISHED
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MAX GENERATED_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MIN GENERATED_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/AVG GENERATED_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.new.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.new.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MIN REAL_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-5-MICROPHONE_ITERATION-1-PHYSICAL_SPEAKER_NO-0-MICROPHONE_NO-0.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MAX REAL_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-5-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-3.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/AVG REAL_ON_TOP GTURIR /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESH2IR/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-GTURIR/MESHTAE/SPEAKER_ITERATION-1-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-1-MICROPHONE_NO-0.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MAX GENERATED_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MIN GENERATED_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.new.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/AVG GENERATED_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.new.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.new.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.MESH2IR.MESHTAE.model_comparison.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MIN REAL_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MIN-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-25.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/MAX REAL_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/MAX-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-3-MICROPHONE_NO-10.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+python3 coherence_plot_group.py /home/mpekmezci/RIR_REPORT/summary/AVG REAL_ON_TOP BUTReverbDB /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESH2IR/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.new_real_front.png /home/mpekmezci/RIR_REPORT/summary/AVG-GLITCH_COUNT-BUTReverbDB/MESHTAE/SPEAKER_ITERATION-0-MICROPHONE_ITERATION-0-PHYSICAL_SPEAKER_NO-2-MICROPHONE_NO-01.wav.MESH2IR.MESHTAE.model_comparison_real_front.png
+./prepare_coherence_plots.sh is FINISHED
+ ####### NODE:3000 HEAD:51 is DONE 
