@@ -1,0 +1,12 @@
+
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-conferrence01-freecad-mesh-Body.obj=0.00018762599
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z23-freecad-mesh-Body.obj=0.0002200316
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z06-freecad-mesh-Body.obj=0.00023356528
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z04-freecad-mesh-Body.obj=0.0001905114
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-207-freecad-mesh-Body.obj=0.00016441695
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-208-freecad-mesh-Body.obj=0.00017512881
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z10-freecad-mesh-Body.obj=0.00022741566
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport01-freecad-mesh-Body.obj=0.00032331873
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-sport02-freecad-mesh-Body.obj=0.00017313859
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z02-freecad-mesh-Body.obj=0.00019132449
+/home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE/METADATA_GTURIR/Meshes/room-z11-freecad-mesh-Body.obj=0.00021808188
