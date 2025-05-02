@@ -294,7 +294,7 @@ def build_mesh_embeddings(data_dir,embeddings):
         if graph_path not in  mesh_embeddings:
            full_mesh_path = full_graph_path.replace('.pickle','.obj')
            #triangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
-           triangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path)
+           triangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path,shuffle=False)
            real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
            triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
            triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
@@ -586,26 +586,28 @@ def load_mesh(path, augments=[], request=[], seed=None):
     return tirangle_coordinates,normals,centers,areas
 
 
-def load_mesh2(path, augments=[], request=[], seed=None):
+def load_mesh2(path, augments=[], request=[], seed=None,shuffle=True):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     #mesh = trimesh.load_mesh(path, process=False)
 
-    pymeshlab_mesh = ml.MeshSet()
-    nanosecs=time.time_ns()
-    tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
-    try :
-        pymeshlab_mesh.load_new_mesh(path)
-        pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
-        pymeshlab_mesh.save_current_mesh(tempfile)
-        #pymeshlab_mesh.save_current_mesh(path+".DECIMATED.BY.PYMESHLAB.obj")
-        mesh = trimesh.load_mesh(tempfile, process=False)
-        os.remove(tempfile)
-    except:
-        print(f"{path} file is imported by pymeshlab but thrown an error while saving as {tempfile}")
-        mesh = trimesh.load_mesh(path, process=False)
+##    pymeshlab_mesh = ml.MeshSet()
+##    nanosecs=time.time_ns()
+##    tempfile="/fastdisk/mpekmezci/temp/"+str(nanosecs)+".obj"
+##    try :
+##        pymeshlab_mesh.load_new_mesh(path)
+##        pymeshlab_mesh.apply_filter('simplification_quadric_edge_collapse_decimation', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
+##        pymeshlab_mesh.save_current_mesh(tempfile)
+##        #pymeshlab_mesh.save_current_mesh(path+".DECIMATED.BY.PYMESHLAB.obj")
+##        mesh = trimesh.load_mesh(tempfile, process=False)
+##        os.remove(tempfile)
+##    except:
+##        print(f"{path} file is imported by pymeshlab but thrown an error while saving as {tempfile}")
+##        mesh = trimesh.load_mesh(path, process=False)
 
             
-    if cfg.TRAIN.FLAG :
+    mesh = trimesh.load_mesh(path, process=False)
+
+    if cfg.TRAIN.FLAG and shuffle:
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
        random.shuffle(mesh.faces)
     #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
@@ -662,7 +664,7 @@ def load_mesh2(path, augments=[], request=[], seed=None):
 #            mesh = random_scale(mesh)
 #        if method == 'deformation':
 #            mesh = mesh_deformation(mesh)
-
+    mesh=trimesh.Trimesh(mesh.vertices,mesh.faces)
     F = mesh.faces ## EVERY FACE IS COMPOSED OF 3 node NUMBERS (vertex index): 
     V = mesh.vertices # this gives every verteice's x,y,z coordinates.
     tirangle_coordinates = V[F.flatten()].reshape(-1,9) # for each face,  [ v1x, v1y, v1z, v2x, v2y, v2z, v3x, v3y, v3z ] 

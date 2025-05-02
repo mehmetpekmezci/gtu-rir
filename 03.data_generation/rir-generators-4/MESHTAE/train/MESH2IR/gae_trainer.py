@@ -172,10 +172,11 @@ class GAETrainer(object):
                if i % 10 == 0 :
                   end_t = time.time()
                   print('''[%d/%d][%d/%d] loss: %.8f Total Time: %.8fsec'''% (epoch, self.max_epoch, i, len(data_loader),loss,(end_t - start_t)),flush=True)
-               if i>0 and (i==100 or i==500 or i==1000 or i % 10000 == 0):
+               #if i>0 and (i==100 or i==500 or i==1000 or i % 10000 == 0):
+               if i>0 and ( (i%2000==0 and i<10000) or  (i%4000==0 and i<20000) or  (i%10000 == 0)):
                     save_mesh_model(self.mesh_net, epoch, self.model_dir)
                     print(f"saved_model : {i}")
-                    if mesh_lr > 0.00000001:
+                    if mesh_lr > 0.00000000001:
                      mesh_lr *= 0.5#0.5  ### HER EPCOHTA learning rate 0.8 azaliyor.
                      for param_group in optimizerM.param_groups:
                         print(param_group['lr'])
