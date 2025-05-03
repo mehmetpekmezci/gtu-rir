@@ -7,8 +7,8 @@ GPU_ID: '0'
 DATA_DIR: '../dataset'
 SYNTHETIC_GEOMETRIC_DATA_DIR: '../dataset'
 
-# NET_G: '../generate/netG_epoch_20.pth'
-# NET_D: '../generate/netD_epoch_last.pth'
+  #NET_G: '../pre-trained-models/netG.pth'
+  #NET_D: '../pre-trained-models/netD.pth'
 
 PRE_TRAINED_MODELS_DIR: '../pre-trained-models/'
 MESH_NET_GAE_FILE: 'gae_mesh_net_trained_model.pth'
@@ -19,8 +19,8 @@ MAX_FACE_COUNT: 3000
 FORCE_DECIMATION: True
 
 ## BUNU DEGISTIRINCE TEXT.DIMENSION'i da degistir.
-#LATENT_VECTOR_SIZE: 10
-LATENT_VECTOR_SIZE: 100
+#LATENT_VECTOR_SIZE: 4
+LATENT_VECTOR_SIZE: 4
 ##
 TRANSFORMER_VOCAB_SIZE: 16
 MESH_FACE_DATA_SIZE: 16 
@@ -33,7 +33,7 @@ WORKERS: 1
 STAGE: 1
 TRAIN:
     FLAG: True
-    BATCH_SIZE: 16
+    BATCH_SIZE: 32
     GAE_BATCH_SIZE: 2
     MAX_EPOCH: 100
     MAX_MESHNET_GAE_EPOCH: 100
@@ -43,7 +43,7 @@ TRAIN:
     # GENERATOR_LR: 0.000004
     # MESH_LR: 0.000004
     DISCRIMINATOR_LR: 0.01
-    GENERATOR_LR: 0.0001
+    GENERATOR_LR: 0.01
     # MESH_LR: 0.001
     #DISCRIMINATOR_LR: 0.0000008
     #GENERATOR_LR: 0.0000008
@@ -66,8 +66,8 @@ GAN:
     GF_DIM: 256
 
 TEXT:
-    #DIMENSION: 14
-    #DIMENSION: 10   
-    DIMENSION: 106 # LATENT_VECTOR_SIZE+6
+    #DIMENSION: 10
+    #DIMENSION: 10
+    DIMENSION: 10
     
     
