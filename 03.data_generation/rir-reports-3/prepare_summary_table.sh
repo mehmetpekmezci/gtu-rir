@@ -17,3 +17,6 @@ do
         done
 done
 ) > summary_table.csv
+
+python3 prepare_summary_table.py
+
