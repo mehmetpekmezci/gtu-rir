@@ -58,24 +58,17 @@ def weights_init(m):
         if m.bias is not None:
             m.bias.data.fill_(0.0)
 
-def load_network_stageI(netG_path):
-        from model import STAGE1_G, STAGE1_D
-        netG = STAGE1_G()
+def load_network(netG_path):
+        from model import RIR_TRANSFORMER
+        netG = RIR_TRANSFORMER()
         netG.apply(weights_init)
-
-        print(netG)
-       
-
-
-
         if netG_path!= '':
             state_dict = \
                 torch.load(netG_path,
                            map_location=lambda storage, loc: storage)
             netG.load_state_dict(state_dict)
             print('Load from: ', netG_path)
-       
-        #netG.to(device='cuda:2')
+
         netG.cuda()
         return netG
 
@@ -128,7 +121,7 @@ def evaluate():
     if(not os.path.exists(output_directory)):
         os.mkdir(output_directory)
 
-    netG = load_network_stageI(netG_path)
+    netG = load_network(netG_path)
     netG.eval()
 
     
