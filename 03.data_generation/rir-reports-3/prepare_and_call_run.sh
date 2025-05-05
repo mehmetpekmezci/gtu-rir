@@ -20,7 +20,7 @@ do
 			rm -f stop
 			exit 1
 		fi
-                if [ ! -f /fastdisk/mpekmezci/models/netG_GAN_${node}_nodes_${head}_heads.pth ]
+                if [ ! -f  ~/workspace-python/gtu-rir/03.data_generation/rir-generators-4/MESHTAE/evaluate/Models/netG_GAN_${node}_nodes_${head}_heads*pth ]
                 then
                         continue
                 fi
