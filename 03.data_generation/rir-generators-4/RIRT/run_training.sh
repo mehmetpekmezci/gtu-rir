@@ -3,7 +3,7 @@
 
 echo rm train/pre-trained-models/mesh_embeddings.pickle
 ls -alrt   train/pre-trained-models/
-#rm train/pre-trained-models/mesh_embeddings.pickle
+rm train/pre-trained-models/mesh_embeddings.pickle
 
 
 
