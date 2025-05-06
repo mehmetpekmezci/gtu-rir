@@ -149,21 +149,18 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, epoch, self.model_dir)
 
-                if generator_lr > 0.00000005 and i>0 and ((i%100==0 and i<1100) or (i%1000==0 and i<11000)  or  i%10000==0 ) :
+                if generator_lr > 0.00000005 and i>0 and ((i%500==0 and i<1100) or (i%1000==0 and i<11000)  or  i%10000==0 ) :
                     rate=0.5
-                    print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
+                    print(f"decreasing lr by 0.5 old generator_lr={generator_lr} ")
                     generator_lr *= rate
                     for param_group in optimizerG.param_groups:
                         param_group['lr'] = generator_lr
-                    discriminator_lr *= rate
-                    for param_group in optimizerD.param_groups:
-                        param_group['lr'] = discriminator_lr
-                    print(f"new generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
+                    print(f"new generator_lr={generator_lr} ")
 
                 
                 if i % 10 == 0:
                     t2 = time.time()
-                    print('''[%d/%d][%d/%d] Loss_G: %.4f Total Time: %.2fsec''' % (epoch, self.max_epoch, i, len(data_loader),loss,(t2 - t1)),flush=True) 
+                    print('''[%d/%d][%d/%d] Loss_G: %.8f Total Time: %.2fsec''' % (epoch, self.max_epoch, i, len(data_loader),loss,(t2 - t1)),flush=True) 
                     t1=time.time()
                     save_model(netG, epoch, self.model_dir)
               except:

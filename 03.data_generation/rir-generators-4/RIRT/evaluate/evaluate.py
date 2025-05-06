@@ -36,7 +36,7 @@ import dateutil.tz
 import librosa
 
 from miscc.config import cfg, cfg_from_file
-from miscc.datasets import load_mesh, normalize_mesh_values, build_mesh_embeddings_for_evaluation_data
+from miscc.datasets import  normalize_mesh_values, build_mesh_embeddings_for_evaluation_data
 
 
 generated_rirs_dir=str(sys.argv[1]).strip()
@@ -188,14 +188,20 @@ def evaluate():
             #txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
             txt_embedding = Variable(txt_embedding).detach().cuda()
             #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
-            lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
+            #fake  = netG(txt_embedding,mesh_embed.repeat(2,1))
+            
+            fake  = netG.forward(txt_embedding,mesh_embed)
 
             for i in range(len(fake)):
                 if(not os.path.exists(output_embed+"/"+folder_name_list[i])):
                     os.mkdir(output_embed+"/"+folder_name_list[i])
 
                 fake_RIR_path = output_embed+"/"+folder_name_list[i]+"/"+wave_name_list[i]
-                fake_IR = np.array(fake[i].to("cpu").detach())
+                fake_i=fake[i]
+
+                if len(fake_i.shape)==1:
+                    fake_i=fake_i.unsqueeze(0)
+                fake_IR = np.array(fake_i.to("cpu").detach())
                 fake_IR_only = fake_IR[:,0:(4096-128)]
                 fake_energy = np.median(fake_IR[:,(4096-128):4096])*10
                 fake_IR = fake_IR_only*fake_energy
