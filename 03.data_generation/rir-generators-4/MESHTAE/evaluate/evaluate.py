@@ -121,7 +121,7 @@ def evaluate():
     #gpus =[0]
 
     #batch_size = 256
-    batch_size = 2
+    batch_size = 1
     fs = 16000
 
 
@@ -196,7 +196,9 @@ def evaluate():
             txt_embedding = Variable(txt_embedding).detach().cuda()
             #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
             #lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
-            lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed)
+            #print(txt_embedding.shape)
+            #print(mesh_embed.unsqueeze(0).shape)
+            lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed.unsqueeze(0))
 
             for i in range(len(fake)):
                 if(not os.path.exists(output_embed+"/"+folder_name_list[i])):
