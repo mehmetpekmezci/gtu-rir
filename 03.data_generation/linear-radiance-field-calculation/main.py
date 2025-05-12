@@ -1,124 +1,118 @@
-import pymeshlab as ml
-import time
-import soundfile as sf
-import PIL
-import os
-import os.path
-import pickle
-import random
-import numpy as np
-import pandas as pd
-from scipy import signal
-
-import io
-import sys
-import random
-import scipy.sparse as sp
-import traceback
-
-
-import json
-import random
-from pathlib import Path
-import numpy as np
-import os
-import trimesh
-from scipy.spatial.transform import Rotation
-import copy
-import csv
-
 import math
+import logging
+import csv
+import glob
+import sys
+import os
+import argparse
+import numpy as np
+import time
+import random
+import pickle
+import matplotlib
+import pymeshlab as ml
+import PIL
+import traceback
+import trimesh
+import copy
 import pyglet
-
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from typing import Tuple
+from numba import jit
+from matplotlib.colors import ListedColormap
+from matplotlib.cm import hsv
+
+from src.colormap import generate_colormap
+from src.mesh import load_mesh
+from src.plot import plot_rays_and_mesh,plot_mesh,plot_points,plot_rays
+from src.ray_face_intersection import rays_triangles_intersection
+from src.ray_generator  import get_ray_directions,generate_ray_centers
+
+np.set_printoptions(threshold=sys.maxsize)
+
+
+PARAM_RESOLUTION_QUOTIENT=90 ## 180'i tam bolmesi lazim.
+PARAM_NUMBER_OF_RAY_CENTERS=3
+PARAM_MAX_FACES=1000 #2500
+
+
+t0=time.time()
+STATIC_RAY_DIRECTIONS=get_ray_directions(RESOLUTION_QUOTIENT=PARAM_RESOLUTION_QUOTIENT)
+plot_rays(STATIC_RAY_DIRECTIONS)
+t1=time.time()
+#mesh=load_mesh("./data/a90118af-0020-44f0-8699-be48e0bdcbb6.obj", TOTAL_NUMBER_OF_FACES=PARAM_MAX_FACES,FORCE_DECIMATION=True)
+#mesh=load_mesh("./data/gtu-cs-room-208.mesh.0.obj", TOTAL_NUMBER_OF_FACES=PARAM_MAX_FACES,FORCE_DECIMATION=True)
+mesh=load_mesh("./data/floor_plan-1.mesh.obj", TOTAL_NUMBER_OF_FACES=PARAM_MAX_FACES,FORCE_DECIMATION=True)
+#mesh=load_mesh("./data/room-z23-freecad-mesh-Body.obj", TOTAL_NUMBER_OF_FACES=PARAM_MAX_FACES,FORCE_DECIMATION=True)
 
 
 
-def load_mesh(path, TOTAL_NUMBER_OF_FACES=2000,FORCE_DECIMATION=True):
-    pymeshlab_mesh = ml.MeshSet()
-    try :
-        pymeshlab_mesh.load_new_mesh(path)
-        pmesh=pymeshlab_mesh.current_mesh()
-
-        pymeshlab_mesh.apply_filter('meshing_remove_unreferenced_vertices')
-        pymeshlab_mesh.apply_filter('meshing_remove_duplicate_faces')
-        pymeshlab_mesh.apply_filter('meshing_remove_null_faces')
-        pymeshlab_mesh.apply_filter('meshing_poly_to_tri')
-        pymeshlab_mesh.apply_filter('meshing_repair_non_manifold_edges')
-        #pymeshlab_mesh.apply_filter('meshing_repair_non_manifold_vertices')
-        pymeshlab_mesh.apply_filter('meshing_surface_subdivision_midpoint')
-        pymeshlab_mesh.apply_filter('meshing_decimation_quadric_edge_collapse', targetfacenum=TOTAL_NUMBER_OF_FACES, preservenormal=True)
-        mesh = trimesh.Trimesh(pmesh.vertex_matrix(),pmesh.face_matrix())
-    except:
-        print(f"{path} file is imported by pymeshlab but thrown an error")
-        mesh = trimesh.load_mesh(path, process=False)
-
-    ### hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
-    if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and FORCE_DECIMATION :
-         mesh.faces=mesh.faces[:TOTAL_NUMBER_OF_FACES]
-
-    mesh=trimesh.Trimesh(mesh.vertices,mesh.faces)
-    return mesh
-#    F = mesh.faces ## EVERY FACE IS COMPOSED OF 3 node NUMBERS (vertex index): 
-#    V = mesh.vertices # this gives every verteice's x,y,z coordinates.
-#    tirangle_coordinates = V[F.flatten()].reshape(-1,9) # for each face,  [ v1x, v1y, v1z, v2x, v2y, v2z, v3x, v3y, v3z ] 
-#    centers = V[F.flatten()].reshape(-1, 3, 3).mean(axis=1) # for each face,  [ (v1.x+v2.x+v3.x)/3 , (v1.y+v2.y+v3.y)/3 ,(v1.z+v2.z+v3.z)/3 ]
-#
-#    normals = mesh.face_normals
-#    areas = mesh.area_faces
-#    ## GRAPH DECIMATION FACE sayisinin 1 veya 2 eksigini verebiliyor.
-#    for i in range(TOTAL_NUMBER_OF_FACES-centers.shape[0]):
-#       tirangle_coordinates=np.vstack((tirangle_coordinates,tirangle_coordinates[0]))
-#       centers=np.vstack((centers,centers[0]))
-#       normals=np.vstack((normals,normals[0]))
-#       areas=areas.reshape(-1,1)
-#       areas=np.vstack((areas,areas[0]))
-#       areas=areas.reshape(-1)
-#
-#    tirangle_coordinates=np.array(tirangle_coordinates)
-#    normals=np.array(normals)
-#    centers=np.array(centers)
-#    areas=np.array(areas).reshape(-1,1)
-#    return tirangle_coordinates,normals,centers,areas
-
-
-
-def plot_mesh(mesh,MESH_dir,file_name):
-    if len(mesh.faces)==0:
-        return
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_trisurf(mesh.vertices[:, 2], mesh.vertices[:,0], triangles=mesh.faces, Z=mesh.vertices[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+".png")
-    plt.close()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(mesh.vertices[:, 2],mesh.vertices[:,0],mesh.vertices[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter.png")
-    plt.close()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(mesh.vertices[:10, 2],mesh.vertices[:10,0],mesh.vertices[:10,1],color=['red','green','blue','orange','purple','brown','pink','gray','olive','cyan'],s=[20,40,60,80,100,120,140,160,180,200])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter.10points.png")
-    plt.close()
-
-
-
-def plot_points(points,MESH_dir,file_name):
-    if len(points)==0:
-        return
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(points[:, 2],points[:,0],points[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter-direct-points.png")
-    plt.close()
-
-
-
-mesh=load_mesh("./data/a90118af-0020-44f0-8699-be48e0bdcbb6.obj", TOTAL_NUMBER_OF_FACES=2000,FORCE_DECIMATION=True)
 plot_mesh(mesh,"./data/","a90118af-0020-44f0-8699-be48e0bdcbb6")
-plot_points(mesh,"./data/","a90118af-0020-44f0-8699-be48e0bdcbb6")
+
+#sys.exit(0)
+#plot_points(mesh.vertices,"./data/","a90118af-0020-44f0-8699-be48e0bdcbb6")
+t2=time.time()
+randomRayCenterPositions=generate_ray_centers(mesh,NUMBER_OF_RAY_CENTERS=PARAM_NUMBER_OF_RAY_CENTERS)
+#print(f"{MAX_X}, { MAX_Y}, {MAX_Z}  === {np.max(randomRayCenterPositions[:,0])},{np.max(randomRayCenterPositions[:,1])},{np.max(randomRayCenterPositions[:,2])}")
+t3=time.time()
+tirangle_coordinates = mesh.vertices [mesh.faces .flatten()].reshape(-1,3,3) # for each face,  [ v1 [x, y, z] , v2 [x, y, z], v3 [x, y, z] ] 
+#colormap=generate_colormap(STATIC_RAY_DIRECTIONS.shape[0])
+t4=time.time()
+for i in range(randomRayCenterPositions.shape[0]):
+       all_rays_intersected, all_rays_t=rays_triangles_intersection(randomRayCenterPositions[i],STATIC_RAY_DIRECTIONS,tirangle_coordinates)
+       
+       indices=~np.isnan(all_rays_t)
+
+       all_rays_t_min=np.min(np.nan_to_num(all_rays_t,nan=np.inf), axis=1)
+       all_rays_t_argmin=np.argmin(np.nan_to_num(all_rays_t,nan=np.inf), axis=1).astype(int)
+       all_rays_intersected_true_indices=np.argwhere(all_rays_intersected==True) 
+       
+       print(f"all_rays_intersected_true_indices.shape={all_rays_intersected_true_indices.shape}")
+       print(f"all_rays_t_argmin.shape={all_rays_t_argmin.shape}")
+       print(f"randomRayCenterPositions[i]={randomRayCenterPositions[i]}")
+       print(f"all_rays_t_argmin={all_rays_t_argmin}")
+       print(f"all_rays_t_min={all_rays_t_min}")
+       print(mesh.faces[all_rays_t_argmin])
+       print(mesh.vertices[mesh.faces[all_rays_t_argmin].flatten()])
+       mesh2=trimesh.Trimesh(mesh.vertices,mesh.faces[all_rays_intersected_true_indices.flatten()])
+       #mesh2=trimesh.Trimesh(mesh.vertices,mesh.faces[all_rays_t_argmin])
+       print(f"mesh.faces.shape={mesh.faces.shape} mesh2.faces.shape={mesh2.faces.shape} all_rays_t.shape={all_rays_t.shape}")
+       
+       
+       
+       
+       #colors=['#404040CC']*all_rays_t.shape[1]
+       #print(all_rays_t_argmin)
+       #print(all_rays_t_argmin.shape)
+       
+       #colors=np.array(colors)
+       #colors[all_rays_t_argmin]=['#FF000000']
+       
+       
+       ###mesh.faces=mesh.faces[all_rays_t_argmin]
+       ###mesh=trimesh.Trimesh(mesh.faces,mesh.vertices)
+       
+       plot_rays_and_mesh('_'+str(i)+'_',randomRayCenterPositions[i],STATIC_RAY_DIRECTIONS,mesh,mesh2)#colors
+       #print(f"all_rays_intersected.shape={all_rays_intersected.shape} all_rays_t_min.shape={all_rays_t_min.shape}")
+       #print(all_rays_intersected)
+
+        
+       #plot_rays(STATIC_RAY_DIRECTIONS)
+
+t5=time.time()
+
+
+
+print(t1-t0)
+print(t2-t1)
+print(t3-t2)
+print(t4-t3)
+print(t5-t4)
+
+
+      
+
+
+
+
