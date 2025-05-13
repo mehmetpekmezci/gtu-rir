@@ -70,20 +70,7 @@ class MeshDataset(data.Dataset):
     def __getitem__(self, index):
 
         label = 0
-        full_mesh_path=os.path.join(self.data_dir,self.mesh_paths[index])
-        #mesh_pickle_file_path = pickle_file_path.replace('.pickle',f'.facecount-{cfg.MAX_FACE_COUNT}.pickle')
-        #full_mesh_path = pickle_file_path.replace('.pickle','.obj')
-        #pickle_file_content=None
-        #if(os.path.exists(mesh_pickle_file_path)):
-        #    pickle_file_content=load_pickle(mesh_pickle_file_path)
-        #else:
-        #    pickle_file_content=None
-
-        #if pickle_file_content is not None:
-        #     (tirangle_coordinates,normals,centers,areas)=pickle_file_content
-       #else:
-            #tirangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path, augments=self.augments,request=self.feats)
-
+        full_mesh_path=os.path.join(self.data_dir,self.mesh_paths[index]).replace('.pickle','.obj')
         try:
           tirangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path, augments=self.augments,request=self.feats)
           tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
@@ -488,107 +475,12 @@ def denormalize_mesh_values(triangle_coordinates,normals,centers,areas):
     return triangle_coordinates,normals,centers,areas
 
 
-def load_mesh(path, augments=[], request=[], seed=None):
-    TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
-    mesh = trimesh.load_mesh(path, process=False)
-
-    if cfg.TRAIN.FLAG :
-       print("TRAIN.FLAG is set")
-    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-       random.shuffle(mesh.faces)
-    #   print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-    #   save_mesh_as_obj(mesh,path+".DECIMATED.2.obj")
-
-
-    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-    #save_mesh_as_obj(mesh,path+".DECIMATED.0.obj")
-
-#    print('BEGINNING : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
-    if mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES-100 :
-        while mesh.faces.shape[0] < TOTAL_NUMBER_OF_FACES:
-              mesh.vertices, mesh.faces = trimesh.remesh.subdivide(mesh.vertices, mesh.faces)
-
-    #save_mesh_as_obj(mesh,path+".DECIMATED.1.obj")
-
-
-#    print(f"1.simplify_quadric_decimation TOTAL_NUMBER_OF_FACES={TOTAL_NUMBER_OF_FACES}")
-#    while mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES :
-    if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES :
-# MP BURADA DONUYOR DATALOADER
-       mesh=mesh.simplify_quadric_decimation(face_count=TOTAL_NUMBER_OF_FACES)
-
-
-#       print('AFTER SUBDIVIDE/DECIMATION : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
-
-#    print("2.simplify_quadric_decimation")
-
-    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.0.obj'")
-    #save_mesh_as_obj(mesh,path+".DECIMATED.3.obj")
-
-                       
-    
-    ### hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
-    if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and cfg.FORCE_DECIMATION :
-         mesh.faces=mesh.faces[:TOTAL_NUMBER_OF_FACES]
-           
-       
-
-       #mesh = trimesh.Trimesh(vertices=[[0, 0, 0], [0, 0, 1], [0, 1, 0]],faces=[[0, 1, 2]])
-                       
-                       
-                       
-    #print(f"save_mesh_as_obj(mesh,{path}+'.DECIMATED.1.obj'")
-    #save_mesh_as_obj(mesh,path+".DECIMATED.4.obj")
-
-#    print('AFTER SUBDIVIDE/DECIMATION : mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
-
-#    for method in augments:
-#        if method == 'orient':
-#            mesh = randomize_mesh_orientation(mesh)
-#        if method == 'scale':
-#            mesh = random_scale(mesh)
-#        if method == 'deformation':
-#            mesh = mesh_deformation(mesh)
-
-    F = mesh.faces ## EVERY FACE IS COMPOSED OF 3 node NUMBERS (vertex index): 
-    V = mesh.vertices # this gives every verteice's x,y,z coordinates.
-    tirangle_coordinates = V[F.flatten()].reshape(-1,9) # for each face,  [ v1x, v1y, v1z, v2x, v2y, v2z, v3x, v3y, v3z ] 
-    centers = V[F.flatten()].reshape(-1, 3, 3).mean(axis=1) # for each face,  [ (v1.x+v2.x+v3.x)/3 , (v1.y+v2.y+v3.y)/3 ,(v1.z+v2.z+v3.z)/3 ]
-
-    normals = mesh.face_normals
-    #print("=========")
-    #print(f"centers = V[F.flatten()].reshape(-1, 3, 3)={V[F.flatten()].reshape(-1, 3, 3)}")
-    #print(f"centers1 = V[F.flatten()].reshape(-1, 3, 3)={V[F.flatten()].reshape(-1, 3, 3).mean(axis=1)}")
-    #print(f"normals[:3]={normals[:3]}")
-    ### MEHMET PEKMEZCI : CENTER'LAR TRIANGLE PLANE'inin ICINDE, ISPAT ETTIM.
-    
-    areas = mesh.area_faces
-#    save_face_normal_center_area_as_obj(normals,centers,areas,path+".face.regenerated.1.obj")
-#    save_as_obj(mesh.vertices,mesh.faces,path+"face.augmented.faces.1.obj")
-
-    ## GRAPH DECIMATION FACE sayisinin 1 veya 2 eksigini verebiliyor.
-    for i in range(TOTAL_NUMBER_OF_FACES-centers.shape[0]):
-       tirangle_coordinates=np.vstack((tirangle_coordinates,tirangle_coordinates[0]))
-       centers=np.vstack((centers,centers[0]))
-       normals=np.vstack((normals,normals[0]))
-       areas=areas.reshape(-1,1)
-       areas=np.vstack((areas,areas[0]))
-       areas=areas.reshape(-1)
-
-    #tirangle_coordinates=torch.Tensor(np.array(tirangle_coordinates))
-    tirangle_coordinates=np.array(tirangle_coordinates)
-    #normals=torch.Tensor(np.array(normals))
-    normals=np.array(normals)
-    #centers=torch.Tensor(np.array(centers))
-    centers=np.array(centers)
-    areas=np.array(areas).reshape(-1,1)
-    #areas=torch.Tensor(np.array(areas))
-    return tirangle_coordinates,normals,centers,areas
-
 
 def load_mesh2(path, augments=[], request=[], seed=None):
     TOTAL_NUMBER_OF_FACES=cfg.MAX_FACE_COUNT
     pymeshlab_mesh = ml.MeshSet()
+    
+    
     try :
         pymeshlab_mesh.load_new_mesh(path)
         pmesh=pymeshlab_mesh.current_mesh()
@@ -604,7 +496,20 @@ def load_mesh2(path, augments=[], request=[], seed=None):
         mesh = trimesh.Trimesh(pmesh.vertex_matrix(),pmesh.face_matrix())
     except:
         print(f"{path} file is imported by pymeshlab but thrown an error")
+        traceback.print_exc()
         mesh = trimesh.load_mesh(path, process=False)
+
+    if "GTURIR" in path:
+        print(f"GTURIR-1 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
+        V=np.empty(mesh.vertices.shape)
+        V[:,0]=mesh.vertices[:,0]
+        V[:,1]=-mesh.vertices[:,1]+np.max(mesh.vertices[:,1])
+        V[:,2]=mesh.vertices[:,2]
+        #V[:,1]=-mesh.vertices[:,2]+np.max(mesh.vertices[:,2])
+        #V[:,2]=mesh.vertices[:,1]
+        mesh=trimesh.Trimesh(V,mesh.faces)
+        print(f"GTURIR-2 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
+
 
     if cfg.TRAIN.FLAG:
         random.shuffle(mesh.faces)
@@ -620,11 +525,7 @@ def load_mesh2(path, augments=[], request=[], seed=None):
     centers = V[F.flatten()].reshape(-1, 3, 3).mean(axis=1) # for each face,  [ (v1.x+v2.x+v3.x)/3 , (v1.y+v2.y+v3.y)/3 ,(v1.z+v2.z+v3.z)/3 ]
 
     normals = mesh.face_normals
-    #print("=========")
-    #print(f"centers = V[F.flatten()].reshape(-1, 3, 3)={V[F.flatten()].reshape(-1, 3, 3)}")
-    #print(f"centers1 = V[F.flatten()].reshape(-1, 3, 3)={V[F.flatten()].reshape(-1, 3, 3).mean(axis=1)}")
-    #print(f"normals[:3]={normals[:3]}")
-    ### MEHMET PEKMEZCI : CENTER'LAR TRIANGLE PLANE'inin ICINDE, ISPAT ETTIM.
+
     
     areas = mesh.area_faces
 #    save_face_normal_center_area_as_obj(normals,centers,areas,path+".face.regenerated.1.obj")
