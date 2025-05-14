@@ -28,17 +28,8 @@ def clear_scene():
 
 
 
-def ray_cast(obj_file_path,origin,directions,position_name,max_distance_in_a_room):
- clear_scene()
+def ray_cast(bmesh_object,scene,depsgraph,origin,directions,position_name,max_distance_in_a_room):
 
- context = bpy.context
- #vl = context.view_layer
- scene = context.scene
- context_object = context.object
- depsgraph=context.evaluated_depsgraph_get()
-# me = context_object.data
- #bmesh_object=bpy.ops.import_scene.obj(filepath=obj_file_path)
- bmesh_object=bpy.ops.wm.obj_import(filepath=obj_file_path)
  #print(obj_file_path)
  #print(bmesh_object)
  #bpy.ops.wm.obj_export(filepath=obj_file_path+'_'+origin[0]+'_'+origin[1]+'_'+origin[2]+'_same.obj')

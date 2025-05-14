@@ -4,6 +4,7 @@
 if [ $# -lt 3 ]
 then
 	echo "Usage: $0 <FORCE/SKIP_IF_ALREADY_DONE> RESOLUTION_QUOTIENT MAX_DISTANCE_IN_A_ROOM"
+	### RES_QUOT=30 ise 30 derecede bir ray var demektir.
 	echo "Example: $0 FORCE 30 15"
 	echo "the final ray_casting image will of shape 360/30 by 180/30 = 12 x 6"
 	exit 1
