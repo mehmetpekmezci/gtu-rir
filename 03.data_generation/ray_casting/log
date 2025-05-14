@@ -1,0 +1,6 @@
+######2 RIR_folder=/home/mpekmezci/RIR_DATA/MESH2IR_TRAINING_DATA/3D-FRONT/outputs/04546af5-acd6-43b1-981a-3e976e01adce/hybrid
+######2 folder=04546af5-acd6-43b1-981a-3e976e01adce 0/5719
+Traceback (most recent call last):
+  File "/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/ray_casting/main.py", line 37, in <module>
+    ray_cast(main_path+'/'+mesh_path,receiver,ray_directions,receiver_position_name)
+TypeError: ray_cast() missing 1 required positional argument: 'max_distance_in_a_room'
