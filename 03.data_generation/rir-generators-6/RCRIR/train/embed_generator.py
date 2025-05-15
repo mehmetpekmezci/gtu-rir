@@ -18,11 +18,13 @@ mesh_folders = os.listdir(path)
 # temp_counter = 0 
 # print("len folders ",len(mesh_folders))
 
+i=0
 
 for folder in mesh_folders:
-	# mesh_path = folder +"/" + folder +".obj"
-	mesh_path = folder +"/" + folder +".pickle"
-	RIR_folder  = path + folder +"/hybrid"
+	mesh_path = folder +"/" + folder +".obj"
+	RIR_folder  = path + "/" +folder +"/hybrid"
+	i=i+1
+	print(f"{folder} {i}/{len(mesh_folders)}")
 
 	if(os.path.exists(RIR_folder)):
 		json_path = RIR_folder +"/sim_config.json"
@@ -40,16 +42,15 @@ for folder in mesh_folders:
 		num_receivers = len(data['receivers'])
 		num_sources = len(data['sources'])
 
-		# print("num_receivers  ", num_receivers,"   num_sources  ", num_sources)
+		#print("num_receivers  ", num_receivers,"   num_sources  ", num_sources)
 		for n in range(num_receivers):
 			for s in range(num_sources):
 				source = data['sources'][s]['xyz']
 				receiver = data['receivers'][n]['xyz']
 				RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
 				RIR_path = folder +"/hybrid/" + RIR_name
-				full_RIR_path = path+ RIR_path
+				full_RIR_path = path+'/'+ RIR_path
 				if(os.path.exists(full_RIR_path)):
-                                  print(full_RIR_path)
                                   embeddings = [mesh_path,RIR_path,source,receiver]
                                   if folder.startswith('f') or folder.startswith('e') or folder.startswith('d') : # each having 300 , 900/5000 makes 18 percent of data will be validation data.
                                      validation_embedding_list.append(embeddings)
@@ -57,8 +58,8 @@ for folder in mesh_folders:
                                      training_embedding_list.append(embeddings)
 
 
-print("validation_embdding_list", len(validation_embedding_list))
-print("training_embdding_list", len(training_embedding_list))
+print("validation_embedding_list", len(validation_embedding_list))
+print("training_embedding_list", len(training_embedding_list))
 
 filler = 128  - (len(validation_embedding_list) % 128)
 len_embed_list = len(validation_embedding_list) -1
