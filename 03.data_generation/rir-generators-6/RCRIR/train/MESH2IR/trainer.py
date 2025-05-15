@@ -2,6 +2,8 @@ from __future__ import print_function
 from six.moves import range
 from PIL import Image
 
+from diffusers.models import AutoencoderKL
+
 import torch.backends.cudnn as cudnn
 import torch
 import torch.nn as nn
@@ -99,7 +101,8 @@ class GANTrainer(object):
             netD.load_state_dict(state_dict)
             print('Load NETD from: ', cfg.NET_D)
 
-            
+        
+        image_vae=
         SOURCE_RECEIVER_XYZ_DIM=6    
         summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,cfg.LATENT_VECTOR_SIZE)] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
@@ -229,10 +232,6 @@ class GANTrainer(object):
 
                 
                 
-#                print(fake_RIRs)
-#                print(real_labels)
-#                print(fake_labels)
-#                print(c_code)
                 #print("Update D network")
                 ############################
                 # (3) Update D network
@@ -242,19 +241,11 @@ class GANTrainer(object):
                     compute_discriminator_loss(netD, real_RIRs, fake_RIRs,
                                                real_labels, fake_labels,
                                                c_code, self.gpus)
-#                print("d ****************")
-#                print(errD)
-#                print(errD_real)
-#                print(errD_wrong)
-#                print(errD_fake)
-#                print("d ****************")
                 
                 errD_total = errD*5
-#                print(f"  i={i}  errD_total={errD_total}  errG_total={errG_total}")
                 errD_total.backward()
                 optimizerD.step()
                 
-                #print("Update G network")
                 ############################
                 # (2) Update G network
                 ###########################
@@ -262,18 +253,6 @@ class GANTrainer(object):
                 netG.zero_grad()
                 errG,L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5,MSE_error1,MSE_error2,criterion_loss= compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs,
                                               real_labels, c_code,filters, self.gpus)
-                
-#                print(L1_error)
-#                print(divergence_loss0)
-#                print(divergence_loss1)
-#                print(divergence_loss2)
-#                print(divergence_loss3)
-#                print(divergence_loss4)
-#                print(divergence_loss5)
-#                print(MSE_error1)
-#                print(MSE_error2)
-#                print(criterion_loss)
-#                print(errG)
                 
                 errG_total = errG *5#+ kl_loss * cfg.TRAIN.COEFF.KL
               
@@ -329,37 +308,6 @@ class GANTrainer(object):
                              errD.data, errG.data, 
                              errD_real, errD_wrong, errD_fake,L1_error*4096,(t2 - t1)),flush=True) ## MP : t1 is first set in the beggining, then reset after each print :)
                     t1=time.time()
-                    # summary_D = summary.scalar('D_loss', errD.data[0])
-                    # summary_D_r = summary.scalar('D_loss_real', errD_real)
-                    # summary_D_w = summary.scalar('D_loss_wrong', errD_wrong)
-                    # summary_D_f = summary.scalar('D_loss_fake', errD_fake)
-                    # summary_G = summary.scalar('G_loss', errG.data[0])
-                    # summary_KL = summary.scalar('KL_loss', kl_loss.data[0])
-                    # summary_D = summary.scalar('D_loss', errD.data)
-                    # summary_D_r = summary.scalar('D_loss_real', errD_real)
-                    # summary_D_w = summary.scalar('D_loss_wrong', errD_wrong)
-                    # summary_D_f = summary.scalar('D_loss_fake', errD_fake)
-                    # summary_G = summary.scalar('G_loss', errG.data)
-                    # summary_KL = summary.scalar('KL_loss', kl_loss.data)
-
-                    # self.summary_writer.add_summary(summary_D, count)
-                    # self.summary_writer.add_summary(summary_D_r, count)
-                    # self.summary_writer.add_summary(summary_D_w, count)
-                    # self.summary_writer.add_summary(summary_D_f, count)
-                    # self.summary_writer.add_summary(summary_G, count)
-                    # self.summary_writer.add_summary(summary_KL, count)
-
-                    ## save the image result for each epoch
-                    #inputs = (txt_embedding,mesh_embed)
-                    #lr_fake, fake, _ = \
-                    #    nn.parallel.data_parallel(netG, inputs, self.gpus)
-                    #if(epoch%self.snapshot_interval==0):
-                    #    #print(f"epoch:{epoch}")
-                    #    #print("real_RIR_cpu:")
-                    #    #print(real_RIR_cpu)
-                    #    save_RIR_results(real_RIR_cpu, fake, epoch, self.RIR_dir,batch_size)
-                    #    if lr_fake is not None:
-                    #        save_RIR_results(None, lr_fake, epoch, self.RIR_dir,batch_size)
               except:
                 print(f"we had an exception  i={i}  errD_total={errD_total}  errG_total={errG_total}")
                 traceback.print_exc() 

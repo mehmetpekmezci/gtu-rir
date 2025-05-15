@@ -2,20 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.parallel
 from miscc.config import cfg
-#from miscc.utils import mask_test_edges
 from torch.autograd import Variable
 import numpy as np
-from torch_geometric.nn import GCNConv, TopKPooling
-from torch_geometric.nn import global_mean_pool as gap, global_max_pool as gmp
-from torch_geometric.utils import to_dense_adj, to_dense_batch, dropout_adj
 import torch.nn.functional as F
-import scipy.sparse as sp
-
 import traceback
 from torchinfo import summary
-#from torch_geometric.nn.models import  GAE,InnerProductDecoder
-#from torch_geometric.utils import negative_sampling, remove_self_loops, add_self_loops
-#from torch_scatter import scatter
 
 
 
@@ -106,15 +97,6 @@ class COND_NET(nn.Module): #not chnaged yet
         # mu = x[:, :self.c_dim]
         # logvar = x[:, self.c_dim:]
         return x
-
-    # def reparametrize(self, mu, logvar):
-    #     std = logvar.mul(0.5).exp_()
-    #     if cfg.CUDA:
-    #         eps = torch.cuda.FloatTensor(std.size()).normal_()
-    #     else:
-    #         eps = torch.FloatTensor(std.size()).normal_()
-    #     eps = Variable(eps)
-    #     return eps.mul(std).add_(mu)
 
     def forward(self, full_embed):
         c_code = self.encode(full_embed)
@@ -286,118 +268,3 @@ class STAGE1_D(nn.Module):
         return RIR_embedding
 
 
-# ############# Networks for stageII GAN #############
-class STAGE2_G(nn.Module):
-    def __init__(self, STAGE1_G):
-        super(STAGE2_G, self).__init__()
-        self.gf_dim = cfg.GAN.GF_DIM
-        self.ef_dim = cfg.GAN.CONDITION_DIM
-        # self.z_dim = cfg.Z_DIM
-        self.STAGE1_G = STAGE1_G
-        # fix parameters of stageI GAN
-        for param in self.STAGE1_G.parameters():
-            param.requires_grad = False
-        self.define_module()
-
-    def _make_layer(self, block, channel_num):
-        layers = []
-        for i in range(cfg.GAN.R_NUM):
-            layers.append(block(channel_num))
-        return nn.Sequential(*layers)
-
-    def define_module(self):
-        ngf = self.gf_dim
-        # TEXT.DIMENSION -> GAN.CONDITION_DIM
-        # self.ca_net = CA_NET()
-        self.cond_net = COND_NET()
-        # --> 4ngf x 16 x 16
-        self.encoder = nn.Sequential(
-            conv3x1(1, ngf),
-            nn.ReLU(True),
-            nn.Conv1d(ngf, ngf * 2, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ngf * 2),
-            nn.ReLU(True),
-            nn.Conv1d(ngf * 2, ngf * 4, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ngf * 4),
-            nn.ReLU(True))
-        self.hr_joint = nn.Sequential(
-            conv3x1(self.ef_dim + ngf * 4, ngf * 4),
-            nn.BatchNorm1d(ngf * 4),
-            nn.ReLU(True))
-        self.residual = self._make_layer(ResBlock, ngf * 4)
-        # --> 2ngf x 1024
-        self.upsample1 = upBlock4(ngf * 4, ngf * 2)
-        # --> ngf x 4096
-        self.upsample2 = upBlock4(ngf * 2, ngf)
-        # --> ngf // 2 x 16384
-        self.upsample3 = upBlock4(ngf, ngf // 2)
-        # --> ngf // 4 x 16384
-        self.upsample4 = sameBlock(ngf // 2, ngf // 4)
-        # --> 1 x 16384
-        self.RIR = nn.Sequential(
-            conv3x1(ngf // 4, 1),
-            nn.Tanh())
-
-    def forward(self, text_embedding):
-        _, stage1_RIR, _= self.STAGE1_G(text_embedding)
-        stage1_RIR = stage1_RIR.detach()
-        encoded_RIR = self.encoder(stage1_RIR)
-
-        # c_code, mu, logvar = self.ca_net(text_embedding)
-        c_code1 = self.cond_net(text_embedding)
-        c_code = c_code1.view(-1, self.ef_dim, 1)
-        c_code = c_code.repeat(1, 1, 256) # c_code.repeat(1, 1, 16, 16)
-        i_c_code = torch.cat([encoded_RIR, c_code], 1)
-        h_code = self.hr_joint(i_c_code)
-        h_code = self.residual(h_code)
-
-        h_code = self.upsample1(h_code)
-        h_code = self.upsample2(h_code)
-        h_code = self.upsample3(h_code)
-        h_code = self.upsample4(h_code)
-
-        fake_RIR = self.RIR(h_code)
-        return stage1_RIR, fake_RIR, c_code1 #mu, logvar
-
-
-class STAGE2_D(nn.Module):
-    def __init__(self):
-        super(STAGE2_D, self).__init__()
-        self.df_dim = cfg.GAN.DF_DIM
-        self.ef_dim = cfg.GAN.CONDITION_DIM
-        self.define_module()
-
-    def define_module(self):
-        ndf, nef = self.df_dim, self.ef_dim
-        self.encode_RIR = nn.Sequential(
-            nn.Conv1d(1, ndf, 3, 1, 1, bias=False),  # 16384 * ndf
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv1d(ndf, ndf * 2, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ndf * 2),
-            nn.LeakyReLU(0.2, inplace=True),  # 4096 * ndf * 2
-            nn.Conv1d(ndf * 2, ndf * 4, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ndf * 4),
-            nn.LeakyReLU(0.2, inplace=True),  # 1024 * ndf * 4
-            nn.Conv1d(ndf * 4, ndf * 8, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ndf * 8),
-            nn.LeakyReLU(0.2, inplace=True),  # 256 * ndf * 8
-            nn.Conv1d(ndf * 8, ndf * 16, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ndf * 16),
-            nn.LeakyReLU(0.2, inplace=True),  # 64 * ndf * 16
-            nn.Conv1d(ndf * 16, ndf * 32, 16, 4, 6, bias=False),
-            nn.BatchNorm1d(ndf * 32),
-            nn.LeakyReLU(0.2, inplace=True),  # 16 * ndf * 32
-            conv3x1(ndf * 32, ndf * 16),
-            nn.BatchNorm1d(ndf * 16),
-            nn.LeakyReLU(0.2, inplace=True),   # 16 * ndf * 16
-            conv3x1(ndf * 16, ndf * 8),
-            nn.BatchNorm1d(ndf * 8),
-            nn.LeakyReLU(0.2, inplace=True)   # 16 * ndf * 8
-        )
-
-        self.get_cond_logits = D_GET_LOGITS(ndf, nef, bcondition=True)
-        self.get_uncond_logits = D_GET_LOGITS(ndf, nef, bcondition=False)
-
-    def forward(self, RIRs):
-        RIR_embedding = self.encode_RIR(RIRs)
-        return RIR_embedding

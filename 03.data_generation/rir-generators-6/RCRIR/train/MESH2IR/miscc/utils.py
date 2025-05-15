@@ -119,11 +119,6 @@ def compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditi
     loss = nn.L1Loss() #nn.MSELoss()
     loss1 = nn.MSELoss()
     RT_error = 0
-    # print("num", real_RIRs.size(),real_RIRs.size()[0])
-    # input("kk")
-    # print("real_RIRs ", real_RIRs.shape)
-    # print("fake_RIRs ", fake_RIRs.shape)
-
     cond = conditions.detach()
     fake_features = nn.parallel.data_parallel(netD, (fake_RIRs), gpus)
     # fake pairs
@@ -132,13 +127,10 @@ def compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditi
     L1_error = loss(real_RIRs,fake_RIRs)
     MSE_error1 = loss1(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968])
     MSE_error2 = loss1(real_RIRs[:,:,3968:4096],fake_RIRs[:,:,3968:4096])
-
-    
     ######################Energy Decay Start############################
     filter_length = 16384  # a magic number, not need to tweak this much
     mult1 = 10
     mult2 = 1
-
     real_ec = convert_IR2EC_batch(cp.asarray(real_RIRs), filters, filter_length)
     fake_ec = convert_IR2EC_batch(cp.asarray(fake_RIRs.to("cpu").detach()), filters, filter_length)
     divergence_loss0 = loss1(real_ec[:,:,:,0],fake_ec[:,:,:,0]) * mult1
@@ -147,75 +139,8 @@ def compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditi
     divergence_loss3 = loss1(real_ec[:,:,:,3],fake_ec[:,:,:,3]) * mult1
     divergence_loss4 = loss1(real_ec[:,:,:,4],fake_ec[:,:,:,4]) * mult1
     divergence_loss5 = loss1(real_ec[:,:,:,5],fake_ec[:,:,:,5]) * mult2
-
-    # print("divergence_loss0   ", divergence_loss0)
-    # print("divergence_loss1   ", divergence_loss1)
-    # print("divergence_loss2   ", divergence_loss2)
-    # print("divergence_loss3   ", divergence_loss3)
-    # print("divergence_loss4   ", divergence_loss4)
-    # print("divergence_loss5   ", divergence_loss5)
     divergence_loss = divergence_loss0 + divergence_loss1 + divergence_loss2 + divergence_loss3 + divergence_loss4 + divergence_loss5
     ######################Energy Decay End############################
-
-
-
-    # real_RIR_part_1 =real_RIRs[:,:,0:512]
-    # real_RIR_part_2 =real_RIRs[:,:,512:1024]
-    # real_RIR_part_3 =real_RIRs[:,:,1024:1536]
-    # real_RIR_part_4 =real_RIRs[:,:,1536:2048]
-    # real_RIR_part_5 =real_RIRs[:,:,2048:2560]
-    # real_RIR_part_6 =real_RIRs[:,:,2560:3072]
-    # real_RIR_part_7 =real_RIRs[:,:,3072:3584]
-    # real_RIR_part_8 =real_RIRs[:,:,3584:4096]
-    
-    # mean_real_RIR_part_1 = torch.reshape(torch.mean(abs(real_RIR_part_1),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001 
-    # mean_real_RIR_part_2 = torch.reshape(torch.mean(abs(real_RIR_part_2),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_3 = torch.reshape(torch.mean(abs(real_RIR_part_3),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_4 = torch.reshape(torch.mean(abs(real_RIR_part_4),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_5 = torch.reshape(torch.mean(abs(real_RIR_part_5),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_6 = torch.reshape(torch.mean(abs(real_RIR_part_6),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_7 = torch.reshape(torch.mean(abs(real_RIR_part_7),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_8 = torch.reshape(torch.mean(abs(real_RIR_part_8),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-
-    # normalize_real_RIR_part_1 = real_RIR_part_1 / mean_real_RIR_part_1
-    # normalize_real_RIR_part_2 = real_RIR_part_2 / mean_real_RIR_part_2
-    # normalize_real_RIR_part_3 = real_RIR_part_3 / mean_real_RIR_part_3
-    # normalize_real_RIR_part_4 = real_RIR_part_4 / mean_real_RIR_part_4
-    # normalize_real_RIR_part_5 = real_RIR_part_5 / mean_real_RIR_part_5
-    # normalize_real_RIR_part_6 = real_RIR_part_6 / mean_real_RIR_part_6
-    # normalize_real_RIR_part_7 = real_RIR_part_7 / mean_real_RIR_part_7
-    # normalize_real_RIR_part_8 = real_RIR_part_8 / mean_real_RIR_part_8
-    
-
-    # normalize_fake_RIR_part_1 = fake_RIRs[:,:,0:512]     / mean_real_RIR_part_1
-    # normalize_fake_RIR_part_2 = fake_RIRs[:,:,512:1024]  / mean_real_RIR_part_2
-    # normalize_fake_RIR_part_3 = fake_RIRs[:,:,1024:1536] / mean_real_RIR_part_3
-    # normalize_fake_RIR_part_4 = fake_RIRs[:,:,1536:2048] / mean_real_RIR_part_4
-    # normalize_fake_RIR_part_5 = fake_RIRs[:,:,2048:2560] / mean_real_RIR_part_5
-    # normalize_fake_RIR_part_6 = fake_RIRs[:,:,2560:3072] / mean_real_RIR_part_6
-    # normalize_fake_RIR_part_7 = fake_RIRs[:,:,3072:3584] / mean_real_RIR_part_7
-    # normalize_fake_RIR_part_8 = fake_RIRs[:,:,3584:4096] / mean_real_RIR_part_8 
-    
-    # MSE_error_part_1 = loss1(normalize_real_RIR_part_1,normalize_fake_RIR_part_1) 
-    # MSE_error_part_2 = loss1(normalize_real_RIR_part_2,normalize_fake_RIR_part_2) 
-    # MSE_error_part_3 = loss1(normalize_real_RIR_part_3,normalize_fake_RIR_part_3) 
-    # MSE_error_part_4 = loss1(normalize_real_RIR_part_4,normalize_fake_RIR_part_4) 
-    # MSE_error_part_5 = loss1(normalize_real_RIR_part_5,normalize_fake_RIR_part_5) 
-    # MSE_error_part_6 = loss1(normalize_real_RIR_part_6,normalize_fake_RIR_part_6) 
-    # MSE_error_part_7 = loss1(normalize_real_RIR_part_7,normalize_fake_RIR_part_7) 
-    # MSE_error_part_8 = loss1(normalize_real_RIR_part_8,normalize_fake_RIR_part_8) 
- 
-
-    # print("MSE_error_part_1   ", MSE_error_part_1)
-    # print("MSE_error_part_2   ", MSE_error_part_2)
-    # print("MSE_error_part_3   ", MSE_error_part_3)
-    # print("MSE_error_part_4   ", MSE_error_part_4)
-    # print("MSE_error_part_5   ", MSE_error_part_5)
-    # print("MSE_error_part_6   ", MSE_error_part_6)
-    # print("MSE_error_part_7   ", MSE_error_part_7)
-    # print("MSE_error_part_8   ", MSE_error_part_8)
-
-    # print("criterion loss ",criterion(fake_logits, real_labels))
     MSE_ERROR11 = MSE_error1*4096*10
     MSE_ERROR21 = MSE_error2*cfg.TRAIN.BATCH_SIZE*10000 ## MP BATCH_SIZE
     MSE_ERROR = MSE_ERROR11+MSE_ERROR21
@@ -307,19 +232,6 @@ def save_RIR_results(data_RIR, fake, epoch, RIR_dir,cfg):
        print("MP: We had an exception while writing generated RIR WAV to disk")
 
 
-def save_model(netG, netD,mesh_net, epoch, model_dir):
-    torch.save(
-        netG.state_dict(),
-        '%s/netG_epoch_%d.pth' % (model_dir, epoch))
-    torch.save(
-        mesh_net.state_dict(),
-        '%s/mesh_net_epoch_%d.pth' % (model_dir, epoch))
-    torch.save(
-        netD.state_dict(),
-        '%s/netD_epoch_last.pth' % (model_dir))
-    #print('Save G/D models')
-
-
 def save_model(netG, netD, epoch, model_dir):
     torch.save(
         netG.state_dict(),
@@ -328,17 +240,6 @@ def save_model(netG, netD, epoch, model_dir):
         netD.state_dict(),
         '%s/netD_epoch_last.pth' % (model_dir))
     #print('Save G/D models')
-
-
-def save_mesh_model(mesh_net, epoch, model_dir):
-    torch.save(
-        mesh_net.state_dict(),
-        '%s/mesh_net_epoch_%d.pth' % (model_dir, epoch))
-
-
-def save_mesh_final_model(mesh_net):
-    mkdir_p(cfg.PRE_TRAINED_MODELS_DIR)
-    torch.save(mesh_net.state_dict(),cfg.PRE_TRAINED_MODELS_DIR+'/'+cfg.MESH_NET_GAE_FILE)
 
 
 def mkdir_p(path):
@@ -426,189 +327,4 @@ def generate_complementary_filterbank(
     ir2Bands = np.concatenate((ir2Bands[nbins:(2 * nbins), :], ir2Bands[0:nbins, :]), axis=0)
 
     return ir2Bands
-
-
-
-def convert_to_trimesh(pos,faces):
-    r"""Converts a :class:`torch_geometric.data.Data` instance to a
-    :obj:`trimesh.Trimesh`.
-    data (torch_geometric.data.Data): The data object.
-    """
-    #print(faces)
-    #print(f"len(pos)={len(pos)}")
-    #print(pos)
-    mesh=trimesh.Trimesh(vertices=pos,faces=faces)
-    return mesh
-
-def save_mesh_as_obj(mesh,path):
-    with open(path,'w') as meshfile:
-         meshfile.write(mesh.export(file_type='obj'))
-    
-def save_pos_face_as_obj(pos,faces,path):
-    with open(path, "w") as objfile:
-         objfile.write(trimesh.Trimesh(vertices=pos,faces=faces).export(file_type='obj'))
-         print(f"{path} is written")
- 
- 
- 
- 
-def coordinates_patch_to_pos_and_face(cordinates_patcha):
-    pos=[]
-    faces=[]
-    triangle_cordinates=cordinates_patcha.reshape(int(cordinates_patcha.shape[0]*cordinates_patcha.shape[1]),9)
-    for triangle_cordinate in triangle_cordinates:
-        v1=list(triangle_cordinate[:3])
-        v2=list(triangle_cordinate[3:6])
-        v3=list(triangle_cordinate[6:9])
-        if v1 not in pos:
-           pos.append(v1) 
-        if v2 not in pos:
-           pos.append(v2) 
-        if v3 not in pos:
-           pos.append(v3) 
-    
-    for triangle_cordinate in triangle_cordinates:
-        v1=list(triangle_cordinate[:3])
-        v2=list(triangle_cordinate[3:6])
-        v3=list(triangle_cordinate[6:9])
-        
-        v1_index=0
-        v2_index=0
-        v3_index=0
-
-        v1_found=False
-        v2_found=False
-        v3_found=False
-        
-        
-        i=0
-        for node in pos :
-            if v1 == node :
-               v1_index=i
-               v1_found=True   
-            if v2 == node :
-               v2_index=i
-               v2_found=True   
-            if v3 == node :
-               v3_index=i
-               v3_found=True   
-            if v1_found and v2_found and v3_found :
-               break
-            i=i+1
-        if [v1_index,v2_index,v3_index] not in faces :
-           faces.append([v1_index,v2_index,v3_index])
-    return pos,faces
-            
-def save_coordinate_patch_as_obj(cordinates_patcha,path):
-    pos,faces=coordinates_patch_to_pos_and_face(cordinates_patcha)
-    save_pos_faces_as_obj(pos,faces,path)
-
-def save_pos_faces_as_obj(pos,faces,path):
-    with open(path, "w") as objfile:
-         objfile.write(trimesh.Trimesh(vertices=pos,faces=faces).export(file_type='obj'))
-         print(f"{path} is written")
-
-
- 
-    
-def plot_mesh(trimesh,MESH_dir,file_name):
-    mesh=trimesh
-    if len(mesh.faces)==0:
-        return
-        
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_trisurf(mesh.vertices[:, 2], mesh.vertices[:,0], triangles=mesh.faces, Z=mesh.vertices[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+".png")
-    plt.close()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(mesh.vertices[:, 2],mesh.vertices[:,0],mesh.vertices[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter.png")
-    plt.close()
-    
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(mesh.vertices[:10, 2],mesh.vertices[:10,0],mesh.vertices[:10,1],color=['red','green','blue','orange','purple','brown','pink','gray','olive','cyan'],s=[20,40,60,80,100,120,140,160,180,200])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter.10points.png")
-    plt.close()
-    
-    
-    
-def plot_points(points,MESH_dir,file_name):
-    if len(points)==0:
-        return
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(points[:, 2],points[:,0],points[:,1])
-    plt.savefig(MESH_dir+"/graph."+file_name+"-scatter-direct-points.png")
-    plt.close()
-
-def edge_index_to_face(edge_index):
-
-    #print(f"edge_index.shape={edge_index.shape}")
-
-    edge_index_length=edge_index.shape[1]
-
-    #print(f"edge_index_length={edge_index_length}")
-
-    faces=[]
-
-    connection_list={}
-    for index1 in range(edge_index_length):
-     node1=edge_index[0][index1].item()   
-     node2=edge_index[1][index1].item()   
-     if node1 not in connection_list:
-        connection_list[node1]=[]
-     if node2 not in connection_list:
-        connection_list[node2]=[]
-     connection_list[node1].append(node2)
-     connection_list[node2].append(node1)
-
-    #print(f"len(connection_list)={len(connection_list)}")
-
-    for node1 in connection_list:
-        for node2 in connection_list[node1]:
-            for node3 in connection_list[node2]:
-                if node1 in connection_list[node3]:
-                   s=[node1,node2,node3]
-                   s.sort()
-                   if s not in faces:
-                      faces.append(s) 
-                        
-    print(f" len(faces)={len(faces)}")
-    return faces
-
-    
-
-def adj_to_face(A):
-    faces=[]
-    indices=np.argwhere(A ==1 )
-
-    k_indices=sorted(set(list(indices[:,1])))
-    
-    for i_j in indices:
-        i=i_j[0]
-        j=i_j[1]
-
-        for k in k_indices:
-          if i!=j and i!=k and j!=k and A[j,k]==1 and A[k,i]==1 :
-             s=[i,j,k]
-             s.sort()
-             if s not in faces:
-                faces.append(s) 
-                if len(faces)%2000 == 0 :
-                    #print(f"adj_to_face : THRESHOLD={THRESHOLD}  i:{i}/{A.shape[0]} j:{j}/{A.shape[0]} k:{k}/{A.shape[0]} len(faces)={len(faces)}")
-                    print(f"adj_to_face :  i:{i}/{A.shape[0]} j:{j}/{A.shape[0]} k:{k}/{A.shape[0]} len(faces)={len(faces)}")
-                 
-
-
-                        
-    print(f"1. len(faces)={len(faces)}")
-    return faces
-
-    
-
-
 
