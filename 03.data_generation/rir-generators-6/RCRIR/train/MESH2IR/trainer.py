@@ -102,9 +102,8 @@ class GANTrainer(object):
             print('Load NETD from: ', cfg.NET_D)
 
         
-        image_vae=
         SOURCE_RECEIVER_XYZ_DIM=6    
-        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,cfg.LATENT_VECTOR_SIZE)] )
+        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
         
         if cfg.CUDA:
@@ -184,7 +183,6 @@ class GANTrainer(object):
                     print("len(data['RIR']):",len(data))
                     print("self.batch_size:",self.batch_size)
                     continue
-                    ## MP : because we depend on batch_size in CustomInnerProductDecoder in model.py
 
                 ######################################################
                 # (1) Prepare training data
@@ -195,15 +193,9 @@ class GANTrainer(object):
                
                 
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
-                txt_embedding = torch.from_numpy(np.array(data['embeddings']))
-                mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings'])) 
+                txt_embedding = torch.from_numpy(data['source_and_receiver'])
+                mesh_embedding = data['mesh_embeddings'] 
                 
-                #data.pop('RIR')
-                #data.pop('embeddings')
-                #print("ORAN") 
-                #print(txt_embedding)
-                #print(mesh_embed)
-
                 real_RIRs = Variable(real_RIR_cpu)
                 txt_embedding = Variable(txt_embedding) 
                 mesh_embed = Variable(mesh_embed) 
@@ -218,8 +210,8 @@ class GANTrainer(object):
                 # (2) Generate fake images (have to modify)
                 ######################################################
                 
-#                print(txt_embedding.shape)#torch.Size([2, 6])
-#                print(mesh_embed.shape)#torch.Size([4226, 8])
+                print(txt_embedding.shape)#torch.Size([2, 6])
+                print(mesh_embed.shape)#torch.Size([4226, 8])
 
                 inputs = (txt_embedding,mesh_embed)
                 

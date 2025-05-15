@@ -1,105 +1,39 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import pymeshlab as ml
 import time
 import torch.utils.data as data
-# from PIL import Image
-import soundfile as sf
-import PIL
 import os
-import os.path
-import pickle
-import random
 import numpy as np
-import pandas as pd
-from scipy import signal
-
 import torch
-import torch_geometric
-from torch_geometric.io import read_ply
 import librosa
-
-import io
 import sys
-import random
+import bpy
+import bmesh
 from miscc.config import cfg
-import torch_geometric.transforms as T
-from torch_geometric.data import Data
-from torch_geometric.utils import to_dense_adj, to_dense_batch, dropout_adj
-import scipy.sparse as sp
-import traceback
+import requests
 
+def backend_factory() -> requests.Session:
+    session = requests.Session()
+    session.verify = False
+    return session
+configure_http_backend(backend_factory=backend_factory)
 
-from miscc.utils import save_mesh_as_obj,save_pos_face_as_obj,load_pickle, write_pickle
-
-
-# using the modelnet40 as the dataset, and using the processed feature matrixes
-import json
-import random
-from pathlib import Path
-import numpy as np
-import os
-import torch
-import torch.utils.data as data
-import trimesh
-from scipy.spatial.transform import Rotation
-import pygem
-from pygem import FFD
-import copy
-import csv
-
-import math
-import pyglet
-
-
-#embeddings = [mesh_path,RIR_path,source,receiver]
-class MeshDataset(data.Dataset):
-    def __init__(self, data_dir,mesh_paths, train=True,augment=None): 
-        self.data_dir = data_dir       
-        self.mesh_paths = mesh_paths
-
-        self.augments = []
-        self.feats = ['area', 'face_angles', 'curvs', 'normal']
-         
-        if train and augment:
-            self.augments = augment
-
-    def __getitem__(self, index):
-
-        label = 0
-        full_mesh_path=os.path.join(self.data_dir,self.mesh_paths[index]).replace('.pickle','.obj')
-        try:
-          tirangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path, augments=self.augments,request=self.feats)
-          tirangle_coordinates,normals,centers,areas = normalize_mesh_values(tirangle_coordinates,normals,centers,areas)
-            #write_pickle(mesh_pickle_file_path,(tirangle_coordinates,normals,centers,areas))
-        except:
-          tirangle_coordinates,normals,centers,areas,full_mesh_path =  np.zeros((cfg.MAX_FACE_COUNT,9)),np.zeros((cfg.MAX_FACE_COUNT,3)),np.zeros((cfg.MAX_FACE_COUNT,3)),np.zeros((cfg.MAX_FACE_COUNT,1)),"ERRONOUS_MESH"
-
-        return   tirangle_coordinates, normals,centers,areas, full_mesh_path
-
-        
-    def __len__(self):
-        return len(self.mesh_paths)
-            
-            
+from huggingface_hub import configure_http_backend
+from diffusers.models import AutoencoderKL
 
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
-
         self.rirsize = rirsize
         self.data = []
         self.data_dir = data_dir       
-        self.bbox = None
-        
-  
         self.embeddings = embeddings
-        self.mesh_embeddings = mesh_embeddings
+        self.ray_directions=self.generate_ray_directions() 
+        self.bpy_context = bpy.context
+        self.bpy_scene = context.scene
+        self.bpy_depsgraph=context.evaluated_depsgraph_get()
+        self.model = AutoencoderKL.from_pretrained("zelaki/eq-vae")
+        self.model.eval()
+        self.model.cuda()
 
     def get_RIR(self, full_RIR_path):
-        # wav,fs = sf.read(full_RIR_path) 
         wav,fs = librosa.load(full_RIR_path)
  
         # wav_resample = librosa.resample(wav,16000,fs)
@@ -132,49 +66,91 @@ class RIRDataset(data.Dataset):
     def __getitem__(self, index):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
-
-        data_dir = self.data_dir
-
-        full_graph_path = os.path.join(data_dir,graph_path)
-        full_RIR_path  = os.path.join(data_dir,RIR_path)
-        source_receiver = source_location+receiver_location
-
-        RIR = self.get_RIR(full_RIR_path)
-
         data = {}
-        
-        data["RIR"] = RIR
-        data["embeddings"] =  np.array(source_receiver).astype('float32')
-        data["mesh_embeddings"] = self.mesh_embeddings[graph_path]
+        data["RIR"] =  self.get_RIR(os.path.join(data_dir,RIR_path))
+        data["source_and_receiver"] =  np.concatanate(np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32'))
+        data["mesh_embeddings"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
 
+        
         return data
         
     def __len__(self):
         return len(self.embeddings)
 
+    def mesh_embeddings(self,full_graph_path,source,receiver):
+        clear_scene()
+        bmesh_object=bpy.ops.wm.obj_import(filepath=full_graph_path)
+        ray_cast_image_source=self.ray_cast(bmesh_object,source)
+        ray_cast_image_receiver=self.ray_cast(bmesh_object,receiver)
+        return torch.concatenate((ray_cast_image_source,ray_cast_image_receiver))
+
+    def clear_scene(self):
+      for obj in bpy.context.scene.objects:
+       if obj.type == 'MESH':
+          obj.select_set(True)
+       else:
+          obj.select_set(False)
+      bpy.ops.object.delete()
+      for block in bpy.data.meshes:
+         if block.users == 0:
+             bpy.data.meshes.remove(block)
+      for block in bpy.data.materials:
+         if block.users == 0:
+             bpy.data.materials.remove(block)
+      for block in bpy.data.textures:
+         if block.users == 0:
+             bpy.data.textures.remove(block)
+      for block in bpy.data.images:
+         if block.users == 0:
+             bpy.data.images.remove(block)
+
+    def ray_cast(self,bmesh_object,origin):
+       origin=list(np.array(origin).astype(np.float32))
+       ray_casting_image=np.zeros((len(self.ray_directions.keys()),len(self.ray_directions[0].keys())))
+       for alfa in self.ray_directions:
+        for beta in self.ray_directions[alfa]:
+          direction=self.ray_directions[alfa][beta]
+          hit, loc, normal, idx, obj, mw = self.scene.ray_cast(self.depsgraph,origin, direction)
+          if hit:
+              distance=np.linalg.norm(np.array(origin)-np.array(loc))
+              gray_scale_color=min(int(63+192*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              ray_casting_image[alfa][beta]=gray_scale_color
+#### NOT : MP : CALISMAZSA BIR DE NORMALI DE ISIN ICINE KATMAYI DENEYEBILIRIZ              
+              #print(f"HIT: location={np.array(loc).shape} normal_vector_of_hit_point={np.array(norm).shape} idx={np.array(idx).shape} obj={np.array(obj).shape} mw={np.array(mw).shape}")
+          else:
+              ray_casting_image[alfa][beta]=0
+       ray_casting_image=ray_casting_image.reshape(cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION,1).repeat(3,axis=2)
+       ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
+       ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION).cuda()
+       latents=self.model.encode(ray_casting_image).latent_dist.sample()
+       latents_flat=latents.flatten()
+
+       return latents_flat
 
 
-def build_mesh_embeddings(data_dir,embeddings):
-    for i in range(len(embeddings)):
-        if i%100000 == 0 :
-            print(f"{i}/{len(embeddings)}")
-        graph_path,RIR_path,source_location,receiver_location= embeddings[i]
-        full_graph_path = os.path.join(data_dir,graph_path)
-        if graph_path not in  mesh_embeddings:
-           full_mesh_path = full_graph_path.replace('.pickle','.obj')
-           #triangle_coordinates,normals,centers,areas = load_mesh(full_mesh_path)
-           triangle_coordinates,normals,centers,areas = load_mesh2(full_mesh_path)
-           real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
-           triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
-           triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
-           normals=torch.autograd.Variable(torch.from_numpy(normals)).float()
-           centers=torch.autograd.Variable(torch.from_numpy(centers)).float()
-           areas=torch.autograd.Variable(torch.from_numpy(areas)).float()
-           faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
-           faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
-           faceData=faceData.unsqueeze(0).detach().cuda()
-           faceData_predicted , latent_vector =  gae_mesh_net(faceData)
-           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
- 
-    return mesh_embeddings
+    def generate_ray_directions(self):
+     alfas=z_directions=np.arange(0               ,    2*np.pi     ,    np.pi/(cfg.RAY_CASTING_IMAGE_RESOLUTION/2)) # 256 values
+     betas=y_directions=np.arange(-np.pi/2,    np.pi/2     ,    np.pi/cfg.RAY_CASTING_IMAGE_RESOLUTION) #  256 values
+     unit_vector=[1,0,0]
+     ray_directions={}
+     for i in range(alfas.shape[0]):
+         if i not in ray_directions:
+             ray_directions[i]={}
+         for j in range(betas.shape[0]):
+                   alfa=z_directions[i]
+                   beta=y_directions[j]
+                   gamma=0
+                   rotation_around_z= [  [ np.cos(alfa) , -np.sin(alfa), 0 ],  [ np.sin(alfa), -np.cos(alfa), 0 ],  [ 0 , 0, 1] ]
+                   rotation_around_y= [  [ np.cos(beta) ,0, np.sin(beta)],  [0,1,0 ],  [-np.sin(beta) , 0, np.cos(beta)] ]
+                   rotation_around_x= [  [1,0,0], [ 0,np.cos(gamma) , -np.sin(gamma) ],  [ 0, np.sin(gamma), np.cos(gamma) ] ]
+                   rotation=np.matmul(rotation_around_z,np.matmul(rotation_around_y,rotation_around_x))
+                   #yaw=rotation_around_z= [  [ cos_alfa , - sin_alfa, 0 ],  [ sin_alfa , - cos_alfa, 0 ],  [ 0 , 0, 1] ]
+                   #pitch=rotation_around_y= [  [ cos_beta , 0,  sin_beta],  [ 0, 1, 0 ],  [ -sin_beta , 0, cos_beta] ].
+                   #roll=rotation_around_x= [ [1,0,0 ], [0, cos_gamma,-sin_gamma], [0,sin_gamma,cos_gamma]]
+                   #R=rotation_around_z * rotation_around_y * rotation_around_x
+                   ray_direction=np.matmul(unit_vector,rotation)
+                   ray_directions[i][j]=ray_direction
+
+     return ray_directions
+
 
