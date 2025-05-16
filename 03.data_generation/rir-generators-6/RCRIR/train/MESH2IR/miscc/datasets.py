@@ -9,6 +9,8 @@ import bpy
 import bmesh
 from miscc.config import cfg
 from PIL import Image
+from contextlib import redirect_stdout
+import io
 
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
@@ -20,7 +22,7 @@ class RIRDataset(data.Dataset):
         self.bpy_context = bpy.context
         self.bpy_scene = self.bpy_context.scene
         self.bpy_depsgraph=self.bpy_context.evaluated_depsgraph_get()
-
+        bpy.context.scene.cycles.device = 'GPU'
     def get_RIR(self, full_RIR_path):
         wav,fs = librosa.load(full_RIR_path)
  

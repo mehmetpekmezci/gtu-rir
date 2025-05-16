@@ -21,7 +21,7 @@ fi
 
 if [ ! -f "$MESH2IR_TRAINING_DATA/3D-FRONT/outputs/training.embeddings.pickle" ]
 then
-        cd $CURRENT_DIR/train/
+        cd $CURRENT_DIR/train/MESH2IR
 	python3 embed_generator.py $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
 else
 	echo "$MESH2IR_TRAINING_DATA/3D-FRONT/outputs/training.embeddings.pickle and validation.embeddings.pickle files are already prepared ..."
@@ -29,4 +29,4 @@ fi
 
 cd $CURRENT_DIR/train/MESH2IR 
 
-python3 main.py --cfg cfg/RIR_s1.yml --gpu 0 --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
+python3 main.py --cfg cfg/RIR_s1.yml --gpu 0 --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs 
