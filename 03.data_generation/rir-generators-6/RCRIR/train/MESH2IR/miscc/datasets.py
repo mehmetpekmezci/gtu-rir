@@ -8,16 +8,7 @@ import sys
 import bpy
 import bmesh
 from miscc.config import cfg
-import requests
-
-def backend_factory() -> requests.Session:
-    session = requests.Session()
-    session.verify = False
-    return session
-configure_http_backend(backend_factory=backend_factory)
-
-from huggingface_hub import configure_http_backend
-from diffusers.models import AutoencoderKL
+from PIL import Image
 
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
@@ -27,11 +18,8 @@ class RIRDataset(data.Dataset):
         self.embeddings = embeddings
         self.ray_directions=self.generate_ray_directions() 
         self.bpy_context = bpy.context
-        self.bpy_scene = context.scene
-        self.bpy_depsgraph=context.evaluated_depsgraph_get()
-        self.model = AutoencoderKL.from_pretrained("zelaki/eq-vae")
-        self.model.eval()
-        self.model.cuda()
+        self.bpy_scene = self.bpy_context.scene
+        self.bpy_depsgraph=self.bpy_context.evaluated_depsgraph_get()
 
     def get_RIR(self, full_RIR_path):
         wav,fs = librosa.load(full_RIR_path)
@@ -67,22 +55,20 @@ class RIRDataset(data.Dataset):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
         data = {}
-        data["RIR"] =  self.get_RIR(os.path.join(data_dir,RIR_path))
-        data["source_and_receiver"] =  np.concatanate(np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32'))
-        data["mesh_embeddings"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
-
-        
+        data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
+        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
+        data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
         return data
         
     def __len__(self):
         return len(self.embeddings)
 
     def mesh_embeddings(self,full_graph_path,source,receiver):
-        clear_scene()
+        self.clear_scene()
         bmesh_object=bpy.ops.wm.obj_import(filepath=full_graph_path)
         ray_cast_image_source=self.ray_cast(bmesh_object,source)
         ray_cast_image_receiver=self.ray_cast(bmesh_object,receiver)
-        return torch.concatenate((ray_cast_image_source,ray_cast_image_receiver))
+        return ray_cast_image_source,ray_cast_image_receiver
 
     def clear_scene(self):
       for obj in bpy.context.scene.objects:
@@ -110,7 +96,7 @@ class RIRDataset(data.Dataset):
        for alfa in self.ray_directions:
         for beta in self.ray_directions[alfa]:
           direction=self.ray_directions[alfa][beta]
-          hit, loc, normal, idx, obj, mw = self.scene.ray_cast(self.depsgraph,origin, direction)
+          hit, loc, normal, idx, obj, mw = self.bpy_scene.ray_cast(self.bpy_depsgraph,origin, direction)
           if hit:
               distance=np.linalg.norm(np.array(origin)-np.array(loc))
               gray_scale_color=min(int(63+192*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
@@ -121,11 +107,10 @@ class RIRDataset(data.Dataset):
               ray_casting_image[alfa][beta]=0
        ray_casting_image=ray_casting_image.reshape(cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION,1).repeat(3,axis=2)
        ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
-       ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION).cuda()
-       latents=self.model.encode(ray_casting_image).latent_dist.sample()
-       latents_flat=latents.flatten()
+       #ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION)
+       ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32)
 
-       return latents_flat
+       return ray_casting_image
 
 
     def generate_ray_directions(self):

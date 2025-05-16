@@ -36,9 +36,16 @@ from torchinfo import summary
 # from torch.utils.tensorboard import summary
 # from torch.utils.tensorboard import FileWriter
 import torchaudio
-from torch_geometric.utils import to_dense_adj, to_dense_batch
 import traceback
-from model_mesh import MESH_TRANSFORMER_AE 
+
+import requests
+from huggingface_hub import configure_http_backend
+
+def backend_factory() -> requests.Session:
+    session = requests.Session()
+    session.verify = False
+    return session
+configure_http_backend(backend_factory=backend_factory)
 
 class GANTrainer(object):
     def __init__(self, output_dir):
@@ -103,18 +110,22 @@ class GANTrainer(object):
 
         
         SOURCE_RECEIVER_XYZ_DIM=6    
-        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)] )
+        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
-        
+       
+        image_vae = AutoencoderKL.from_pretrained("zelaki/eq-vae")
+        image_vae.eval()
+
         if cfg.CUDA:
             netG.cuda()
             netD.cuda()
-        return netG, netD
+            image_vae.cuda()
+        return netG, netD , image_vae
 
 
     def train(self, data_loader, stage=1):
         if stage == 1:
-            netG, netD = self.load_network_stageI()
+            netG, netD , image_vae= self.load_network_stageI()
         # else:
         #     netG, netD = self.load_network_stageII()
         
@@ -193,25 +204,39 @@ class GANTrainer(object):
                
                 
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
-                txt_embedding = torch.from_numpy(data['source_and_receiver'])
-                mesh_embedding = data['mesh_embeddings'] 
+                #txt_embedding = torch.from_numpy(data['source_and_receiver'])
+                txt_embedding = data['source_and_receiver']
+                mesh_embedding_source_image = data['mesh_embeddings_source_image'] 
+                mesh_embedding_receiver_image = data['mesh_embeddings_receiver_image'] 
                 
                 real_RIRs = Variable(real_RIR_cpu)
-                txt_embedding = Variable(txt_embedding) 
-                mesh_embed = Variable(mesh_embed) 
+                #txt_embedding = Variable(txt_embedding) 
+                #mesh_embedding_source_image = Variable(mesh_embedding_source_image) 
+                #mesh_embedding_receiver_image = Variable(mesh_embedding_receiver_image) 
 
                 
                 if cfg.CUDA:
                     real_RIRs = real_RIRs.cuda()
                     txt_embedding = txt_embedding.cuda()
-                    mesh_embed = mesh_embed.cuda()
+                    mesh_embedding_source_image = mesh_embedding_source_image.cuda()
+                    mesh_embedding_receiver_image = mesh_embedding_receiver_image.cuda()
                
                 #######################################################
                 # (2) Generate fake images (have to modify)
                 ######################################################
-                
-                print(txt_embedding.shape)#torch.Size([2, 6])
-                print(mesh_embed.shape)#torch.Size([4226, 8])
+                with torch.no_grad():
+                     mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image).latent_dist.sample().reshape(self.batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+                     mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image).latent_dist.sample().reshape(self.batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+                     #print(mesh_embedding_source_image_latents.shape)
+                     #print(mesh_embedding_receiver_image_latents.shape)
+                     mesh_embed=torch.concatenate((mesh_embedding_source_image_latents,mesh_embedding_receiver_image_latents),axis=1)
+
+                #real_RIRs.detach()
+                #txt_embedding.detach()
+                #mesh_embed.detach()
+
+                #print(txt_embedding.shape)#torch.Size([2, 6])
+                #print(mesh_embed.shape)#torch.Size([4226, 8])
 
                 inputs = (txt_embedding,mesh_embed)
                 
@@ -248,7 +273,7 @@ class GANTrainer(object):
                 
                 errG_total = errG *5#+ kl_loss * cfg.TRAIN.COEFF.KL
               
-#                print(f" i={i}  errD_total={errD_total}  errG_total={errG_total}")
+                #print(f" i={i}  errD_total={errD_total}  errG_total={errG_total}")
                 errG_total.backward()
                 optimizerG.step()
 
@@ -264,7 +289,7 @@ class GANTrainer(object):
                                               real_labels, c_code,filters, self.gpus)
                     # kl_loss = KL_loss(mu, logvar)
                     errG_total = errG *5#+ kl_loss * cfg.TRAIN.COEFF.KL
-#                    print(f" i={i}  errD_total={errD_total}  errG_total={errG_total}")
+                    #print(f" i={i}  errD_total={errD_total}  errG_total={errG_total}")
                     errG_total.backward()
                     optimizerG.step()
                     ## NORMALDE BURADA BIR DE MESHNET OPTIMIZER (optimizerM) vardi , ama onu  sentetik verilerle egittik, onun icin MESHNET i egitmiyoruz.

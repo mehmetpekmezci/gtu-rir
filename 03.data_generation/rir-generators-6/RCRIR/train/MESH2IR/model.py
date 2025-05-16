@@ -87,7 +87,7 @@ class COND_NET(nn.Module): #not chnaged yet
     # (https://github.com/pytorch/examples/blob/master/vae/main.py)
     def __init__(self):
         super(COND_NET, self).__init__()
-        self.t_dim = cfg.TEXT.DIMENSION
+        self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)+3+3  ## 3 is source_location, 3 is microphone_location
         self.c_dim = cfg.GAN.CONDITION_DIM
         self.fc = nn.Linear(self.t_dim, self.c_dim, bias=True)
         self.relu = nn.PReLU()#nn.ReLU()
@@ -179,8 +179,6 @@ class STAGE1_G(nn.Module):
         kernel_length  = 41
         ninput = self.ef_dim #self.z_dim + self.ef_dim
         ngf = self.gf_dim
-        # TEXT.DIMENSION -> GAN.CONDITION_DIM
-        # self.ca_net = CA_NET()
         self.cond_net = COND_NET()
         # -> ngf x 16
         self.fc = nn.Sequential(

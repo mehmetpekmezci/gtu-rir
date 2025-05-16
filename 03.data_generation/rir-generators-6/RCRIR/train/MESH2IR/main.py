@@ -17,7 +17,7 @@ import dateutil.tz
 dir_path = (os.path.abspath(os.path.join(os.path.realpath(__file__), './.')))
 sys.path.append(dir_path)
 
-from miscc.datasets import TextDataset
+from miscc.datasets import RIRDataset
 from miscc.config import cfg, cfg_from_file
 from miscc.utils import mkdir_p
 from trainer import GANTrainer
@@ -69,10 +69,10 @@ if __name__ == "__main__":
     if cfg.TRAIN.FLAG:
         embeddings = load_embedding(cfg.DATA_DIR,'training.embeddings.pickle')
         print(f"len(embeddings)={len(embeddings)}")
-        rir_dataset = TextDataset(cfg.DATA_DIR, embeddings, rirsize=cfg.RIRSIZE)
+        rir_dataset = RIRDataset(cfg.DATA_DIR, embeddings, rirsize=cfg.RIRSIZE)
         assert rir_dataset
         print(f"batch_size of rir dataloaader : {cfg.TRAIN.BATCH_SIZE * num_gpu}")
         data_loader=DataLoader(rir_dataset, batch_size=cfg.TRAIN.BATCH_SIZE * num_gpu,num_workers=int(cfg.WORKERS),shuffle=True,drop_last=True)
-        print(f"len(rir_and_mesh_train_data_loader): {len(rir_and_mesh_train_data_loader)}")
+        print(f"len(data_loader): {len(data_loader)}")
         algo = GANTrainer(output_dir)
         algo.train(data_loader,stage=cfg.STAGE)
