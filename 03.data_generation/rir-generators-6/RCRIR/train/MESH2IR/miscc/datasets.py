@@ -11,6 +11,7 @@ from miscc.config import cfg
 from PIL import Image
 from contextlib import redirect_stdout
 import io
+import pickle
 
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 

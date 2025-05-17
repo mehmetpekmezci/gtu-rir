@@ -49,13 +49,22 @@ for folder in mesh_folders:
    num_sources = len(data['sources'])
    for n in range(num_receivers):
      receiver = data['receivers'][n]['xyz']
+     temp=receiver[1]
+     receiver[1]=receiver[2]
+     receiver[2]=temp
+     print("receiver:",receiver)
      receiver_position_name="R"+str(n)
      ray_cast_image=ray_cast(bmesh_object,scene,depsgraph,receiver,ray_directions,receiver_position_name,max_distance_in_a_room)
+     print(ray_cast_image)
+     sys.exit(0)
      l.append([ray_cast_image,n,0])
      #print(ray_cast_image)
      ## save image
    for s in range(num_sources):
        source = data['sources'][s]['xyz']
+       temp=source[1]
+       source[1]=source[2]
+       source[2]=temp
        loudspeaker_position_name="L"+str(s)
        ray_cast_image=ray_cast(bmesh_object,scene,depsgraph,source,ray_directions,loudspeaker_position_name,max_distance_in_a_room)
        #print(ray_cast_image)
@@ -106,11 +115,11 @@ if(filler < 128):
 # embedding_list = embedding_list[0:embed_count]
 # print("embdiing_list12345", len(embedding_list))
 
-training_embeddings_pickle =main_path+"/training.embeddings.pickle"
+training_embeddings_pickle =main_path+"/training.embeddings.X.pickle"
 with open(training_embeddings_pickle, 'wb') as f:
 	pickle.dump(training_embedding_list, f, protocol=2)
 
-validation_embeddings_pickle =main_path+"/validation.embeddings.pickle"
+validation_embeddings_pickle =main_path+"/validation.embeddings.X.pickle"
 with open(validation_embeddings_pickle, 'wb') as f:
 	pickle.dump(validation_embedding_list, f, protocol=2)
 

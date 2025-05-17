@@ -45,8 +45,14 @@ for folder in mesh_folders:
 		#print("num_receivers  ", num_receivers,"   num_sources  ", num_sources)
 		for n in range(num_receivers):
 			for s in range(num_sources):
-				source = data['sources'][s]['xyz']
+                source = data['sources'][s]['xyz'] # MP: xyz diye yazmislar ama icinde xzy olarak bulunyor
+                temp=source[1]
+                source[1]=source[2]
+                source[2]=temp
 				receiver = data['receivers'][n]['xyz']
+                temp=receiver[1]
+                receiver[1]=receiver[2]
+                receiver[2]=temp
 				RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
 				RIR_path = folder +"/hybrid/" + RIR_name
 				full_RIR_path = path+'/'+ RIR_path

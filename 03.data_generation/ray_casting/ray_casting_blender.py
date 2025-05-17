@@ -28,7 +28,7 @@ def clear_scene():
 
 
 
-def ray_cast(bmesh_object,scene,depsgraph,origin,directions,position_name,max_distance_in_a_room):
+def ray_cast_(bmesh_object,scene,depsgraph,origin,directions,position_name,max_distance_in_a_room):
 
  #print(obj_file_path)
  #print(bmesh_object)
@@ -50,8 +50,11 @@ def ray_cast(bmesh_object,scene,depsgraph,origin,directions,position_name,max_di
     hit, loc, norm, idx, obj, mw = scene.ray_cast(depsgraph,origin, direction)
   
     if hit:
+        print("alfa:",alfa,"beta:",beta,"loc:",loc," norm:",norm)
         distance=np.linalg.norm(np.array(origin)-np.array(loc))
+        print("distance:",distance)
         gray_scale_color=min(int(63+192*distance/max_distance_in_a_room),255)
+        print("gray_scale_color:",gray_scale_color)
         ray_casting_image[alfa][beta]=gray_scale_color
         #print(f"HIT: location={np.array(loc).shape} normal_vector_of_hit_point={np.array(norm).shape} idx={np.array(idx).shape} obj={np.array(obj).shape} mw={np.array(mw).shape}")
 #        print(f"{alfa},{beta}={gray_scale_color}")
@@ -60,6 +63,30 @@ def ray_cast(bmesh_object,scene,depsgraph,origin,directions,position_name,max_di
 #        print(f"{alfa},{beta}=0")
 
  return ray_casting_image
+
+
+def ray_cast(bmesh_object,scene,depsgraph,origin,ray_directions,position_name,max_distance_in_a_room):
+       origin=list(np.array(origin).astype(np.float32))
+       print("origin:",origin,"max_distance_in_a_room:",max_distance_in_a_room)
+       ray_casting_image=np.zeros((len(ray_directions.keys()),len(ray_directions[0].keys())))
+       for alfa in ray_directions:
+        for beta in ray_directions[alfa]:
+          direction=ray_directions[alfa][beta]
+          hit, loc, normal, idx, obj, mw = scene.ray_cast(depsgraph,origin, direction)
+          if hit:
+              print("alfa:",alfa,"beta:",beta,"loc:",loc," normal:",normal)
+              distance=np.linalg.norm(np.array(origin)-np.array(loc))
+              print("distance:",distance)
+              gray_scale_color=min(int(63+192*distance/max_distance_in_a_room),255)
+              print("gray_scale_color:",gray_scale_color)
+              ray_casting_image[alfa][beta]=gray_scale_color
+          else:
+              ray_casting_image[alfa][beta]=0
+       #ray_casting_image=ray_casting_image.reshape(cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION,1).repeat(3,axis=2)
+       #ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
+       #ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32)
+
+       return ray_casting_image
 
 
 # if hit:
