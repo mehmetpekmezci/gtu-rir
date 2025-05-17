@@ -261,7 +261,7 @@ class GANTrainer(object):
                 # kl_loss = KL_loss(mu, logvar)
                 netG.zero_grad()
                 errG,L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5,MSE_error1,MSE_error2,criterion_loss= compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs,
-                                              real_labels, c_code,filters, self.gpus)
+                                              real_labels, c_code,filters, self.gpus,cfg)
                 
 #                print(L1_error)
 #                print(divergence_loss0)
@@ -290,7 +290,7 @@ class GANTrainer(object):
                     _, fake_RIRs,c_code = nn.parallel.data_parallel(netG, inputs, self.gpus)
                     netG.zero_grad()
                     errG,L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5,MSE_error1,MSE_error2,criterion_loss  = compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs,
-                                              real_labels, c_code,filters, self.gpus)
+                                              real_labels, c_code,filters, self.gpus,cfg)
                     # kl_loss = KL_loss(mu, logvar)
                     errG_total = errG *5#+ kl_loss * cfg.TRAIN.COEFF.KL
 #                    print(f" i={i}  errD_total={errD_total}  errG_total={errG_total}")

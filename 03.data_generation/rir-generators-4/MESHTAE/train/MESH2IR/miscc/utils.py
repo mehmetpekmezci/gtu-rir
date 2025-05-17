@@ -49,12 +49,15 @@ def read_obj_file(path):
 
 
 #PEKMEZ
-def audio_ssim(data1,data2,mfcc_transform_fn):
-   mfcc1 = mfcc_transform_fn(data1)
-   mfcc2 = mfcc_transform_fn(data2)
-   audio_ssim_value=ssim( mfcc1, mfcc2, data_range=255, size_average=True).item()
-   return audio_ssim_value
 
+def pure_ssim_loss(real_data,generated_data):
+         generated_data_tiled=torch.tile(generated_data, (3, 1)) ## duplicate 1d data to 2d
+         real_data_tiled=torch.tile(real_data, (3, 1)) ## duplicate 1d data to 2d
+         generated_data_tiled=torch.reshape(generated_data_tiled,(1,generated_data_tiled.shape[0],generated_data_tiled.shape[1],generated_data_tiled.shape[2]))
+         real_data_tiled=torch.reshape(real_data_tiled,(1,real_data_tiled.shape[0],real_data_tiled.shape[1],real_data_tiled.shape[2]))
+
+         SSIM=ssim(generated_data_tiled,real_data_tiled, data_range=2, size_average=True).item()
+         return SSIM
 
 def KL_loss(mu, logvar):
     # -0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
@@ -113,8 +116,50 @@ def compute_discriminator_loss(netD, real_RIRs, fake_RIRs,
     # return errD, errD_real.data[0], errD_wrong.data[0], errD_fake.data[0]
 
 
+def  compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus,cfg):
+    criterion = nn.BCELoss()
+    loss = nn.L1Loss() #nn.MSELoss()
+    loss1 = nn.MSELoss()
+    mseloss=loss1
+    RT_error = 0
+    inputs = (fake_features, cond)
+    fake_logits = nn.parallel.data_parallel(netD.get_cond_logits, inputs, gpus)
+    L1_error = loss(real_RIRs,fake_RIRs)
+    MSE_COEF=0.7
+    SSIM_LOSS_COEF=0.3
+    MSE_error1= MSE_COEF*mseloss(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968])+SSIM_LOSS_COEF*(1 - pure_ssim_loss(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968]))
+    MSE_error2 = loss1(real_RIRs[:,:,3968:4096],fake_RIRs[:,:,3968:4096])
+    ######################Energy Decay Start############################
+    filter_length = 16384  # a magic number, not need to tweak this much
+    mult1 = 10
+    mult2 = 1
+    real_ec = convert_IR2EC_batch(cp.asarray(real_RIRs), filters, filter_length)
+    fake_ec = convert_IR2EC_batch(cp.asarray(fake_RIRs.to("cpu").detach()), filters, filter_length)
+    divergence_loss0 = loss1(real_ec[:,:,:,0],fake_ec[:,:,:,0]) * mult1
+    divergence_loss1 = loss1(real_ec[:,:,:,1],fake_ec[:,:,:,1]) * mult1
+    divergence_loss2 = loss1(real_ec[:,:,:,2],fake_ec[:,:,:,2]) * mult1
+    divergence_loss3 = loss1(real_ec[:,:,:,3],fake_ec[:,:,:,3]) * mult1
+    divergence_loss4 = loss1(real_ec[:,:,:,4],fake_ec[:,:,:,4]) * mult1
+    divergence_loss5 = loss1(real_ec[:,:,:,5],fake_ec[:,:,:,5]) * mult2
+    divergence_loss = divergence_loss0 + divergence_loss1 + divergence_loss2 + divergence_loss3 + divergence_loss4 + divergence_loss5
+    ######################Energy Decay End############################
+    # print("criterion loss ",criterion(fake_logits, real_labels))
+    MSE_ERROR11 = MSE_error1*4096*10
+    MSE_ERROR21 = MSE_error2*cfg.TRAIN.BATCH_SIZE*10000 ## MP BATCH_SIZE
+    MSE_ERROR = MSE_ERROR11+MSE_ERROR21
+    criterion_loss = criterion(fake_logits, real_labels)
+    # errD_fake = criterion(fake_logits, real_labels) + 5* 4096 * MSE_error1 #+ 40 * RT_error
+    errD_fake = 2*criterion_loss + divergence_loss+(MSE_ERROR) #+ 5* 4096*MSE_error1
+    if netD.get_uncond_logits is not None:
+        fake_logits = \
+            nn.parallel.data_parallel(netD.get_uncond_logits,
+                                      (fake_features), gpus)
+        uncond_errD_fake = criterion(fake_logits, real_labels)
+        errD_fake += uncond_errD_fake
+    return errD_fake, L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5, MSE_ERROR11,MSE_ERROR21 ,criterion_loss #,RT_error
 
-def compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus):
+
+def compute_generator_loss_old(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus):
     criterion = nn.BCELoss()
     loss = nn.L1Loss() #nn.MSELoss()
     loss1 = nn.MSELoss()

@@ -63,10 +63,17 @@ for folder in mesh_folders:
                 for s in range(num_sources):
 
                         source = data['sources'][s]['xyz']
+                        temp=source[1]
+                        source[1]=source[2]
+                        source[2]=temp
 
                         #print(f'{s}}')
                         for n in range(num_receivers):
                                 receiver = data['receivers'][n]['xyz']
+                                temp=receiver[1]
+                                receiver[1]=receiver[2]
+                                receiver[2]=temp
+
                                 RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
                                 RIR_path = folder +"/hybrid/" + RIR_name
                                 full_RIR_path = path+'/'+ RIR_path
