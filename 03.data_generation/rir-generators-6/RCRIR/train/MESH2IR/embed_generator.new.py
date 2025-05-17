@@ -17,7 +17,7 @@ import bmesh
 from miscc.config import cfg,cfg_from_file
 from PIL import Image
 from diffusers.models import AutoencoderKL
-
+import threading
 import requests
 from huggingface_hub import configure_http_backend
 
@@ -40,8 +40,6 @@ bpy_depsgraph=bpy_context.evaluated_depsgraph_get()
 image_vae = AutoencoderKL.from_pretrained("zelaki/eq-vae")
 image_vae.eval()
 
-if cfg.CUDA:
-   image_vae.to(device='cuda:1')
 
 
 #embeddings = [mesh_path,RIR_path,source,receiver]
@@ -51,6 +49,13 @@ validation_embedding_list=[]
 
 #path = "dataset/"
 path = str(sys.argv[1]).strip()
+folderstart = str(sys.argv[2]).strip()
+CUDANO=2
+if folderstart.isdigit() and int(folderstart)<8:
+    CUDANO=1
+CUDANO=str(CUDANO)    
+if cfg.CUDA:
+   image_vae.to(device='cuda:'+CUDANO)
 mesh_folders = os.listdir(path)
 # num_counter = 9
 # temp_counter = 0 
@@ -117,11 +122,7 @@ def clear_scene():
          if block.users == 0:
              bpy.data.images.remove(block)
 
-def ray_cast(bmesh_object,origin):
-       origin=list(np.array(origin).astype(np.float32))
-       ray_casting_image=np.zeros((len(ray_directions.keys()),len(ray_directions[0].keys())))
-       for alfa in ray_directions:
-        for beta in ray_directions[alfa]:
+def ray_cast_per_alfa(ray_casting_image,origin,alfa,beta):
           direction=ray_directions[alfa][beta]
           hit, loc, normal, idx, obj, mw = bpy_scene.ray_cast(bpy_depsgraph,origin, direction)
           if hit:
@@ -132,9 +133,17 @@ def ray_cast(bmesh_object,origin):
               #print(f"HIT: location={np.array(loc).shape} normal_vector_of_hit_point={np.array(norm).shape} idx={np.array(idx).shape} obj={np.array(obj).shape} mw={np.array(mw).shape}")
           else:
               ray_casting_image[alfa][beta]=0
+
+def ray_cast(bmesh_object,origin):
+       origin=list(np.array(origin).astype(np.float32))
+       ray_casting_image=np.zeros((len(ray_directions.keys()),len(ray_directions[0].keys())))
+       for alfa in ray_directions:
+        for beta in ray_directions[alfa]:
+           ray_cast_per_alfa(ray_casting_image,origin,alfa,beta)
        ray_casting_image=ray_casting_image.reshape(cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION,1).repeat(3,axis=2)
-       ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
-       ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION)
+       #ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
+       #ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION)
+       ray_casting_image=torch.tensor(np.array(ray_casting_image.astype(np.uint8)).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION)
        #ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32)
 
        return ray_casting_image
@@ -168,14 +177,15 @@ def generate_ray_directions():
 
 ray_directions=generate_ray_directions() 
 i=0
-
 for folder in mesh_folders:
+ if folder.startswith(folderstart) :
+    t1=time.time()
     mesh_path = folder +"/" + folder +".obj"
     RIR_folder  = path + "/" +folder +"/hybrid"
     i=i+1
-    print(f"{folder} {i}/{len(mesh_folders)}")
     clear_scene()
     bmesh_object=bpy.ops.wm.obj_import(filepath= path + "/" +folder +"/" + folder +".obj")
+    bpy.context.view_layer.update()
     if(os.path.exists(RIR_folder)):
         json_path = RIR_folder +"/sim_config.json"
         json_file = open(json_path)
@@ -196,17 +206,16 @@ for folder in mesh_folders:
         for n in range(num_receivers):
             receiver = data['receivers'][n]['xyz']
             mesh_embedding_receiver_image = ray_cast(bmesh_object,receiver)
-            mesh_embedding_receiver_image = mesh_embedding_receiver_image.detach().to(device='cuda:1')
+            mesh_embedding_receiver_image = mesh_embedding_receiver_image.detach().to(device='cuda:'+CUDANO)
             with torch.no_grad():
                mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image).latent_dist.sample().reshape(int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
             for s in range(num_sources):
-                print(n,s)
                 source = data['sources'][s]['xyz']
                 RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
                 RIR_path = folder +"/hybrid/" + RIR_name
                 full_RIR_path = path+'/'+ RIR_path
                 mesh_embedding_source_image=ray_cast(bmesh_object,source)
-                mesh_embedding_source_image = mesh_embedding_source_image.detach().to(device='cuda:1')
+                mesh_embedding_source_image = mesh_embedding_source_image.detach().to(device='cuda:'+CUDANO)
                 with torch.no_grad():
                    mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image).latent_dist.sample().reshape(int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
                 if(os.path.exists(full_RIR_path)):
@@ -219,6 +228,10 @@ for folder in mesh_folders:
                                      validation_embedding_list.append(embed_data)
                                   else:
                                      training_embedding_list.append(embed_data)
+
+    t2=time.time()
+    print(f"{folder} {i}/{len(mesh_folders)} time:{t2-t1}",flush=True)
+
 
 
 
@@ -241,11 +254,11 @@ if(filler < 128):
 # embedding_list = embedding_list[0:embed_count]
 # print("embdiing_list12345", len(embedding_list))
 
-training_embeddings_pickle =path+"/training.embeddings.2.pickle"
+training_embeddings_pickle =path+"/training.embeddings."+folderstart+".pickle"
 with open(training_embeddings_pickle, 'wb') as f:
     pickle.dump(training_embedding_list, f, protocol=2)
 
-validation_embeddings_pickle =path+"/validation.embeddings.2.pickle"
+validation_embeddings_pickle =path+"/validation.embeddings."+folderstart+".pickle"
 with open(validation_embeddings_pickle, 'wb') as f:
     pickle.dump(validation_embedding_list, f, protocol=2)
 
