@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#./run_eval.sh  $HOME/RIR_DATA/GTU-RIR-1.0/data/single-speaker $HOME/RIR_REPORT/RCRIR.01 GTURIR
 #./run_eval.sh  $HOME/RIR_DATA/GTU-RIR-1.0/data/single-speaker $HOME/RIR_REPORT/GTURIR/MESH2IR-MSE GTURIR
 #./run_eval.sh /home/mpekmezci/RIR_DATA/GTU-RIR-1.0/data/single-speaker/ /home/mpekmezci/RIR_REPORT/GTURIR//MESHTAE GTURIR
 
@@ -8,6 +9,7 @@ then
 	echo "Usage $0 <MESH2IR_INPUT_DATA_DIR>  <GENERATED_RIRS_DIR>  <GTURIR|BUTReverbDB> "
 	exit 1
 fi
+
 
 MESH2IR_INPUT_DATA_DIR=$1
 GENERATED_RIRS_DIR=$2
@@ -59,14 +61,12 @@ fi
 
 cd $CURRENT_DIR
 
-#echo "1. Change the netG.pth file"
-#echo "2. Change the mesh_net.pth file"
-#echo "3. Change the number of nodes in the RIR_s1.yml file" 
-#echo "4. Change the number of heads h in the mesh_model.py file" 
+echo "Check the netG.pth file"
+echo "Check the RAY CASTING RESOLUTION in the RIR_s1.yml file" 
+sleep 2
 #echo "Press Enter When Done"
 #read 
 
-echo " Set the MAX_FACE_COUNT and NUMBER_OF_TRANSFORMER_HEADS in RIR_s1.yml corresponding your model file !"
 
 if [ ! -f $GENERATED_RIRS_DIR/$METADATA_DIR_NAME/.rirs_are_generated_for_$DATASET_NAME ]
 then

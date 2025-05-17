@@ -24,6 +24,13 @@ class RIRDataset(data.Dataset):
         self.bpy_depsgraph=self.bpy_context.evaluated_depsgraph_get()
         bpy.context.scene.cycles.device = 'GPU'
     def get_RIR(self, full_RIR_path):
+
+        picklePath=full_RIR_path.replace(".wav",".pickle")
+        if os.path.exists(picklePath):
+            with open(picklePath, "rb") as f:
+                  x = pickle.load(f)
+            return x
+
         wav,fs = librosa.load(full_RIR_path)
  
         # wav_resample = librosa.resample(wav,16000,fs)
@@ -50,6 +57,9 @@ class RIRDataset(data.Dataset):
         RIR = RIR_original
 
         RIR = np.array([RIR]).astype('float32')
+
+        with open(picklePath, 'wb') as f:
+            pickle.dump(RIR, f, protocol=2)
 
         return RIR
 

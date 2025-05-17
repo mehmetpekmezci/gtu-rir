@@ -1,5 +1,8 @@
 #!/bin/bash
 
+ulimit -n 100000
+export CUDA_LAUNCH_BLOCKING=1
+
 CURRENT_DIR=$(pwd)
 
 DEFAULT_MAIN_DATA_DIR=$HOME/RIR_DATA
