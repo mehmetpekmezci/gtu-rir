@@ -1,7 +1,9 @@
 from __future__ import print_function
 from six.moves import range
 from PIL import Image
+from diffusers.models import AutoencoderKL
 
+from miscc.datasets import RIRDataset
 
 import torch.backends.cudnn as cudnn
 import torch
@@ -36,7 +38,17 @@ import dateutil.tz
 import librosa
 
 from miscc.config import cfg, cfg_from_file
-from miscc.datasets import normalize_mesh_values, build_mesh_embeddings_for_evaluation_data
+
+
+import requests
+from huggingface_hub import configure_http_backend
+
+def backend_factory() -> requests.Session:
+    session = requests.Session()
+    session.verify = False
+    return session
+configure_http_backend(backend_factory=backend_factory)
+
 
 
 generated_rirs_dir=str(sys.argv[1]).strip()
@@ -77,7 +89,12 @@ def load_network_stageI(netG_path):
        
         #netG.to(device='cuda:2')
         netG.cuda()
-        return netG
+
+        image_vae = AutoencoderKL.from_pretrained("zelaki/eq-vae")
+        image_vae.eval()
+        image_vae.cuda()
+
+        return netG,image_vae
 
 
 def load_embedding(data_dir):
@@ -89,14 +106,12 @@ def load_embedding(data_dir):
 
 def evaluate():
     print(f"metadata_dir={metadata_dir}") 
-    mesh_embeddings={}
     gpus = cfg.GPU_ID.split(',')
     gpus = [int(ix) for ix in gpus]
         #self.gpus=[0]
     num_gpus = len(gpus)
 
     torch.cuda.set_device(gpus[0]) 
-
     
     SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
     
@@ -110,13 +125,8 @@ def evaluate():
     mesh_directory = metadata_dir+"/Meshes"
     output_directory = generated_rirs_dir
 
-    #netG_path = "Models/MESH2IR/netG_epoch_175.pth"
-    #mesh_net_path = "Models/MESH2IR/mesh_net_epoch_175.pth"
-    #netG_path = "Models/netG.pth"
-    netG_path = "Models/netG_GAN_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
-    #netG_path = "Models/netG_GAN_3000_nodes_71_heads.pth"
-    mesh_net_path = "Models/mesh_net_transformer_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
-    #mesh_net_path = "Models/gae_mesh_net_trained_model.pth"
+    #netG_path = "Models/netG_GAN_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
+    netG_path = "Models/netG.pth"
     #gpus =[0,1]
     #gpus =[0]
 
@@ -128,51 +138,34 @@ def evaluate():
     if(not os.path.exists(output_directory)):
         os.mkdir(output_directory)
 
-    netG = load_network_stageI(netG_path)
+    netG,image_vae = load_network_stageI(netG_path)
     netG.eval()
 
-    
-    #netG.to(device='cuda')
-    #mesh_net.to(device='cuda')
- 
     embedding_list = os.listdir(embedding_directory)
 
-    if not os.path.exists(embedding_directory+"/"+metadata_dirname+".mesh_embeddings.pickle"):
-           obj_file_name_list=[]
-           for embed in embedding_list:
-              embed_path = embedding_directory + "/"+embed
-              embeddings = load_embedding(embed_path)
-              mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
-              if mesh_obj not in obj_file_name_list :
-                  obj_file_name_list.append(mesh_obj)
-
-           print(f"MESH EMBEDDINGS FILE  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle DOES NOT EXISTS SO STARTING TO GENERATE ......")
-           build_mesh_embeddings_for_evaluation_data(mesh_net_path,mesh_directory,embedding_directory,metadata_dirname,obj_file_name_list)
-           print("FINISHED MESH EMBEDDINGS FILE  ......")
-
-    print(f"load  {embedding_directory}/{metadata_dirname}.mesh_embeddings.pickle")
-    mesh_embeddings = load_embedding(embedding_directory+'/'+metadata_dirname+".mesh_embeddings.pickle")
-
-
-    for embed in embedding_list:
-      if not "mesh_embeddings" in embed:
-        embed_path = embedding_directory + "/"+embed
+    for embedding_pickle_per_room in embedding_list:
+      print("embedding_pickle_per_room:",embedding_pickle_per_room)
+      if not "mesh_embeddings" in embedding_pickle_per_room:
+        embed_path = embedding_directory + "/"+embedding_pickle_per_room
         embeddings = load_embedding(embed_path)
-        embed_name = embed[0:len(embed)-7]
+        embed_name = embedding_pickle_per_room[0:len(embedding_pickle_per_room)-7]
         output_embed  = output_directory+'/'+embed_name
         if(not os.path.exists(output_embed)):
             os.mkdir(output_embed)
 
         print("embed_name   ",output_embed)
+        print("len(embeddings)   ",len(embeddings))
 
         mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
-        if mesh_obj not in mesh_embeddings:
-            print(f"{mesh_obj} does not exist in mesh_embeddings")
-            continue
-        #mesh_embed=mesh_embeddings[mesh_obj].detach().to(device='cuda:2')
-        #mesh_embed=mesh_embeddings[mesh_obj].detach().cuda()
-        mesh_embed=mesh_embeddings[mesh_obj]
-        mesh_embed=mesh_embed.detach().cuda()
+        print("mesh_obj:",mesh_obj)
+        print("folder_name:",folder_name)
+        print("wave_name:",wave_name)
+        print("source_location:",source_location)
+        print("receiver_location:",receiver_location)
+
+        rir_dataset = RIRDataset(cfg.DATA_DIR, embeddings, rirsize=cfg.RIRSIZE)
+
+
 
         embed_sets = len(embeddings) /batch_size
         embed_sets = int(embed_sets)
@@ -191,14 +184,23 @@ def evaluate():
                 folder_name_list.append(folder_name)
                 wave_name_list.append(wave_name)
 
+            mesh_embedding_source_image,mesh_embedding_receiver_image=rir_dataset.mesh_embeddings(os.path.join(mesh_directory,mesh_obj),source_location,receiver_location)
+            mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+            mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+            mesh_embed=torch.concatenate((mesh_embedding_source_image_latents,mesh_embedding_receiver_image_latents),axis=1)
+            print(mesh_embed)
+            print(mesh_embed.shape)
             txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
             #txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
             txt_embedding = Variable(txt_embedding).detach().cuda()
+            print(txt_embedding)
+            print(txt_embedding.shape)
             #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
             #lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
             #print(txt_embedding.shape)
             #print(mesh_embed.unsqueeze(0).shape)
-            lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed.unsqueeze(0))
+            #lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed.unsqueeze(0))
+            lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed)
 
             for i in range(len(fake)):
                 if(not os.path.exists(output_embed+"/"+folder_name_list[i])):
