@@ -1,3 +1,5 @@
+#### python3 embed_generator.new.py $HOME/RIR_DATA/MESH2IR_TRAINING_DATA/3D-FRONT/outputs
+
 import os
 import json
 import numpy as np
@@ -49,10 +51,7 @@ validation_embedding_list=[]
 
 #path = "dataset/"
 path = str(sys.argv[1]).strip()
-folderstart = str(sys.argv[2]).strip()
-CUDANO=2
-if folderstart.isdigit() and int(folderstart)<8:
-    CUDANO=1
+CUDANO=1
 CUDANO=str(CUDANO)    
 if cfg.CUDA:
    image_vae.to(device='cuda:'+CUDANO)
@@ -178,7 +177,6 @@ def generate_ray_directions():
 ray_directions=generate_ray_directions() 
 i=0
 for folder in mesh_folders:
- if folder.startswith(folderstart) :
     t1=time.time()
     mesh_path = folder +"/" + folder +".obj"
     RIR_folder  = path + "/" +folder +"/hybrid"
@@ -254,11 +252,11 @@ if(filler < 128):
 # embedding_list = embedding_list[0:embed_count]
 # print("embdiing_list12345", len(embedding_list))
 
-training_embeddings_pickle =path+"/training.embeddings."+folderstart+".pickle"
+training_embeddings_pickle =path+"/training.embeddings.new.pickle"
 with open(training_embeddings_pickle, 'wb') as f:
     pickle.dump(training_embedding_list, f, protocol=2)
 
-validation_embeddings_pickle =path+"/validation.embeddings."+folderstart+".pickle"
+validation_embeddings_pickle =path+"/validation.embeddings.new.pickle"
 with open(validation_embeddings_pickle, 'wb') as f:
     pickle.dump(validation_embedding_list, f, protocol=2)
 
