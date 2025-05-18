@@ -3,7 +3,19 @@
 
 echo rm train/pre-trained-models/mesh_embeddings.pickle
 ls -alrt   train/pre-trained-models/
-rm train/pre-trained-models/mesh_embeddings.pickle
+echo "###"
+echo "###"
+echo "###"
+echo "###"
+echo "ATTENTION PLEASE :"
+echo 
+echo "If you changed the geometric model , please delete the file train/pre-trained-models/mesh_embeddings.pickle"
+echo 
+echo "###"
+echo "###"
+echo "###"
+sleep 15
+#rm train/pre-trained-models/mesh_embeddings.pickle
 
 
 
@@ -42,6 +54,7 @@ fi
 if [ ! -f "$MESH2IR_TRAINING_DATA/3D-FRONT/outputs/embeddings.pickle" ]
 then
         cd $CURRENT_DIR/train/
+	echo  python3 embed_generator.py $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
 	python3 embed_generator.py $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
 else
 	echo "$MESH2IR_TRAINING_DATA/3D-FRONT/outputs/embeddings.pickle file is already prepared ..."
@@ -51,6 +64,7 @@ if [ ! -f $MESH2IR_TRAINING_DATA/3D-FRONT/outputs/cache/.caching_is_done ]
 then
         cd $CURRENT_DIR/train/
         mkdir -p $MESH2IR_TRAINING_DATA/3D-FRONT/outputs/cache
+	echo python3 wav_pickle_cache_generator.py $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
         python3 wav_pickle_cache_generator.py $MESH2IR_TRAINING_DATA/3D-FRONT/outputs
 	if [ $? = 0 ]
 	then
@@ -72,5 +86,6 @@ then
 fi
 
 mkdir -p /fastdisk/mpekmezci/temp
+echo python3 main.py --cfg cfg/RIR_s1.yml --gpu $GPU_NO --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs --synthetic_geometric_data_dir $DEFAULT_MAIN_DATA_DIR/APARTMENT_MESH
 
 python3 main.py --cfg cfg/RIR_s1.yml --gpu $GPU_NO --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs --synthetic_geometric_data_dir $DEFAULT_MAIN_DATA_DIR/APARTMENT_MESH

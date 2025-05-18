@@ -122,6 +122,8 @@ def  compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, condit
     loss1 = nn.MSELoss()
     mseloss=loss1
     RT_error = 0
+    cond = conditions.detach()
+    fake_features = nn.parallel.data_parallel(netD, (fake_RIRs), gpus)
     inputs = (fake_features, cond)
     fake_logits = nn.parallel.data_parallel(netD.get_cond_logits, inputs, gpus)
     L1_error = loss(real_RIRs,fake_RIRs)

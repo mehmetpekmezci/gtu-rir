@@ -251,7 +251,7 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
 
 
 def build_mesh_embeddings(data_dir,embeddings):
-    GENERATE_SAMPLES_FOR_DOCUMENTING=True
+    GENERATE_SAMPLES_FOR_DOCUMENTING=False
     from model_mesh import MESH_TRANSFORMER_AE
     gae_mesh_net=MESH_TRANSFORMER_AE()
     
@@ -274,8 +274,8 @@ def build_mesh_embeddings(data_dir,embeddings):
     loss_list_content=""
 
     for i in range(len(embeddings)):
-        if i%100000 == 0 :
-            print(f"{i}/{len(embeddings)}")
+        if i%100 == 0 :
+            print(f"{i}/{len(embeddings)}",flush=True)
         graph_path,RIR_path,source_location,receiver_location= embeddings[i]
         full_graph_path = os.path.join(data_dir,graph_path)
         if graph_path not in  mesh_embeddings:

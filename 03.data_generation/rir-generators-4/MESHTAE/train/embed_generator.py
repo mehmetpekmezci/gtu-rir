@@ -64,14 +64,16 @@ for folder in mesh_folders:
 
                         source = data['sources'][s]['xyz']
                         temp=source[1]
-                        source[1]=source[2]
+                        source[1]=str(-float(source[2]))
                         source[2]=temp
 
                         #print(f'{s}}')
                         for n in range(num_receivers):
-                                receiver = data['receivers'][n]['xyz']
+                                receiver = data['receivers'][n]['xyz'] # MP: xyz diye yazmislar ama icinde xzy olarak bulunyor
+                # coordinate lar xzy ama zaten mesh de xzy olark geliyor. onun icin bununla oynama :
+                # diye yazmistim ama meshi export edip bakinca asagidaki donusumu yapmak mantilki geldi.
                                 temp=receiver[1]
-                                receiver[1]=receiver[2]
+                                receiver[1]=str(-float(receiver[2]))
                                 receiver[2]=temp
 
                                 RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
