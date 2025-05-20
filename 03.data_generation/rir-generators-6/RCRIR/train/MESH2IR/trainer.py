@@ -110,8 +110,7 @@ class GANTrainer(object):
 
         
         SOURCE_RECEIVER_XYZ_DIM=6    
-        #summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))] )
-        summary(netG,[(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))] )
+        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
        
         image_vae = AutoencoderKL.from_pretrained("zelaki/eq-vae")
@@ -206,19 +205,19 @@ class GANTrainer(object):
                 
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
                 #txt_embedding = torch.from_numpy(data['source_and_receiver'])
-                #txt_embedding = data['source_and_receiver']
+                txt_embedding = data['source_and_receiver']
                 mesh_embedding_source_image = data['mesh_embeddings_source_image'] 
                 mesh_embedding_receiver_image = data['mesh_embeddings_receiver_image'] 
                 
                 real_RIRs = Variable(real_RIR_cpu)
-                #txt_embedding = Variable(txt_embedding) 
-                #mesh_embedding_source_image = Variable(mesh_embedding_source_image) 
-                #mesh_embedding_receiver_image = Variable(mesh_embedding_receiver_image) 
+                txt_embedding = Variable(txt_embedding) 
+                mesh_embedding_source_image = Variable(mesh_embedding_source_image) 
+                mesh_embedding_receiver_image = Variable(mesh_embedding_receiver_image) 
 
                 
                 if cfg.CUDA:
                     real_RIRs = real_RIRs.cuda()
-                    #txt_embedding = txt_embedding.cuda()
+                    txt_embedding = txt_embedding.cuda()
                     mesh_embedding_source_image = mesh_embedding_source_image.cuda()
                     mesh_embedding_receiver_image = mesh_embedding_receiver_image.cuda()
                
@@ -239,8 +238,7 @@ class GANTrainer(object):
                 #print(txt_embedding.shape)#torch.Size([2, 6])
                 #print(mesh_embed.shape)#torch.Size([4226, 8])
 
-                #inputs = (txt_embedding,mesh_embed)
-                inputs = (mesh_embed,)
+                inputs = (txt_embedding,mesh_embed)
                 
                 # _, fake_RIRs, mu, logvar = \
                 #     nn.parallel.data_parallel(netG, inputs, self.gpus)
@@ -305,7 +303,7 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, netD, epoch, self.model_dir)
 
-                if generator_lr > 0.000000005 and i>0 and ((i%500==0 and i<1100) or (i%1000==0 and i<11000)  or  i%10000==0 ) :
+                if generator_lr > 0.000000005 and i>0 and i%500==0:
                     rate=0.5
                     print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
                     generator_lr *= rate

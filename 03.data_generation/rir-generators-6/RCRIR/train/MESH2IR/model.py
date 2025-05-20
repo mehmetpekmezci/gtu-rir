@@ -87,8 +87,7 @@ class COND_NET(nn.Module): #not chnaged yet
     # (https://github.com/pytorch/examples/blob/master/vae/main.py)
     def __init__(self):
         super(COND_NET, self).__init__()
-        #self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)+3+3  ## 3 is source_location, 3 is microphone_location
-        self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)
+        self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)+3+3  ## 3 is source_location, 3 is microphone_location
         self.c_dim = cfg.GAN.CONDITION_DIM
         self.fc = nn.Linear(self.t_dim, self.c_dim, bias=True)
         self.relu = nn.PReLU()#nn.ReLU()
@@ -203,10 +202,8 @@ class STAGE1_G(nn.Module):
             # old_conv3x1(ngf // 16, 1), # conv3x3(ngf // 16, 3),
             nn.Tanh())
 
-    #def forward(self, text_embedding,mesh_embed):
-    def forward(self, mesh_embed):
-        #full_embed= torch.cat((mesh_embed, text_embedding), 1)
-        full_embed= mesh_embed
+    def forward(self, text_embedding,mesh_embed):
+        full_embed= torch.cat((mesh_embed, text_embedding), 1)
         c_code = self.cond_net(full_embed)
 
         h_code = self.fc(c_code)
