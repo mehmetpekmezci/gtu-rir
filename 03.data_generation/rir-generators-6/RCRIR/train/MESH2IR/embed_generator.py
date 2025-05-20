@@ -46,13 +46,13 @@ for folder in mesh_folders:
         for n in range(num_receivers):
             receiver = data['receivers'][n]['xyz']
             ## xzy to xyz :
-            new_z=receiver[1]
-            new_x=receiver[2]
-            new_y=receiver[0]
+            #new_z=receiver[1]
+            #new_x=receiver[2]
+            #new_y=receiver[0]
 
-            receiver[0]=new_x
-            receiver[1]=new_y
-            receiver[2]=new_z
+            #receiver[0]=new_x
+            #receiver[1]=new_y
+            #receiver[2]=new_z
 
             for s in range(num_sources):
                 source = data['sources'][s]['xyz'] # MP: xyz diye yazmislar ama icinde xzy olarak bulunyor
@@ -60,13 +60,13 @@ for folder in mesh_folders:
 
                 # sayilara bakinca yukaridaki gibi dusunuyordum, ancak dataset.py deki gibi export alip bakinca
                 # asagidaki donusumu yapmanin mantikli oldugunu gordum, bu sekilde mik ve spk. mantikli yerlerde bulunuyor.
-                new_z=source[1]
-                new_x=source[2]
-                new_y=source[0]
+                #new_z=source[1]
+                #new_x=source[2]
+                #new_y=source[0]
 
-                source[0]=new_x
-                source[1]=new_y
-                source[2]=new_z
+                #source[0]=new_x
+                #source[1]=new_y
+                #source[2]=new_z
                 RIR_name = "L"+str(data['sources'][s]['name'][1:]) + "_R"  + str(data['receivers'][n]['name'][1:]).zfill(4)+".wav"
                 RIR_path = folder +"/hybrid/" + RIR_name
                 full_RIR_path = path+'/'+ RIR_path

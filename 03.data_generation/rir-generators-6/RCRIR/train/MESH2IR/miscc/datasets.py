@@ -13,6 +13,11 @@ from contextlib import redirect_stdout
 import io
 import pickle
 
+import io
+from contextlib import contextmanager
+
+
+
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
         self.rirsize = rirsize
@@ -23,6 +28,7 @@ class RIRDataset(data.Dataset):
         self.bpy_context = bpy.context
         self.bpy_scene = self.bpy_context.scene
         self.bpy_depsgraph=self.bpy_context.evaluated_depsgraph_get()
+        self.stdout = io.StringIO()
         bpy.context.scene.cycles.device = 'GPU'
     def get_RIR(self, full_RIR_path):
 
@@ -76,14 +82,183 @@ class RIRDataset(data.Dataset):
     def __len__(self):
         return len(self.embeddings)
 
-    def mesh_embeddings(self,full_graph_path,source,receiver):
+    @contextmanager
+    def stdout_redirected(to=os.devnull):
+      to='/tmp/uselessfile'
+      ##import os
+      ##with stdout_redirected(to=filename):
+      ##  print("from Python")
+      ##  os.system("echo non-Python applications are also supported")
+      fd = sys.stdout.fileno()
+
+       ##### assert that Python and C stdio write using the same file descriptor
+       ####assert libc.fileno(ctypes.c_void_p.in_dll(libc, "stdout")) == fd == 1
+
+      def _redirect_stdout(to):
+        sys.stdout.close() # + implicit flush()
+        os.dup2(to.fileno(), fd) # fd writes to 'to' file
+        sys.stdout = os.fdopen(fd, 'w') # Python writes to fd
+
+      with os.fdopen(os.dup(fd), 'w') as old_stdout:
+        with open(to, 'w') as file:
+            _redirect_stdout(to=file)
+        try:
+            yield # allow code to be run with the redirected stdout
+        finally:
+            _redirect_stdout(to=old_stdout) # restore stdout.
+                                            # buffering and flags such as
+                                            # CLOEXEC may be different
+
+    def mesh_embeddings(self,full_graph_path,source,receiver,permute_axis=True):
         self.clear_scene()
-        bpy.ops.wm.obj_import(filepath=full_graph_path)
+        #with redirect_stdout(self.stdout), redirect_stderr(self.stdout):
+        with self.stdout_redirected():
+             bpy.ops.wm.obj_import(filepath=full_graph_path)
         #self.printMesh()
-        #bpy.ops.wm.obj_import(filepath=full_graph_path,forward_axis='X',up_axis='Z')
-        ray_cast_image_source=self.ray_cast(source)
-        ray_cast_image_receiver=self.ray_cast(receiver)
-#        bpy.ops.wm.obj_export(filepath=full_graph_path+f'.source.and.receiver.added.1.obj')
+        #bpy.ops.wm.obj_import(filepath=full_graph_path,forward_axis='Z',up_axis='Y')
+
+        s=(np.array(source).astype(np.float32))
+        r=(np.array(receiver).astype(np.float32))
+
+        if permute_axis: 
+           s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+           s12.append(s[0])
+           s12.append(-s[2])
+           s12.append(s[1])
+
+           r12=[]
+           r12.append(r[0])
+           r12.append(-r[2])
+           r12.append(r[1])
+        else:
+           s12=s
+           r12=r
+
+        ray_cast_image_source=self.ray_cast(s12)
+        ray_cast_image_receiver=self.ray_cast(r12)
+
+        #ray_cast_image_source=self.ray_cast(source)
+        #ray_cast_image_receiver=self.ray_cast(receiver)
+        
+
+#        s=(np.array(source).astype(np.float32))
+#        s1=[] ## bu olmaz
+#        s1.append(s[0])
+#        s1.append(s[2])
+#        s1.append(s[1])
+#
+#        r=(np.array(receiver).astype(np.float32))
+#        r1=[]
+#        r1.append(r[0])
+#        r1.append(r[2])
+#        r1.append(r[1])
+#
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 0.2, location = s1)
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 0.8, location = r1)
+#
+#
+#        s11=[] ## bu olmaz
+#        s11.append(-s[0])
+#        s11.append(s[2])
+#        s11.append(s[1])
+#
+#        r11=[]
+#        r11.append(-r[0])
+#        r11.append(r[2])
+#        r11.append(r[1])
+#
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 1.2, location = s11)
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 1.8, location = r11)
+#
+#
+#        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+#        s12.append(s[0])
+#        s12.append(-s[2])
+#        s12.append(s[1])
+#
+#        r12=[]
+#        r12.append(r[0])
+#        r12.append(-r[2])
+#        r12.append(r[1])
+#
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 2.2, location = s12)
+#        bpy.ops.mesh.primitive_uv_sphere_add(radius = 2.8, location = r12)
+#
+#        s13=[] ## bu olmaz
+#        s13.append(-s[0])
+#        s13.append(-s[2])
+#        s13.append(s[1])
+#
+#        r13=[]
+#        r13.append(-r[0])
+#        r13.append(-r[2])
+#        r13.append(r[1])
+#
+#        bpy.ops.mesh.primitive_cube_add(size = 2.2, location = s13)
+#        bpy.ops.mesh.primitive_cube_add(size = 2.8, location = r13)
+#
+#
+#
+#        s2=[] ## bu olabilir , bu olmaza gibi
+#        s2.append(s[2])
+#        s2.append(s[0])
+#        s2.append(s[1])
+#
+#        r2=[]
+#        r2.append(r[2])
+#        r2.append(r[0])
+#        r2.append(r[1])
+#
+#        bpy.ops.mesh.primitive_cube_add(size = 0.2, location = s2)
+#        bpy.ops.mesh.primitive_cube_add(size = 0.8, location = r2)
+#
+#
+#        s3=[] ## bu olamaz
+#        s3.append(s[2])
+#        s3.append(-s[0])
+#        s3.append(s[1])
+#
+#        r3=[]
+#        r3.append(r[2])
+#        r3.append(-r[0])
+#        r3.append(r[1])
+#
+#        bpy.ops.mesh.primitive_cylinder_add(radius = 0.2, location = s3)
+#        bpy.ops.mesh.primitive_cylinder_add(radius = 0.8, location = r3)
+#
+#
+#        s4=[] ## bu olmaz.
+#        s4.append(-s[2])
+#        s4.append(-s[0])
+#        s4.append(s[1])
+#
+#        r4=[]
+#        r4.append(-r[2])
+#        r4.append(-r[0])
+#        r4.append(r[1])
+#
+#        bpy.ops.mesh.primitive_cylinder_add(radius = 1.2, location = s4)
+#        bpy.ops.mesh.primitive_cylinder_add(radius = 1.8, location = r4)
+#
+#        s5=[] # bu olmaz
+#        s5.append(-s[2])
+#        s5.append(s[0])
+#        s5.append(s[1])
+#
+#        r5=[]
+#        r5.append(-r[2])
+#        r5.append(r[0])
+#        r5.append(r[1])
+#
+#        bpy.ops.mesh.primitive_cube_add(size = 1.2, location = s5)
+#        bpy.ops.mesh.primitive_cube_add(size = 1.8, location = r5)
+#
+#
+#        #bpy.ops.wm.obj_export(filepath=full_graph_path+f'.source.and.receiver.added.10.obj',forward_axis='Z',up_axis='Y')
+#
+#        #bpy.ops.wm.obj_export(filepath=full_graph_path+f'.source.and.receiver.added.10.obj',forward_axis='Z',up_axis='Y')
+#        bpy.ops.wm.obj_export(filepath=full_graph_path+f'.source.and.receiver.added.11.obj')
+#        print(full_graph_path+'.source.and.receiver.added.10.obj')
 
 ### SEKILLERE BAKRAK *.5.obj nin en iyi oldugunu gordum.
 #### DOLAYISIYLA BUNU EMBEDDING_GENERTOR.PY dosyasina yansitacagim :)
@@ -184,7 +359,6 @@ class RIRDataset(data.Dataset):
 
     def ray_cast(self,origin):
        origin=list(np.array(origin).astype(np.float32))
-       bpy.ops.mesh.primitive_uv_sphere_add(radius = 0.5, location = origin)
 
        #print(f"origin={origin}")
        #self.printMesh()
@@ -199,7 +373,7 @@ class RIRDataset(data.Dataset):
               #gray_scale_color=min(int(63+192*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
               gray_scale_color=min(int(254*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
               ray_casting_image[alfa][beta][0]=gray_scale_color
-              ray_casting_image[alfa][beta][1]=min(int(254*(100*normal[0]+10000*normal[1]+1000000*normal[2])/(1000000*2)),255)
+              ray_casting_image[alfa][beta][1]=min(int(254*((100*normal[0]+10000*normal[1]+1000000*normal[2])+(1000000*2))/(1000000*4)),255)
               hit1, loc1, normal1, idx1, obj1, mw1 = self.bpy_scene.ray_cast(self.bpy_depsgraph,loc, normal)
               distance1=np.linalg.norm(np.array(loc)-np.array(loc1))
               #gray_scale_color1=min(int(63+192*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
@@ -216,7 +390,7 @@ class RIRDataset(data.Dataset):
               ray_casting_image[alfa][beta][2]=0
        #print( ray_casting_image)
        #ray_casting_image=ray_casting_image.reshape(cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION,1).repeat(3,axis=2)
-       ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
+       #ray_casting_image=Image.fromarray(np.uint8(ray_casting_image), mode="RGB")
        #ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32).reshape(1,3,cfg.RAY_CASTING_IMAGE_RESOLUTION,cfg.RAY_CASTING_IMAGE_RESOLUTION)
        ray_casting_image=torch.tensor(np.array(ray_casting_image).transpose(2, 0, 1), dtype=torch.float32)
 
