@@ -1,0 +1,51 @@
+MESH2IR_TRAINING_DATA env. var. is not defined
+MESH2IR_TRAINING_DATA=/home/mpekmezci/RIR_DATA/MESH2IR_TRAINING_DATA
+/home/mpekmezci/RIR_DATA/MESH2IR_TRAINING_DATA/3D-FRONT/outputs training data is already prepared ...
+  File "/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-6/RCRIR/train/MESH2IR/embed_generator.py", line 52
+    receiver[0]=new_x
+                     ^
+IndentationError: unindent does not match any outer indentation level
+/usr/local/lib/python3.10/dist-packages/cupyx/jit/_interface.py:173: FutureWarning: cupyx.jit.rawkernel is experimental. The interface can change in the future.
+  cupy._util.experimental('cupyx.jit.rawkernel')
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:31: UserWarning: An issue occurred while importing 'torch-scatter'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-scatter'. "
+/home/mpekmezci/.local/lib/python3.10/site-packages/torch_geometric/typing.py:42: UserWarning: An issue occurred while importing 'torch-sparse'. Disabling its usage. Stacktrace: libcudart.so.11.0: cannot open shared object file: No such file or directory
+  warnings.warn(f"An issue occurred while importing 'torch-sparse'. "
+Using config:
+{'CONFIG_NAME': 'stageI',
+ 'CUDA': True,
+ 'DATASET_NAME': 'RIR',
+ 'DATA_DIR': '/home/mpekmezci/RIR_DATA/MESH2IR_TRAINING_DATA/3D-FRONT/outputs',
+ 'EMBEDDING_TYPE': 'cnn-rnn',
+ 'EVAL_DIR': '',
+ 'GAN': {'CONDITION_DIM': 10, 'DF_DIM': 96, 'GF_DIM': 256, 'R_NUM': 4},
+ 'GPU_ID': '0',
+ 'MAX_RAY_CASTING_DISTANCE': 15,
+ 'NET_D': '',
+ 'NET_G': '',
+ 'PRE_TRAINED_MODELS_DIR': '',
+ 'RAY_CASTING_IMAGE_RESOLUTION': 32,
+ 'RIRSIZE': 4096,
+ 'STAGE': 1,
+ 'STAGE1_G': '',
+ 'TEXT': {},
+ 'TRAIN': {'BATCH_SIZE': 128,
+           'COEFF': {'KL': 2.0},
+           'DISCRIMINATOR_LR': 0.01,
+           'FLAG': True,
+           'GENERATOR_LR': 0.001,
+           'LR_DECAY_EPOCH': 7,
+           'MAX_EPOCH': 100,
+           'PRETRAINED_EPOCH': 600,
+           'PRETRAINED_MODEL': '',
+           'SNAPSHOT_INTERVAL': 25},
+ 'VIS_COUNT': 32,
+ 'WORKERS': 4,
+ 'Z_DIM': 100}
+Loading embeddings ...
+Traceback (most recent call last):
+  File "/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-6/RCRIR/train/MESH2IR/main.py", line 70, in <module>
+    embeddings = load_embedding(cfg.DATA_DIR,'training.embeddings.pickle')
+  File "/home/mpekmezci/workspace-python/gtu-rir/03.data_generation/rir-generators-6/RCRIR/train/MESH2IR/main.py", line 31, in load_embedding
+    with open(embedding_directory, 'rb') as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/home/mpekmezci/RIR_DATA/MESH2IR_TRAINING_DATA/3D-FRONT/outputs/training.embeddings.pickle'
