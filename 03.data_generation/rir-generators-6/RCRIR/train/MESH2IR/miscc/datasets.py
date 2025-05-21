@@ -112,8 +112,12 @@ class RIRDataset(data.Dataset):
     def mesh_embeddings(self,full_graph_path,source,receiver,permute_axis=True):
         self.clear_scene()
         #with redirect_stdout(self.stdout), redirect_stderr(self.stdout):
-        with self.stdout_redirected():
+        try:
+          with self.stdout_redirected():
              bpy.ops.wm.obj_import(filepath=full_graph_path)
+        except:
+             bpy.ops.wm.obj_import(filepath=full_graph_path)
+
         #self.printMesh()
         #bpy.ops.wm.obj_import(filepath=full_graph_path,forward_axis='Z',up_axis='Y')
 
