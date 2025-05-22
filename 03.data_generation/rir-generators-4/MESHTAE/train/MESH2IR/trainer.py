@@ -307,7 +307,7 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, netD, epoch, self.model_dir)
 
-                if generator_lr > 0.00000005 and i>0 and ((i%100==0 and i<1100) or (i%1000==0 and i<11000)  or  i%10000==0 ) :
+                if generator_lr > 0.0000000005 and i>0 and ((i%100==0 and i<2000) or (i%1000==0 and  i<11000)  or  i%10000==0 ) :
                     rate=0.5
                     print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
                     generator_lr *= rate

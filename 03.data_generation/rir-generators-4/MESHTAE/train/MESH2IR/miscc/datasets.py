@@ -135,6 +135,22 @@ class TextDataset(data.Dataset):
 
         data_dir = self.data_dir
 
+        s=(np.array(source_location).astype(np.float32))
+        r=(np.array(receiver_location).astype(np.float32))
+        
+        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+        s12.append(s[0])
+        s12.append(-s[2])
+        s12.append(s[1])
+
+        r12=[]
+        r12.append(r[0])
+        r12.append(-r[2])
+        r12.append(r[1])
+
+        source_location=s12
+        receiver_location=r12
+
         full_graph_path = os.path.join(data_dir,graph_path)
         full_RIR_path  = os.path.join(data_dir,RIR_path)
         source_receiver = source_location+receiver_location

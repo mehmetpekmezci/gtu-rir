@@ -116,7 +116,7 @@ def compute_discriminator_loss(netD, real_RIRs, fake_RIRs,
     # return errD, errD_real.data[0], errD_wrong.data[0], errD_fake.data[0]
 
 
-def  compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus,cfg):
+def  compute_generator_loss_ssim(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus,cfg):
     criterion = nn.BCELoss()
     loss = nn.L1Loss() #nn.MSELoss()
     loss1 = nn.MSELoss()
@@ -127,8 +127,8 @@ def  compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, condit
     inputs = (fake_features, cond)
     fake_logits = nn.parallel.data_parallel(netD.get_cond_logits, inputs, gpus)
     L1_error = loss(real_RIRs,fake_RIRs)
-    MSE_COEF=0.7
-    SSIM_LOSS_COEF=0.3
+    MSE_COEF=0.5
+    SSIM_LOSS_COEF=0.5
     MSE_error1= MSE_COEF*mseloss(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968])+SSIM_LOSS_COEF*(1 - pure_ssim_loss(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968]))
     MSE_error2 = loss1(real_RIRs[:,:,3968:4096],fake_RIRs[:,:,3968:4096])
     ######################Energy Decay Start############################
@@ -161,31 +161,22 @@ def  compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, condit
     return errD_fake, L1_error,divergence_loss0,divergence_loss1,divergence_loss2,divergence_loss3,divergence_loss4,divergence_loss5, MSE_ERROR11,MSE_ERROR21 ,criterion_loss #,RT_error
 
 
-def compute_generator_loss_old(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus):
+def compute_generator_loss(epoch,netD,real_RIRs, fake_RIRs, real_labels, conditions,filters, gpus,cfg):
     criterion = nn.BCELoss()
     loss = nn.L1Loss() #nn.MSELoss()
     loss1 = nn.MSELoss()
     RT_error = 0
-    # print("num", real_RIRs.size(),real_RIRs.size()[0])
-    # input("kk")
-    # print("real_RIRs ", real_RIRs.shape)
-    # print("fake_RIRs ", fake_RIRs.shape)
-
     cond = conditions.detach()
     fake_features = nn.parallel.data_parallel(netD, (fake_RIRs), gpus)
-    # fake pairs
     inputs = (fake_features, cond)
     fake_logits = nn.parallel.data_parallel(netD.get_cond_logits, inputs, gpus)
     L1_error = loss(real_RIRs,fake_RIRs)
     MSE_error1 = loss1(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968])
     MSE_error2 = loss1(real_RIRs[:,:,3968:4096],fake_RIRs[:,:,3968:4096])
-
-    
     ######################Energy Decay Start############################
     filter_length = 16384  # a magic number, not need to tweak this much
     mult1 = 10
     mult2 = 1
-
     real_ec = convert_IR2EC_batch(cp.asarray(real_RIRs), filters, filter_length)
     fake_ec = convert_IR2EC_batch(cp.asarray(fake_RIRs.to("cpu").detach()), filters, filter_length)
     divergence_loss0 = loss1(real_ec[:,:,:,0],fake_ec[:,:,:,0]) * mult1
@@ -194,74 +185,8 @@ def compute_generator_loss_old(epoch,netD,real_RIRs, fake_RIRs, real_labels, con
     divergence_loss3 = loss1(real_ec[:,:,:,3],fake_ec[:,:,:,3]) * mult1
     divergence_loss4 = loss1(real_ec[:,:,:,4],fake_ec[:,:,:,4]) * mult1
     divergence_loss5 = loss1(real_ec[:,:,:,5],fake_ec[:,:,:,5]) * mult2
-
-    # print("divergence_loss0   ", divergence_loss0)
-    # print("divergence_loss1   ", divergence_loss1)
-    # print("divergence_loss2   ", divergence_loss2)
-    # print("divergence_loss3   ", divergence_loss3)
-    # print("divergence_loss4   ", divergence_loss4)
-    # print("divergence_loss5   ", divergence_loss5)
     divergence_loss = divergence_loss0 + divergence_loss1 + divergence_loss2 + divergence_loss3 + divergence_loss4 + divergence_loss5
     ######################Energy Decay End############################
-
-
-
-    # real_RIR_part_1 =real_RIRs[:,:,0:512]
-    # real_RIR_part_2 =real_RIRs[:,:,512:1024]
-    # real_RIR_part_3 =real_RIRs[:,:,1024:1536]
-    # real_RIR_part_4 =real_RIRs[:,:,1536:2048]
-    # real_RIR_part_5 =real_RIRs[:,:,2048:2560]
-    # real_RIR_part_6 =real_RIRs[:,:,2560:3072]
-    # real_RIR_part_7 =real_RIRs[:,:,3072:3584]
-    # real_RIR_part_8 =real_RIRs[:,:,3584:4096]
-    
-    # mean_real_RIR_part_1 = torch.reshape(torch.mean(abs(real_RIR_part_1),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001 
-    # mean_real_RIR_part_2 = torch.reshape(torch.mean(abs(real_RIR_part_2),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_3 = torch.reshape(torch.mean(abs(real_RIR_part_3),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_4 = torch.reshape(torch.mean(abs(real_RIR_part_4),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_5 = torch.reshape(torch.mean(abs(real_RIR_part_5),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_6 = torch.reshape(torch.mean(abs(real_RIR_part_6),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_7 = torch.reshape(torch.mean(abs(real_RIR_part_7),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-    # mean_real_RIR_part_8 = torch.reshape(torch.mean(abs(real_RIR_part_8),dim=2),[real_RIRs.shape[0],1,1]) + 0.00001
-
-    # normalize_real_RIR_part_1 = real_RIR_part_1 / mean_real_RIR_part_1
-    # normalize_real_RIR_part_2 = real_RIR_part_2 / mean_real_RIR_part_2
-    # normalize_real_RIR_part_3 = real_RIR_part_3 / mean_real_RIR_part_3
-    # normalize_real_RIR_part_4 = real_RIR_part_4 / mean_real_RIR_part_4
-    # normalize_real_RIR_part_5 = real_RIR_part_5 / mean_real_RIR_part_5
-    # normalize_real_RIR_part_6 = real_RIR_part_6 / mean_real_RIR_part_6
-    # normalize_real_RIR_part_7 = real_RIR_part_7 / mean_real_RIR_part_7
-    # normalize_real_RIR_part_8 = real_RIR_part_8 / mean_real_RIR_part_8
-    
-
-    # normalize_fake_RIR_part_1 = fake_RIRs[:,:,0:512]     / mean_real_RIR_part_1
-    # normalize_fake_RIR_part_2 = fake_RIRs[:,:,512:1024]  / mean_real_RIR_part_2
-    # normalize_fake_RIR_part_3 = fake_RIRs[:,:,1024:1536] / mean_real_RIR_part_3
-    # normalize_fake_RIR_part_4 = fake_RIRs[:,:,1536:2048] / mean_real_RIR_part_4
-    # normalize_fake_RIR_part_5 = fake_RIRs[:,:,2048:2560] / mean_real_RIR_part_5
-    # normalize_fake_RIR_part_6 = fake_RIRs[:,:,2560:3072] / mean_real_RIR_part_6
-    # normalize_fake_RIR_part_7 = fake_RIRs[:,:,3072:3584] / mean_real_RIR_part_7
-    # normalize_fake_RIR_part_8 = fake_RIRs[:,:,3584:4096] / mean_real_RIR_part_8 
-    
-    # MSE_error_part_1 = loss1(normalize_real_RIR_part_1,normalize_fake_RIR_part_1) 
-    # MSE_error_part_2 = loss1(normalize_real_RIR_part_2,normalize_fake_RIR_part_2) 
-    # MSE_error_part_3 = loss1(normalize_real_RIR_part_3,normalize_fake_RIR_part_3) 
-    # MSE_error_part_4 = loss1(normalize_real_RIR_part_4,normalize_fake_RIR_part_4) 
-    # MSE_error_part_5 = loss1(normalize_real_RIR_part_5,normalize_fake_RIR_part_5) 
-    # MSE_error_part_6 = loss1(normalize_real_RIR_part_6,normalize_fake_RIR_part_6) 
-    # MSE_error_part_7 = loss1(normalize_real_RIR_part_7,normalize_fake_RIR_part_7) 
-    # MSE_error_part_8 = loss1(normalize_real_RIR_part_8,normalize_fake_RIR_part_8) 
- 
-
-    # print("MSE_error_part_1   ", MSE_error_part_1)
-    # print("MSE_error_part_2   ", MSE_error_part_2)
-    # print("MSE_error_part_3   ", MSE_error_part_3)
-    # print("MSE_error_part_4   ", MSE_error_part_4)
-    # print("MSE_error_part_5   ", MSE_error_part_5)
-    # print("MSE_error_part_6   ", MSE_error_part_6)
-    # print("MSE_error_part_7   ", MSE_error_part_7)
-    # print("MSE_error_part_8   ", MSE_error_part_8)
-
     # print("criterion loss ",criterion(fake_logits, real_labels))
     MSE_ERROR11 = MSE_error1*4096*10
     MSE_ERROR21 = MSE_error2*cfg.TRAIN.BATCH_SIZE*10000 ## MP BATCH_SIZE
