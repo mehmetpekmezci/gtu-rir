@@ -73,6 +73,22 @@ class RIRDataset(data.Dataset):
     def __getitem__(self, index):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
+        s=(np.array(source_location).astype(np.float32))
+        r=(np.array(receiver_location).astype(np.float32))
+
+        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+        s12.append(s[0])
+        s12.append(-s[2])
+        s12.append(s[1])
+
+        r12=[]
+        r12.append(r[0])
+        r12.append(-r[2])
+        r12.append(r[1])
+
+        source_location=s12
+        receiver_location=r12
+
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
         data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
@@ -109,7 +125,7 @@ class RIRDataset(data.Dataset):
                                             # buffering and flags such as
                                             # CLOEXEC may be different
 
-    def mesh_embeddings(self,full_graph_path,source,receiver,permute_axis=True):
+    def mesh_embeddings(self,full_graph_path,source,receiver):
         self.clear_scene()
         #with redirect_stdout(self.stdout), redirect_stderr(self.stdout):
         try:
@@ -121,25 +137,25 @@ class RIRDataset(data.Dataset):
         #self.printMesh()
         #bpy.ops.wm.obj_import(filepath=full_graph_path,forward_axis='Z',up_axis='Y')
 
-        s=(np.array(source).astype(np.float32))
-        r=(np.array(receiver).astype(np.float32))
+#        s=(np.array(source).astype(np.float32))
+#        r=(np.array(receiver).astype(np.float32))
+#
+#        if permute_axis: 
+#           s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+#           s12.append(s[0])
+#           s12.append(-s[2])
+#           s12.append(s[1])
+#
+#           r12=[]
+#           r12.append(r[0])
+#           r12.append(-r[2])
+#           r12.append(r[1])
+#        else:
+#           s12=s
+#           r12=r
 
-        if permute_axis: 
-           s12=[] ## sadece bu olabilir, hepsinde calisan durum.
-           s12.append(s[0])
-           s12.append(-s[2])
-           s12.append(s[1])
-
-           r12=[]
-           r12.append(r[0])
-           r12.append(-r[2])
-           r12.append(r[1])
-        else:
-           s12=s
-           r12=r
-
-        ray_cast_image_source=self.ray_cast(s12)
-        ray_cast_image_receiver=self.ray_cast(r12)
+        ray_cast_image_source=self.ray_cast(source)
+        ray_cast_image_receiver=self.ray_cast(receiver)
 
         #ray_cast_image_source=self.ray_cast(source)
         #ray_cast_image_receiver=self.ray_cast(receiver)
@@ -374,15 +390,21 @@ class RIRDataset(data.Dataset):
           hit, loc, normal, idx, obj, mw = self.bpy_scene.ray_cast(self.bpy_depsgraph,origin, direction)
           if hit:
               distance=np.linalg.norm(np.array(origin)-np.array(loc))
-              #gray_scale_color=min(int(63+192*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
-              gray_scale_color=min(int(254*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              gray_scale_color=min(int(25+220*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              #gray_scale_color=min(int(254*distance/cfg.MAX_RAY_CASTING_DISTANCE),255)
               ray_casting_image[alfa][beta][0]=gray_scale_color
-              ray_casting_image[alfa][beta][1]=min(int(254*((100*normal[0]+10000*normal[1]+1000000*normal[2])+(1000000*2))/(1000000*4)),255)
+              #ray_casting_image[alfa][beta][1]=min(int(254*((100*normal[0]+10000*normal[1]+1000000*normal[2])+(1000000*2))/(1000000*4)),255)
               hit1, loc1, normal1, idx1, obj1, mw1 = self.bpy_scene.ray_cast(self.bpy_depsgraph,loc, normal)
               distance1=np.linalg.norm(np.array(loc)-np.array(loc1))
-              #gray_scale_color1=min(int(63+192*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
-              gray_scale_color1=min(int(254*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
-              ray_casting_image[alfa][beta][2]=gray_scale_color1
+              gray_scale_color1=min(int(25+220*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              #gray_scale_color1=min(int(254*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              ray_casting_image[alfa][beta][1]=gray_scale_color1
+
+              hit2, loc2, normal2, idx2, obj2, mw2 = self.bpy_scene.ray_cast(self.bpy_depsgraph,loc1, normal1)
+              distance2=np.linalg.norm(np.array(loc1)-np.array(loc2))
+              gray_scale_color2=min(int(25+220*distance2/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              #gray_scale_color1=min(int(254*distance1/cfg.MAX_RAY_CASTING_DISTANCE),255)
+              ray_casting_image[alfa][beta][2]=gray_scale_color2
               #print(f"normal={normal}")
               #ray_casting_image[alfa][beta][1]=
               #ray_casting_image[alfa][beta][2]=gray_scale_color
