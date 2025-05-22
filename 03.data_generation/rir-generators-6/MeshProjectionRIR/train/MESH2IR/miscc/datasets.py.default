@@ -1,0 +1,123 @@
+import time
+import torch.utils.data as data
+import os
+import numpy as np
+import torch
+import librosa
+import sys
+from miscc.config import cfg
+from PIL import Image
+from contextlib import redirect_stdout
+import io
+import pickle
+import trimesh
+
+
+
+class RIRDataset(data.Dataset):
+    def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
+        self.rirsize = rirsize
+        self.data = []
+        self.data_dir = data_dir       
+        self.embeddings = embeddings
+        self.stdout = io.StringIO()
+    def get_RIR(self, full_RIR_path):
+
+        picklePath=full_RIR_path.replace(".wav",".pickle")
+        if os.path.exists(picklePath):
+            with open(picklePath, "rb") as f:
+                  x = pickle.load(f)
+            return x
+
+        wav,fs = librosa.load(full_RIR_path)
+ 
+        # wav_resample = librosa.resample(wav,16000,fs)
+        wav_resample = librosa.resample(wav,orig_sr=fs,target_sr=16000)
+
+        length = wav_resample.size
+
+        crop_length = 3968 #int(16384)
+        if(length<crop_length):
+            zeros = np.zeros(crop_length-length)
+            std_value = np.std(wav_resample) * 10
+            std_array = np.repeat(std_value,128)
+            wav_resample_new = np.concatenate([wav_resample,zeros])/std_value
+            RIR_original = np.concatenate([wav_resample_new,std_array])
+        else:
+            wav_resample_new = wav_resample[0:crop_length]
+            std_value = np.std(wav_resample_new)  * 10
+            std_array = np.repeat(std_value,128)
+            wav_resample_new =wav_resample_new/std_value
+            RIR_original = np.concatenate([wav_resample_new,std_array])
+
+        resample_length = int(self.rirsize)
+        
+        RIR = RIR_original
+
+        RIR = np.array([RIR]).astype('float32')
+
+        with open(picklePath, 'wb') as f:
+            pickle.dump(RIR, f, protocol=2)
+
+        return RIR
+
+    def __getitem__(self, index):
+
+        graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
+
+
+
+        s=(np.array(source_location).astype(np.float32))
+        r=(np.array(receiver_location).astype(np.float32))
+
+        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+        s12.append(s[0])
+        s12.append(-s[2])
+        s12.append(s[1])
+
+        r12=[]
+        r12.append(r[0])
+        r12.append(-r[2])
+        r12.append(r[1])
+
+        source_location=s12
+        receiver_location=r12
+
+        data = {}
+        data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
+        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
+        data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
+        return data
+        
+    def __len__(self):
+        return len(self.embeddings)
+
+    def create_projection_image(self,mesh,origin):
+        image=np.zeros((cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION,3))
+         
+        section_1 = mesh.section(plane_origin=origin, plane_normal=[1, 0, 0])
+        if section_1 is not None:
+           section_1,_ = section_1.to_planar()
+           image[:,:,0] = np.array(Image.open(io.BytesIO(section_1.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0]
+           section_2= mesh.section(plane_origin=origin, plane_normal=[0, 1, 0])
+           if section_2 is not None :
+              section_2,_ = section_2.to_planar()
+              image[:,:,1] = np.array(Image.open(io.BytesIO(section_2.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0]
+              section_3= mesh.section(plane_origin=origin, plane_normal=[1, 0, 0])
+              if section_3 is not None :
+                 section_3,_ = section_3.to_planar()
+                 image[:,:,2] = np.array(Image.open(io.BytesIO(section_3.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0]
+        return image
+
+
+    def mesh_embeddings(self,full_graph_path,source,receiver):
+        mesh = trimesh.load_mesh(full_graph_path)
+        if mesh is not None:
+           source_image=self.create_projection_image(mesh,source)
+           receiver_image=self.create_projection_image(mesh,receiver)
+           source_image=torch.tensor(np.array(source_image).transpose(2, 0, 1), dtype=torch.float32)
+           receiver_image=torch.tensor(np.array(receiver_image).transpose(2, 0, 1), dtype=torch.float32)
+           return source_image, receiver_image
+        else:
+           return None,None
+
