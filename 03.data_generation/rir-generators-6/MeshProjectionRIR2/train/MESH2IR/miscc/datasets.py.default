@@ -78,10 +78,13 @@ class RIRDataset(data.Dataset):
 
     def create_projection_image(self,mesh):
         # FLOOR_PLAN
-        section_3= mesh.section(plane_origin=[0,0,0], plane_normal=[0, 0, 1]) ## Z AXIS
+        section_3= mesh.section(plane_origin=[0,0,0], plane_normal=[0, 1, 0]) ## Z AXIS
         if section_3 is not None :
            section_3,_ = section_3.to_planar()
-           return (np.abs(np.array(Image.open(io.BytesIO(section_3.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0].reshape(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)-255)/255).astype(np.float32)
+           image=Image.open(io.BytesIO(section_3.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False)))
+           #t=time.time()
+           #image.save('deneme.'+str(t)+'.png')
+           return (np.abs(np.array(image)[:,:,0].reshape(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)-255)/255).astype(np.float32)
         else:
            return np.zeros((cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)).astype(np.float32)
 

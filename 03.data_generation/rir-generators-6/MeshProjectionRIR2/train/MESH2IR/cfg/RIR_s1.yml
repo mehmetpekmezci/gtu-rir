@@ -9,7 +9,7 @@ DATA_DIR: '../dataset'
   #NET_G: '../pre-trained-models/netG.pth'
   #NET_D: '../pre-trained-models/netD.pth'
 
-IMAGE_RESOLUTION: 32 # 256x256x3 input,  4x 256/8 x 256/8 = 4096 output
+IMAGE_RESOLUTION: 256 # 256x256x3 input,  4x 256/8 x 256/8 = 4096 output
 RIRSIZE: 4096
 WORKERS: 4 #4
 STAGE: 1
