@@ -1,0 +1,6 @@
+(EE) 
+Fatal server error:
+(EE) Server is already active for display 21
+	If this server is no longer running, remove /tmp/.X21-lock
+	and start again.
+(EE) 
