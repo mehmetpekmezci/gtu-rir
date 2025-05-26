@@ -1,0 +1,2 @@
+nohup ./run.sh >& log &
+
