@@ -1,2 +1,6 @@
 *.pth
 *.pyc
+nohup.out*
+.swp
+*/output/*
+output
