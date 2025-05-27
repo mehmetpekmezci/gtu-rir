@@ -109,8 +109,8 @@ class GANTrainer(object):
             print('Load NETD from: ', cfg.NET_D)
 
         
-        SOURCE_RECEIVER_XYZ_DIM=6    
-        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION))] )
+        SOURCE_RECEIVER_XYZ_AND_ROOM_DIM=9    
+        summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_AND_ROOM_DIM),(self.batch_size,int(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION))] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
        
 
@@ -202,7 +202,7 @@ class GANTrainer(object):
                 
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
                 #txt_embedding = torch.from_numpy(data['source_and_receiver'])
-                txt_embedding = data['source_and_receiver']
+                txt_embedding = data['source_and_receiver_and_room_dims']
                 mesh_embedding = data['mesh_embedding'] 
                 if mesh_embedding is None:
                     continue
@@ -284,7 +284,7 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, netD, epoch, self.model_dir)
 
-                if generator_lr > 0.00000000005 and i>0 and ( (i%100==0 and i<500 ) or (i%200==0 and i<2000) or (i%1000==0) ):
+                if generator_lr > 0.000000005 and i>0 and i%1000==0:
                     rate=0.5
                     print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
                     generator_lr *= rate

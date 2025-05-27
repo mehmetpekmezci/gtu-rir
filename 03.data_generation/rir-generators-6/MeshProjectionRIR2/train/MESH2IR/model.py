@@ -87,7 +87,7 @@ class COND_NET(nn.Module): #not chnaged yet
     # (https://github.com/pytorch/examples/blob/master/vae/main.py)
     def __init__(self):
         super(COND_NET, self).__init__()
-        self.t_dim = int(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)+3+3  ## 3 is source_location, 3 is microphone_location
+        self.t_dim = int(cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)+3+3+3 ##last 3 is for room_dims  ## 3 is source_location, 3 is microphone_location
         self.c_dim = cfg.GAN.CONDITION_DIM
         self.fc = nn.Linear(self.t_dim, self.c_dim, bias=True)
         self.relu = nn.PReLU()#nn.ReLU()

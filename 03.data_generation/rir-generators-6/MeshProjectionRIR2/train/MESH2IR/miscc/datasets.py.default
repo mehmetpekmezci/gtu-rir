@@ -22,6 +22,7 @@ class RIRDataset(data.Dataset):
         self.embeddings = embeddings
         self.stdout = io.StringIO()
         self.mesh_embeddings_cache={}
+        self.room_dims_cache={}
     def get_RIR(self, full_RIR_path):
 
         picklePath=full_RIR_path.replace(".wav",".pickle")
@@ -67,10 +68,10 @@ class RIRDataset(data.Dataset):
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
-        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
         if graph_path not in self.mesh_embeddings_cache:
-            self.mesh_embeddings_cache[graph_path]= self.mesh_embeddings(os.path.join(self.data_dir,graph_path))
+            self.mesh_embeddings_cache[graph_path],  self.room_dims_cache[graph_path]= self.mesh_embeddings(os.path.join(self.data_dir,graph_path))
         data["mesh_embedding"] = self.mesh_embeddings_cache[graph_path]
+        data["source_and_receiver_and_room_dims"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32'),np.array(self.room_dims_cache[graph_path]).astype('float32')))
         return data
         
     def __len__(self):
@@ -91,8 +92,29 @@ class RIRDataset(data.Dataset):
 
     def mesh_embeddings(self,full_graph_path):
         mesh = trimesh.load_mesh(full_graph_path)
+
+
+        if "GTURIR" in full_graph_path:
+            print("GTURIR veri setindeki bu meshi translate ediyoruz")
+            Y=np.max(mesh.vertices[:,2])/2
+            X=np.max(mesh.vertices[:,0])/2
+            #print(f" mesh.apply_transform(trimesh.transformations.translation_matrix([{-X},0,{-Y}]))")
+            mesh.apply_transform(trimesh.transformations.translation_matrix([-X,0,-Y]))
+
+
+
+
+
         if mesh is not None:
-           return self.create_projection_image(mesh)
+           v=np.array(mesh.vertices)
+           max_x=np.max(v[:,0])
+           min_x=np.min(v[:,0])
+           max_y=np.max(v[:,1])
+           min_y=np.min(v[:,1])
+           max_z=np.max(v[:,2])
+           min_z=np.min(v[:,2])
+           room_dims=[max_x-min_x,max_y-min_y,max_z-min_z]
+           return self.create_projection_image(mesh),room_dims
         else:
-           return np.zeros((cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)).astype(np.float32)
+           return np.zeros((cfg.IMAGE_RESOLUTION*cfg.IMAGE_RESOLUTION)).astype(np.float32), [0,0,0]
 

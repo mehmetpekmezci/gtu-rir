@@ -27,7 +27,6 @@ for file in mesh_files:
 		graph_path = move_path +  file[0:len(file)-4] +".pickle"
 		print("graph_path ",graph_path)
 		if(os.path.exists(full_mesh_path)):
-			print("came here ")
 			mesh = read_ply(full_mesh_path);
 			pre_transform = torch_geometric.transforms.FaceToEdge();
 			graph =pre_transform(mesh);

@@ -176,23 +176,22 @@ def evaluate():
             wave_name_list = []
             for j in range(batch_size):
                 mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[((i*batch_size)+j)]
+                mesh_embed,room_dims=rir_dataset.mesh_embeddings(os.path.join(mesh_directory,mesh_obj))#,source_location,receiver_location)
 
-                source_receiver = source_location+receiver_location
+                source_receiver = source_location+receiver_location+room_dims
                 txt_embedding_single = np.array(source_receiver).astype('float32')
 
                 txt_embedding_list.append(txt_embedding_single)
                 folder_name_list.append(folder_name)
                 wave_name_list.append(wave_name)
 
-            mesh_embedding_source_image,mesh_embedding_receiver_image=rir_dataset.mesh_embeddings(os.path.join(mesh_directory,mesh_obj),source_location,receiver_location)
-            mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.IMAGE_RESOLUTION/8*cfg.IMAGE_RESOLUTION/8))
-            mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.IMAGE_RESOLUTION/8*cfg.IMAGE_RESOLUTION/8))
-            mesh_embed=torch.concatenate((mesh_embedding_source_image_latents,mesh_embedding_receiver_image_latents),axis=1)
             print(mesh_embed)
             print(mesh_embed.shape)
             txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
+            mesh_embed=torch.from_numpy(np.array(mesh_embed)).unsqueeze(0)
             #txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
             txt_embedding = Variable(txt_embedding).detach().cuda()
+            mesh_embed = Variable(mesh_embed).detach().cuda()
             print(txt_embedding)
             print(txt_embedding.shape)
             #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")

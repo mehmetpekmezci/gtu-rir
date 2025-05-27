@@ -21,7 +21,10 @@ fi
 if [ "$GANMODELS" = "" ]
 then
         #GANMODELS="RIRT MESHTAE MESH2IR"
-        GANMODELS="RCRIR MESH2IR"
+        #GANMODELS="RCRIR MESH2IR"
+        #GANMODELS="RCRIR MeshProjectionRIR2"
+        GANMODELS="MeshProjectionRIR2"
+        #GANMODELS="MeshProjectionRIR"
 fi
 
 if [ "$RIR_GENERATORS_DIR" = "" ]

@@ -1,7 +1,6 @@
 #!/bin/bash
 
 #./run_eval.sh  $HOME/RIR_DATA/GTU-RIR-1.0/data/single-speaker $HOME/RIR_REPORT/GTURIR/MESH2IR-MSE GTURIR
-
 if [ $# -lt 2 ]
 then
 	echo "Usage $0 <MESH2IR_INPUT_DATA_DIR>  <GENERATED_RIRS_DIR>  <GTURIR|BUTReverbDB>"

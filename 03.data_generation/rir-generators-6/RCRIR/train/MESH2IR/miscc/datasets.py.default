@@ -15,7 +15,7 @@ import pickle
 
 import io
 from contextlib import contextmanager
-
+import trimesh
 
 
 class RIRDataset(data.Dataset):
@@ -73,21 +73,21 @@ class RIRDataset(data.Dataset):
     def __getitem__(self, index):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
-        s=(np.array(source_location).astype(np.float32))
-        r=(np.array(receiver_location).astype(np.float32))
-
-        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
-        s12.append(s[0])
-        s12.append(-s[2])
-        s12.append(s[1])
-
-        r12=[]
-        r12.append(r[0])
-        r12.append(-r[2])
-        r12.append(r[1])
-
-        source_location=s12
-        receiver_location=r12
+#        s=(np.array(source_location).astype(np.float32))
+#        r=(np.array(receiver_location).astype(np.float32))
+#
+#        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+#        s12.append(s[0])
+#        s12.append(-s[2])
+#        s12.append(s[1])
+#
+#        r12=[]
+#        r12.append(r[0])
+#        r12.append(-r[2])
+#        r12.append(r[1])
+#
+#        source_location=s12
+#        receiver_location=r12
 
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
@@ -133,6 +133,17 @@ class RIRDataset(data.Dataset):
              bpy.ops.wm.obj_import(filepath=full_graph_path)
         except:
              bpy.ops.wm.obj_import(filepath=full_graph_path)
+
+        if "GTURIR" in full_graph_path :
+
+
+
+            mesh = trimesh.load_mesh(full_graph_path, process=False)
+            Y=np.max(mesh.vertices[:,2])/2
+            X=np.max(mesh.vertices[:,0])/2
+
+            bpy.ops.object.select_all(action='SELECT') # DESELECT
+            bpy.ops.transform.translate(value=(-X, 0, -Y))
 
         #self.printMesh()
         #bpy.ops.wm.obj_import(filepath=full_graph_path,forward_axis='Z',up_axis='Y')

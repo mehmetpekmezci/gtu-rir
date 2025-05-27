@@ -143,6 +143,7 @@ def evaluate():
         print("embed_name   ",output_embed)
 
         graph_path,folder_name,wave_name,source_location,receiver_location = embeddings[0]
+        print(f"source_location={source_location} receiver_location={receiver_location} graph_path={graph_path} folder_name={folder_name}  wave_name={wave_name} ")
 
         full_graph_path = graph_directory + graph_path
         if not os.path.exists(full_graph_path):
@@ -155,6 +156,7 @@ def evaluate():
         data = next(iter(loader))
         data['edge_index'] = Variable(data['edge_index'])
         data['pos'] = Variable(data['pos'])
+        print(f"torch.max(data['pos'])={torch.max(data['pos'])}")
         data = data.cuda()
         
         mesh_embed = nn.parallel.data_parallel(mesh_net, data,  [gpus[0]])

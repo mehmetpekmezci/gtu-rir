@@ -2,6 +2,7 @@ import pymeshlab as ml
 import os
 import trimesh
 import sys
+import numpy as np
 #6810
 #13311
 
@@ -43,6 +44,17 @@ for subdir,dir,files in os.walk(path):
                 while mesh.faces.shape[0] < TARGET_Faces:
                       mesh.vertices, mesh.faces = trimesh.remesh.subdivide(mesh.vertices, mesh.faces)
                 print('--output mesh has ', mesh.vertices.shape[0], ' vertex and ', mesh.faces.shape[0], ' faces')
+                #if np.min(mesh.vertices[:,2]) >= 0 :
+                print(f"f_path={f_path}, GTURIR is in f_path = {'GTURIR' in f_path}")
+                if "GTURIR" in f_path:
+                   print("in GTURIR case")
+                   Y=np.max(mesh.vertices[:,2])/2
+                   print(f"YYYY={Y}")
+                   X=np.max(mesh.vertices[:,0])/2
+                   #X=0
+                   print(f"XXXX={X}")
+                   mesh.apply_transform(trimesh.transformations.translation_matrix([-X,0,-Y]))
+
                 mesh.export(f_path)
 
                 # reload mesh file from pymeshlab

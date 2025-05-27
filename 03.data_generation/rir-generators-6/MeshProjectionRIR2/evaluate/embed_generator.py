@@ -10,7 +10,8 @@ import sys
 
 
 def permuteGANInput(x,y,z,roomDepth,roomWidth,roomHeight):
-     return  x,roomWidth-y,z
+    # return  x,roomWidth-y,z
+ return  x-roomDepth/2,z,y-roomWidth/2
 
 rir_data_field_numbers={"timestamp":0,"speakerMotorIterationNo":1,"microphoneMotorIterationNo":2,"speakerMotorIterationDirection":3,"currentActiveSpeakerNo":4,"currentActiveSpeakerChannelNo":5,
 "physicalSpeakerNo":6,"microphoneStandInitialCoordinateX":7,"microphoneStandInitialCoordinateY":8,"microphoneStandInitialCoordinateZ":9,"speakerStandInitialCoordinateX":10,

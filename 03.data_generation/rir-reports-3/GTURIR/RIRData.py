@@ -146,35 +146,6 @@ class RIRData :
      #plt.close()    
          
          
- def plotSpectrogram(self,title,power_to_db,sr,show=False,saveToPath=None):
- 
- 
-     
-     
-     ###plt.figure(figsize=(8, 7))
-     fig, ax = plt.subplots()
-     #fig.set_figheight(self.SPECTROGRAM_DIM)
-     #img=librosa.display.specshow(power_to_db, sr=sr, x_axis='time', y_axis='mel', cmap='magma', hop_length=hop_length,ax=ax)
-     img=librosa.display.specshow(power_to_db, sr=sr, x_axis='time',  cmap='magma',  ax=ax)
-     
-     
-     fig.colorbar(img, ax=ax,label='dB')
-     #plt.title('Mel-Spectrogram (dB)'+title, fontdict=dict(size=18))
-     plt.title('MFCC '+title, fontdict=dict(size=18))
-     plt.xlabel('', fontdict=dict(size=15))
-     plt.ylabel('', fontdict=dict(size=15))
-     #plt.axis('off')
-     
-     
-     ###if show :
-     ###   plt.show()
-     ###if saveToPath is not None :
-     
-     ###plt.savefig(saveToPath, bbox_inches='tight', pad_inches=0)
-     plt.savefig(saveToPath)
-        
-     plt.close()    
-         
  
 
  def allignVertically(self,generated_data,real_data):
@@ -352,8 +323,8 @@ class RIRData :
          title=""
 
          ## plot only 1 of 10 samples.
-         if True or i%10 == 0 :
-            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
+#         if True or i%10 == 0 :
+#            self.plotWav(real_data,generated_data,MSE,SSIM,glitch_points,title,saveToPath=roomWorkDir+"/"+record_name+".wave.png")
          
          f = open(roomWorkDir+"/MSE.db.txt", "a")
          f.write(record_name+"="+str(MSE)+"\n")
@@ -397,23 +368,6 @@ class RIRData :
      return np.argmax(data[:limit]>=maximum_value)
 
         
- def localMaxDiffSum(self,signal1,signal2,numberOfChunks=64):
-     maxDiffSum=0
-     chunkSize=int(self.data_length/numberOfChunks)
-     for i in range(numberOfChunks):
-         #max1=np.max(np.abs(signal1[i:i+chunkSize]))
-         #max2=np.max(np.abs(signal2[i:i+chunkSize]))
-         max1=np.mean(np.abs(signal1[i:i+chunkSize]))
-         max2=np.mean(np.abs(signal2[i:i+chunkSize]))
-         maxDiff=abs(max2-max1)
-         maxDiffSum=maxDiffSum+maxDiff
-     return maxDiffSum/numberOfChunks
-
-
-
-# def getCrossCorrelation(self,generated,real):
-#     return scipy.signal.correlate(generated,real)[0]*10000
-#
 
 
 
