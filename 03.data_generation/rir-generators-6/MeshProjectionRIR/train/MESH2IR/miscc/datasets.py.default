@@ -65,23 +65,21 @@ class RIRDataset(data.Dataset):
 
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
 
-
-
-        s=(np.array(source_location).astype(np.float32))
-        r=(np.array(receiver_location).astype(np.float32))
-
-        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
-        s12.append(s[0])
-        s12.append(-s[2])
-        s12.append(s[1])
-
-        r12=[]
-        r12.append(r[0])
-        r12.append(-r[2])
-        r12.append(r[1])
-
-        source_location=s12
-        receiver_location=r12
+#        s=(np.array(source_location).astype(np.float32))
+#        r=(np.array(receiver_location).astype(np.float32))
+#
+#        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
+#        s12.append(s[0])
+#        s12.append(-s[2])
+#        s12.append(s[1])
+#
+#        r12=[]
+#        r12.append(r[0])
+#        r12.append(-r[2])
+#        r12.append(r[1])
+#
+#        source_location=s12
+#        receiver_location=r12
 
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
@@ -103,7 +101,7 @@ class RIRDataset(data.Dataset):
            if section_2 is not None :
               section_2,_ = section_2.to_planar()
               image[:,:,1] = np.array(Image.open(io.BytesIO(section_2.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0]
-              section_3= mesh.section(plane_origin=origin, plane_normal=[1, 0, 0])
+              section_3= mesh.section(plane_origin=origin, plane_normal=[0, 0, 1])
               if section_3 is not None :
                  section_3,_ = section_3.to_planar()
                  image[:,:,2] = np.array(Image.open(io.BytesIO(section_3.scene().save_image(resolution=[cfg.IMAGE_RESOLUTION,cfg.IMAGE_RESOLUTION],visible=False))))[:,:,0]

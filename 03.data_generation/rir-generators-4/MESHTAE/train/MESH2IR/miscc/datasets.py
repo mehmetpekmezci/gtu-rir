@@ -515,20 +515,27 @@ def load_mesh2(path, augments=[], request=[], seed=None):
         traceback.print_exc()
         mesh = trimesh.load_mesh(path, process=False)
 
-    if "GTURIR" in path:
-        print(f"GTURIR-1 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
-        V=np.empty(mesh.vertices.shape)
-        V[:,0]=mesh.vertices[:,0]
-        V[:,1]=-mesh.vertices[:,1]+np.max(mesh.vertices[:,1])
-        V[:,2]=mesh.vertices[:,2]
-        #V[:,1]=-mesh.vertices[:,2]+np.max(mesh.vertices[:,2])
-        #V[:,2]=mesh.vertices[:,1]
-        mesh=trimesh.Trimesh(V,mesh.faces)
-        print(f"GTURIR-2 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
+#    if "GTURIR" in path:
+##        print(f"GTURIR-1 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
+##        V=np.empty(mesh.vertices.shape)
+##        V[:,0]=mesh.vertices[:,0]
+###        V[:,1]=-mesh.vertices[:,1]+np.max(mesh.vertices[:,1])
+##        V[:,2]=mesh.vertices[:,2]
+##        #V[:,1]=-mesh.vertices[:,2]+np.max(mesh.vertices[:,2])
+##        #V[:,2]=mesh.vertices[:,1]
+##        mesh=trimesh.Trimesh(V,mesh.faces)
+##        print(f"GTURIR-2 mesh.vertices[:10,0]={mesh.vertices[:10,0]} mesh.vertices[:10,1]={mesh.vertices[:10,1]} mesh.vertices[:10,2]={mesh.vertices[:10,2]}")
+#         #print(f"np.min(mesh.vertices[:,2])={np.min(mesh.vertices[:,2])}")
+#         #if np.min(mesh.vertices[:,2]) >= -0.01:
+#                   print("GTURIR veri setindeki bu meshi translate ediyoruz")
+#                   Y=np.max(mesh.vertices[:,2])/2
+#                   X=np.max(mesh.vertices[:,0])/2
+#                   #print(f" mesh.apply_transform(trimesh.transformations.translation_matrix([{-X},0,{-Y}]))")
+#                   mesh.apply_transform(trimesh.transformations.translation_matrix([-X,0,-Y]))
 
 
-    if cfg.TRAIN.FLAG:
-        random.shuffle(mesh.faces)
+#    if cfg.TRAIN.FLAG:
+#        random.shuffle(mesh.faces)
 
     ### hala buyukse mesh.faces, o zaman elle silecegim. (bu duruma dusmemesi lazim, gelistirmenin az GPUlu makinede devam edebilmesi icin yapiyorum)
     if mesh.faces.shape[0] > TOTAL_NUMBER_OF_FACES and cfg.FORCE_DECIMATION :

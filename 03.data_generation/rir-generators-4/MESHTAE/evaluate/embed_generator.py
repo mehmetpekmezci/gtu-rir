@@ -10,7 +10,9 @@ import sys
 
 
 def permuteGANInput(x,y,z,roomDepth,roomWidth,roomHeight):
-     return  x,roomWidth-y,z
+     #return  x,roomWidth-y,z
+     #return  x-roomDepth/2,z,y-roomWidth/2
+     return  x,z,y
 
 rir_data_field_numbers={"timestamp":0,"speakerMotorIterationNo":1,"microphoneMotorIterationNo":2,"speakerMotorIterationDirection":3,"currentActiveSpeakerNo":4,"currentActiveSpeakerChannelNo":5,
 "physicalSpeakerNo":6,"microphoneStandInitialCoordinateX":7,"microphoneStandInitialCoordinateY":8,"microphoneStandInitialCoordinateZ":9,"speakerStandInitialCoordinateX":10,
@@ -61,6 +63,7 @@ for dataline in rir_data:
               roomDepth=float(dataline[int(rir_data_field_numbers['roomDepth'])])/CENT # CM to M
               roomWidth=float(dataline[int(rir_data_field_numbers['roomWidth'])])/CENT # CM to M
               roomHeight=float(dataline[int(rir_data_field_numbers['roomHeight'])])/CENT # CM to M
+
               microphoneCoordinatesX=float(dataline[int(rir_data_field_numbers['microphoneStandInitialCoordinateX'])])/CENT +float(dataline[int(rir_data_field_numbers['mic_RelativeCoordinateX'])])/CENT # CM to M
               microphoneCoordinatesY=float(dataline[int(rir_data_field_numbers['microphoneStandInitialCoordinateY'])])/CENT +float(dataline[int(rir_data_field_numbers['mic_RelativeCoordinateY'])])/CENT # CM to M
               microphoneCoordinatesZ=float(dataline[int(rir_data_field_numbers['mic_RelativeCoordinateZ'])])/CENT

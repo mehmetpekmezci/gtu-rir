@@ -183,7 +183,7 @@ def evaluate():
             wave_name_list = []
             for j in range(batch_size):
                 mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[((i*batch_size)+j)]
-
+                print(f"folder_name={folder_name} wave_name={wave_name} source_location={source_location} receiver_location={receiver_location}")
                 source_receiver = source_location+receiver_location
                 txt_embedding_single = np.array(source_receiver).astype('float32')
 
