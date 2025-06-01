@@ -2,29 +2,12 @@ import numpy as np
 np.seterr(divide='ignore', invalid='ignore') # ignore numpy runtime warning saying divide by zero or nan
 
 """
-This code attempts to make shadow casting functions in python that are computationally efficient.
-I did not want to make a c function and the bindings for python.  This code will be purely 
-python and relies on numpy's c bindings to vectorize the raycasting calculation.
-
-The result is a fairly fast raycasting numpy pased function that was fast enough for my 
-needs in a separate project.  Cython could probably improve the speed slightly but 
-I didn't have the need and most of the code happens in numpy.  Would really only improve the functions
-that still rely on for loops.
-
-Only depends on numpy.
-The demo depends on pygame if you want to see a visual demo of the raycasted shadows
-Note the demo shadow have a visual glitch caused by the fact that overlapping 
-boxes do not generate a point at the intersection. (I randomly generate boxes)
 
 Three main functions for raycasting:
 raycast_ray_segment : one ray, one segment 
 raycast_ray_segments : one ray, multi segments 
 raycast_rays_segments : multi rays, multi segments 
   
-This has been a long exercise for me enjoy.  
-"""
-
-"""
 ray: numpy array [p1, p2] (vector in space)
 segment: numpy array [p1, p2] (segment in space)
 return: the point of intersection alpha distance metric [x, y, a]
@@ -130,9 +113,12 @@ def raycast_rays_segments(rays, segments):
     T2 = (t8 + t9) / (t3 - t4)
     T1 = (((s_px + (s_dx * T2)).T - r_px) / r_dx).T
 
-    ix = (r_px + r_dx * T1.T).T
-    iy = (r_py + r_dy * T1.T).T
-
+    ix = ((r_px + r_dx * T1.T).T)
+    iy = ((r_py + r_dy * T1.T).T)
+    
+    ix=ix-np.sign(ix-r_px.reshape((r_px.shape[0],1)))*0.001*ix
+    iy=iy-np.sign(iy-r_py.reshape((r_py.shape[0],1)))*0.001*iy
+    
     intersections = np.stack((ix, iy, T1), axis=-1)
 
     bad_values = np.logical_or((T1 < 0), np.logical_or(T2 < 0, T2 > 1))
@@ -156,15 +142,7 @@ def generate_rays_from_points(view_position, points):
 
     return rays
 
-def generate_rays_circle(view_position, num=100):
-    angles = np.linspace(0, 2*np.pi, num=num)
 
-    rays = np.empty((angles.shape[0], 2, 2))
-    rays[:, 0, 0] = view_position[0]
-    rays[:, 0, 1] = view_position[1]
-    rays[:, 1, 0] = view_position[0] + np.cos(angles)
-    rays[:, 1, 1] = view_position[1] + np.sin(angles)
-    return rays
 
 def unique_points_from_segments(segments):
     all_points = segments.reshape(-1, 2)
@@ -213,99 +191,19 @@ def generate_random_box_segments(w, h, number=1, size_min=20, size_max=100):
 
     return np.concatenate((s1, s2, s3, s4), axis=0)
 
-def test_performance_difference():
-    import time
-
-    width = 1000
-    height = 1000
-    segments = generate_random_box_segments(width, height, 50)
-    points = unique_points_from_segments(segments)
-    rays = generate_rays_from_points((width/2, height/2), points)
-
-    print("Test Inputs: Rays, Segments, Points")
-    print("Shape of segments: {}".format(segments.shape))
-    print("Shape of points: {}".format(points.shape))
-    print("Shape of rays: {}".format(rays.shape))
-    print("Note there are 400 rays (twice the amount of points) because we desire a shadow effect\n")
-
-    print("============================ single ray single segment =========================\n")
-    print("""Description: This function takes in a single ray and a single segment.
-    The function returns the position hit and the alpha distance metric.
-    You must loop over every ray and segment to create a "light" effect.
-    This is very costly, looping in python is very slow.
-    Takes so long only one loop is done
-    returns none if no hit\n""")
-
-    n = 1
-    start = time.time()
-    for i in range(n):
-        for r in rays:
-            for s in segments:
-                raycast_ray_segment(r, s)
-    ray_segment_time = time.time() - start
-    ray_segment_avg = ray_segment_time/n
-    print("Total time: {}".format(ray_segment_time))
-    print("Took an average of {} seconds\n".format(ray_segment_avg))
-
-    print("============================= single ray multi segment =========================\n")
-    print("""Description: This function takes in a single ray and an array of segments.
-    The function returns the positions hit and the alpha distance metric.
-    You must only loop over the rays as the segment intersections is vertorized.
-    Returns a numpy array of every segment hit position and alpha distance metric.
-    returns non if no hit
-    100 loops are done\n""")
-
-    n = 100
-    start = time.time()
-    for i in range(n):
-        for r in rays:
-            raycast_ray_segments(r, segments)
-    ray_segments_time = time.time() - start
-    ray_segments_avg = ray_segments_time/n
-    print("Total time: {}".format(ray_segment_time))
-    print("Took an average of {} seconds\n".format(ray_segment_avg))
-
-    print("============================= single ray multi segment =========================\n")
-    print("""Description: This function takes in an array of rays and an array of segments.
-    The function returns the positions hit and the alpha distance metric.
-    The shape of the returned matrix is (rays, segments, (x,y,a) i.e. 3).
-    Note, the forced shape of the output means many fields will contain nan values as the 
-    not every ray hits every segment, or necessarily any segment at all. 
-    this requires additional processing of the return.
-    The closest_intersection_from_raycast_rays_segments function will return the closest point 
-    hit for each ray for each ray that hits a segment. 
-    1000 loops are done\n""")
-
-    n = 1000
-    start = time.time()
-    for i in range(n):
-        raycast_rays_segments(rays, segments)
-    rays_segments_time = time.time() - start
-    rays_segments_avg = rays_segments_time/n
-    print("Total time: {}".format(ray_segment_time))
-    print("Took an average of {} seconds\n".format(ray_segment_avg))
-
-    print("============================= Performance Results ================================\n")
-    print("Ray_Segment: 1x")
-    print("Ray_Segments: {}x".format(ray_segment_avg/ray_segments_avg))
-    print("Rays_Segments: {}x".format(ray_segment_avg/rays_segments_avg))
-    print()
-
 
 
 if __name__ == "__main__":
 
-    i = input("Input 1 for demo\nInput 2 for preformance test\nThen Press Enter: ")
 
-    if i == "2":
-        test_performance_difference()
-    else:
+
+    if True:
         import pygame
         from pygame.locals import *
         import sys
 
         pygame.init()
-        width, height = 500, 500
+        width, height = 256,256
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Visual Demo")
         clock = pygame.time.Clock()
@@ -320,7 +218,8 @@ if __name__ == "__main__":
         mouse_position = (0,0)
         method = True
         while True:
-            clock.tick(60)
+            #clock.tick(60)
+            clock.tick(1)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -333,19 +232,28 @@ if __name__ == "__main__":
 
             screen.fill((255,255,255))
 
-            # using fully vectorized method
-
-            if method:
-                rays = generate_rays_from_points(mouse_position, points)
-            else:
-                rays = generate_rays_circle(mouse_position, num=200)
+            print(mouse_position)
+            
+            rays = generate_rays_from_points(mouse_position, points)
 
             intersections = raycast_rays_segments(rays, segments)
             closest = closest_intersection_from_raycast_rays_segments(intersections)
-            print(closest[-1])
+#            pygame.draw.polygon(screen, (255,0,0), closest)
+#            for intersect in closest:
+#                pygame.draw.aaline(screen, (0, 255, 0), mouse_position, (intersect[0], intersect[1]))
+
+            for origin in closest:
+                    rays2=generate_rays_from_points(origin, points)
+                    intersections2 = raycast_rays_segments(rays2, segments)
+                    closest2=closest_intersection_from_raycast_rays_segments(intersections2)
+                    pygame.draw.polygon(screen, (0,0,255), closest2)
+                    for intersect2 in closest2:
+                          pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
+
             pygame.draw.polygon(screen, (255,0,0), closest)
             for intersect in closest:
                 pygame.draw.aaline(screen, (0, 255, 0), mouse_position, (intersect[0], intersect[1]))
+
 
             draw_segments(screen, segments)
             pygame.display.flip()
