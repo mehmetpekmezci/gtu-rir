@@ -1,0 +1,24 @@
+ xzy -> xyz
+
+Z
+|
+____Y
+|
+X
+
+den
+
+
+Z
+| Y
+ /
+___X
+
+cevirim sirasinda
+
+
+x=1, y=2  ise x=2 , y=-1
+x=-1, y=2 ise x=2, y=1
+x=
+_
+
