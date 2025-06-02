@@ -1,74 +1,14 @@
 import numpy as np
 np.seterr(divide='ignore', invalid='ignore') # ignore numpy runtime warning saying divide by zero or nan
-
-"""
-
-Three main functions for raycasting:
-raycast_ray_segment : one ray, one segment 
-raycast_ray_segments : one ray, multi segments 
-raycast_rays_segments : multi rays, multi segments 
-  
-ray: numpy array [p1, p2] (vector in space)
-segment: numpy array [p1, p2] (segment in space)
-return: the point of intersection alpha distance metric [x, y, a]
-none if no intersection
-"""
-def raycast_ray_segment(ray, segment):
-    r_px = ray[0, 0]
-    r_py = ray[0, 1]
-    r_dx = ray[1, 0] - ray[0, 0]
-    r_dy = ray[1, 1] - ray[0, 1]
-
-    s_px = segment[0, 0]
-    s_py = segment[0, 1]
-    s_dx = segment[1, 0] - segment[0, 0]
-    s_dy = segment[1, 1] - segment[0, 1]
-
-    r_mag = np.sqrt(r_dx * r_dx + r_dy * r_dy)
-    s_mag = np.sqrt(s_dx * s_dx + s_dy * s_dy)
-
-    if r_dx / r_mag == s_dx / s_mag and r_dy / r_mag == s_dy / s_mag:
-        return None
-
-    try:
-        T2 = (r_dx * (s_py - r_py) + r_dy * (r_px - s_px)) / (s_dx * r_dy - s_dy * r_dx)
-    except ZeroDivisionError:
-        T2 = (r_dx * (s_py - r_py) + r_dy * (r_px - s_px)) / (s_dx * r_dy - s_dy * r_dx - 0.01)
-
-    try:
-        T1 = (s_px + s_dx * T2 - r_px) / r_dx
-    except ZeroDivisionError:
-        T1 = (s_px + s_dx * T2 - r_px) / (r_dx - 0.01)
-
-    if T1 < 0: return None
-    if T2 < 0 or T2 > 1: return None
-
-    return (r_px + r_dx * T1, r_py + r_dy * T1, T1)
-
-"""
-ray: numpy array [p1, p2] (vector in space)
-segments: numpy array [:, (p1, p2)] (segments in space)
-return: a list of intersections and alpha distance metric [number_of_intersections, (x, y, a)]
-none if no intersections
-"""
-def raycast_ray_segments(ray, segments):
-    r_px = ray[0, 0]
-    r_py = ray[0, 1]
-    r_dx = ray[1, 0] - ray[0, 0]
-    r_dy = ray[1, 1] - ray[0, 1]
-
-    s_px = segments[:, 0, 0]
-    s_py = segments[:, 0, 1]
-    s_dx = segments[:, 1, 0] - segments[:, 0, 0]
-    s_dy = segments[:, 1, 1] - segments[:, 0, 1]
-
-    T2 = (r_dx * (s_py - r_py) + r_dy * (-s_px + r_px)) / (s_dx * r_dy - s_dy * r_dx)
-    T1 = (s_px + s_dx * T2 - r_px) / r_dx
-
-    # remove bad values
-    T1 = T1[np.logical_and(np.invert(T1 < 0), np.invert(np.logical_or(T2 < 0, T2 > 1)))]
-    return np.vstack((r_px + r_dx * T1, r_py + r_dy * T1, T1))
-
+import pygame
+from pygame.locals import *
+import sys
+import trimesh
+ 
+ 
+ 
+RESOLUTION=512
+ 
 """
 rays: numpy array [:, p1, p2] (vectors in space)
 segments: numpy array [:, (p1, p2)] (segments in space)
@@ -159,37 +99,30 @@ def closest_intersection_from_raycast_rays_segments(intersections):
     closest = np.nanargmin(intersections[:, :, 2], axis=1)
     return intersections[list(range(0, intersections.shape[0])), closest, :2]
 
-def segments_from_box(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    s = []
-    s.append([[x1,y1],[x2,y1]])
-    s.append([[x2,y1],[x2,y2]])
-    s.append([[x2,y2],[x1,y2]])
-    s.append([[x1,y2],[x1,y1]])
-    return s
+
+def segments_from_path2d(path2d,WIDTH,DEPTH):
+        segments=[]
+       
+        #print(vertices)
+        vertices=np.array(path2d.vertices)*MESH_EXPAND_RATIO
+        vertices[:,1]=vertices[:,1]*-1
+        vertices[:,0]+=(WIDTH/2)
+        vertices[:,1]+=(DEPTH/2)
+
+        for line in path2d.entities:
+                line_segments=vertices[line.points]
+                print(f"line_segments={line_segments}")
+                if line_segments.shape[0]>2:
+                     for i in range(1,line_segments.shape[0]-1):
+                              segments.append(line_segments[i-1:i+1])
+                else:
+                     segments.append(line_segments)
+        return segments
 
 def draw_segments(screen, segments):
     for p1, p2 in segments:
         pygame.draw.line(screen, (0,0,0), p1, p2, 1)
 
-def generate_random_box_segments(w, h, number=1, size_min=20, size_max=100):
-    x1 = np.random.randint(w, size=number) # random widths
-    y1 = np.random.randint(h, size=number) # random heights
-    x2 = x1 + np.random.randint(size_max-size_min, size=number)+size_min
-    y2 = y1 + np.random.randint(size_max-size_min, size=number)+size_min
-
-    p1 = np.column_stack((x1, y1))
-    p2 = np.column_stack((x2, y2))
-    p3 = np.column_stack((x2, y1))
-    p4 = np.column_stack((x1, y2))
-
-    s1 = np.column_stack((p1, p3)).reshape(-1,2,2)
-    s2 = np.column_stack((p3, p2)).reshape(-1,2,2)
-    s3 = np.column_stack((p2, p4)).reshape(-1,2,2)
-    s4 = np.column_stack((p4, p1)).reshape(-1,2,2)
-
-    return np.concatenate((s1, s2, s3, s4), axis=0)
 
 
 
@@ -198,21 +131,39 @@ if __name__ == "__main__":
 
 
     if True:
-        import pygame
-        from pygame.locals import *
-        import sys
 
+
+        full_graph_path=str(sys.argv[1]).strip()
+        mesh = trimesh.load_mesh(full_graph_path)
+        path3d= mesh.section(plane_origin=[0,0,0], plane_normal=[0, 1, 0]) 
+        path2d,matrix_to_3D = path3d.to_2D()
+        v=np.array(mesh.vertices)
+        max_x=np.max(v[:,0])
+        min_x=np.min(v[:,0])
+        max_y=np.max(v[:,1])
+        min_y=np.min(v[:,1])
+        max_z=np.max(v[:,2])
+        min_z=np.min(v[:,2])
+        
+        DEPTH=(max_x-min_x)
+        WIDTH=(max_z-min_z)
+        HEIGHT=(max_y-min_y)
+        max_dim=max(DEPTH,WIDTH)
+        MESH_EXPAND_RATIO=RESOLUTION/max_dim
+        
+        DEPTH=DEPTH*MESH_EXPAND_RATIO
+        WIDTH=WIDTH*MESH_EXPAND_RATIO
+
+        
         pygame.init()
-        width, height = 256,256
+        width, height = WIDTH*1.2,DEPTH*1.2
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("Visual Demo")
         clock = pygame.time.Clock()
 
-        segments = []
-        segments.extend(segments_from_box((10,10), (width-10, height-10)))
-        segments.extend(generate_random_box_segments(width, height, 50).tolist())
+        segments=segments_from_path2d(path2d,WIDTH,DEPTH)
         segments = np.array(segments)
-        print(segments)
+   
         points = unique_points_from_segments(segments)
 
         mouse_position = (0,0)
@@ -257,4 +208,5 @@ if __name__ == "__main__":
 
             draw_segments(screen, segments)
             pygame.display.flip()
-            pygame.display.set_caption("fps: " + str(clock.get_fps()))
+            pygame.image.save( screen, 'screen.png' )
+            #pygame.display.set_caption("fps: " + str(clock.get_fps()))
