@@ -4,8 +4,9 @@ import pygame
 from pygame.locals import *
 import sys
 import trimesh
- 
- 
+import torch 
+import time 
+import threading
  
 RESOLUTION=512
  
@@ -26,6 +27,51 @@ The closest_intersection_from_raycast_rays_segments will return the closest hit 
 that has at least one intersection with a segment 
 Not he alpha distance metric is smaller for closer intersections 
 """
+def raycast_rays_segments_(rays, segments):
+    rays=torch.from_numpy(rays).cuda()
+    segments=torch.from_numpy(segments).cuda()
+    
+    n_r = rays.shape[0]
+    n_s = segments.shape[0]
+
+    r_px = rays[:, 0, 0]
+    r_py = rays[:, 0, 1]
+    r_dx = rays[:, 1, 0] - rays[:, 0, 0]
+    r_dy = rays[:, 1, 1] - rays[:, 0, 1]
+
+    s_px = torch.tile(segments[:, 0, 0], (n_r, 1))
+    s_py = torch.tile(segments[:, 0, 1], (n_r, 1))
+    s_dx = torch.tile(segments[:, 1, 0] - segments[:, 0, 0], (n_r, 1))
+    s_dy = torch.tile(segments[:, 1, 1] - segments[:, 0, 1], (n_r, 1))
+
+    t1 = (s_py.T - r_py).T
+    t2 = (-s_px.T + r_px).T
+    t3 = (s_dx.T * r_dy).T
+    t4 = (s_dy.T * r_dx).T
+    t5 = (r_dx * t1.T).T
+    t6 = (r_dy * t2.T).T
+    t7 = t3 - t4
+    t8 = (r_dx * t1.T).T
+    t9 = (r_dy * t2.T).T
+
+    T2 = (t8 + t9) / (t3 - t4)
+    T1 = (((s_px + (s_dx * T2)).T - r_px) / r_dx).T
+
+    ix = ((r_px + r_dx * T1.T).T)
+    iy = ((r_py + r_dy * T1.T).T)
+    
+    ix=ix-torch.sign(ix-r_px.reshape((r_px.shape[0],1)))*0.001*ix
+    iy=iy-torch.sign(iy-r_py.reshape((r_py.shape[0],1)))*0.001*iy
+    
+    intersections = torch.stack((ix, iy, T1), axis=-1)
+
+    bad_values = torch.logical_or((T1 < 0), torch.logical_or(T2 < 0, T2 > 1))
+    intersections[bad_values, :] = torch.nan
+
+    intersections=intersections.detach().cpu().numpy()
+    
+    return intersections
+
 def raycast_rays_segments(rays, segments):
     n_r = rays.shape[0]
     n_s = segments.shape[0]
@@ -65,14 +111,6 @@ def raycast_rays_segments(rays, segments):
     intersections[bad_values, :] = np.nan
 
     return intersections
-
-
-def generate_rays_from_points_2(view_positions, points):
-    all_rays=np.empty((0, 2, 2))
-    for view_position in view_positions:
-        rays=generate_rays_from_points(view_position,points)
-        all_rays=np.concatenate((rays,all_rays), axis=0)
-    return all_rays
     
 def generate_rays_from_points(view_position, points):
     angles = np.arctan2(points[:, 1] - view_position[1], points[:, 0] - view_position[0])
@@ -132,6 +170,13 @@ def draw_segments(screen, segments):
         pygame.draw.line(screen, (0,0,0), p1, p2, 1)
 
 
+def a(origin,points,segments):
+                    rays2=generate_rays_from_points(origin, points)
+                    intersections2 = raycast_rays_segments(rays2, segments)
+                    closest2=closest_intersection_from_raycast_rays_segments(intersections2)
+                    pygame.draw.polygon(screen, (0,0,255), closest2)
+                    for intersect2 in closest2:
+                          pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
 
 
 if __name__ == "__main__":
@@ -171,7 +216,7 @@ if __name__ == "__main__":
 
         segments=segments_from_path2d(path2d,WIDTH,DEPTH)
         segments = np.array(segments)
-   
+        segments=segments[:100]
         points = unique_points_from_segments(segments)
 
         mouse_position = (0,0)
@@ -189,33 +234,56 @@ if __name__ == "__main__":
                     if event.key == K_m:
                         method = not method
 
+            t1=time.time()
             screen.fill((255,255,255))
 
-            print(mouse_position)
+            t2=time.time()
+            
             
             rays = generate_rays_from_points(mouse_position, points)
-
+            
+            t3=time.time()
+            
             intersections = raycast_rays_segments(rays, segments)
+
+            t4=time.time()
+
             closest = closest_intersection_from_raycast_rays_segments(intersections)
 #            pygame.draw.polygon(screen, (255,0,0), closest)
 #            for intersect in closest:
 #                pygame.draw.aaline(screen, (0, 255, 0), mouse_position, (intersect[0], intersect[1]))
 
-            print(f"len(closest)={len(closest)}")
-            
-            rays2=generate_rays_from_points_2(closest, points)
-            intersections2 = raycast_rays_segments(rays2, segments)
-            closest2=closest_intersection_from_raycast_rays_segments(intersections2)
-            pygame.draw.polygon(screen, (0,0,255), closest2)
-            #for intersect2 in closest2:
-            #              pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
+            t5=time.time()
+
+            threads=[]
+            for origin in closest:                    
+                    t51=time.time()
+                    t=threading.Thread(target=a,args=(origin,points,segments))
+                    t.start()
+                    threads.append(t)
+                    t52=time.time()
+
+            for t in threads:
+                    t.join()
+                    
+            t6=time.time()
 
             pygame.draw.polygon(screen, (255,0,0), closest)
             for intersect in closest:
                 pygame.draw.aaline(screen, (0, 255, 0), mouse_position, (intersect[0], intersect[1]))
 
+            t7=time.time()
 
             draw_segments(screen, segments)
             pygame.display.flip()
+            
             pygame.image.save( screen, 'screen.png' )
+            
+            print(f"t2-t1={t2-t1}")
+            print(f"t3-t2={t3-t2}")
+            print(f"t4-t3={t4-t3}")
+            print(f"t5-t4={t5-t4}")
+            print(f"t52-t51={t52-t51}")
+            print(f"t6-t5={t6-t5}")
+            print(f"t7-t6={t7-t6}")
             #pygame.display.set_caption("fps: " + str(clock.get_fps()))

@@ -1,10 +1,10 @@
 import numpy as np
-np.seterr(divide='ignore', invalid='ignore') # ignore numpy runtime warning saying divide by zero or nan
+torch.seterr(divide='ignore', invalid='ignore') # ignore numpy runtime warning saying divide by zero or nan
 import pygame
 from pygame.locals import *
 import sys
 import trimesh
- 
+import torch 
  
  
 RESOLUTION=512
@@ -35,10 +35,10 @@ def raycast_rays_segments(rays, segments):
     r_dx = rays[:, 1, 0] - rays[:, 0, 0]
     r_dy = rays[:, 1, 1] - rays[:, 0, 1]
 
-    s_px = np.tile(segments[:, 0, 0], (n_r, 1))
-    s_py = np.tile(segments[:, 0, 1], (n_r, 1))
-    s_dx = np.tile(segments[:, 1, 0] - segments[:, 0, 0], (n_r, 1))
-    s_dy = np.tile(segments[:, 1, 1] - segments[:, 0, 1], (n_r, 1))
+    s_px = torch.tile(segments[:, 0, 0], (n_r, 1))
+    s_py = torch.tile(segments[:, 0, 1], (n_r, 1))
+    s_dx = torch.tile(segments[:, 1, 0] - segments[:, 0, 0], (n_r, 1))
+    s_dy = torch.tile(segments[:, 1, 1] - segments[:, 0, 1], (n_r, 1))
 
     t1 = (s_py.T - r_py).T
     t2 = (-s_px.T + r_px).T
@@ -56,37 +56,29 @@ def raycast_rays_segments(rays, segments):
     ix = ((r_px + r_dx * T1.T).T)
     iy = ((r_py + r_dy * T1.T).T)
     
-    ix=ix-np.sign(ix-r_px.reshape((r_px.shape[0],1)))*0.001*ix
-    iy=iy-np.sign(iy-r_py.reshape((r_py.shape[0],1)))*0.001*iy
+    ix=ix-torch.sign(ix-r_px.reshape((r_px.shape[0],1)))*0.001*ix
+    iy=iy-torch.sign(iy-r_py.reshape((r_py.shape[0],1)))*0.001*iy
     
-    intersections = np.stack((ix, iy, T1), axis=-1)
+    intersections = torch.stack((ix, iy, T1), axis=-1)
 
-    bad_values = np.logical_or((T1 < 0), np.logical_or(T2 < 0, T2 > 1))
-    intersections[bad_values, :] = np.nan
+    bad_values = torch.logical_or((T1 < 0), torch.logical_or(T2 < 0, T2 > 1))
+    intersections[bad_values, :] = torch.nan
 
     return intersections
 
-
-def generate_rays_from_points_2(view_positions, points):
-    all_rays=np.empty((0, 2, 2))
-    for view_position in view_positions:
-        rays=generate_rays_from_points(view_position,points)
-        all_rays=np.concatenate((rays,all_rays), axis=0)
-    return all_rays
-    
 def generate_rays_from_points(view_position, points):
-    angles = np.arctan2(points[:, 1] - view_position[1], points[:, 0] - view_position[0])
+    angles = torch.arctan2(points[:, 1] - view_position[1], points[:, 0] - view_position[0])
     # sort angles for correct polygon recontruction
-    angles = np.flip(np.sort(np.concatenate((angles - 0.00001, angles + 0.00001))), 0)
+    angles = torch.flip(torch.sort(torch.concatenate((angles - 0.00001, angles + 0.00001))), 0)
 
     """ return unit vectors pointing to each point in the scene ...
         once the amount of points becomes very high, will become more
         efficent to just create equally spaced rays around the look position """
-    rays = np.empty((angles.shape[0], 2, 2))
+    rays = torch.empty((angles.shape[0], 2, 2))
     rays[:, 0, 0] = view_position[0]
     rays[:, 0, 1] = view_position[1]
-    rays[:, 1, 0] = view_position[0] + np.cos(angles)
-    rays[:, 1, 1] = view_position[1] + np.sin(angles)
+    rays[:, 1, 0] = view_position[0] + torch.cos(angles)
+    rays[:, 1, 1] = view_position[1] + torch.sin(angles)
 
     return rays
 
@@ -94,17 +86,17 @@ def generate_rays_from_points(view_position, points):
 
 def unique_points_from_segments(segments):
     all_points = segments.reshape(-1, 2)
-    return np.unique(all_points, axis=0)
+    return torch.unique(all_points, axis=0)
 
 def closest_intersection_from_raycast_rays_segments(intersections):
     # get closest intersections (rays, segments, (x,y,T1))
 
     # remove rays with no intersection (full nan return on the final axis, causes nanargmin to throw error)
     # kinda obscure code
-    n = (~np.isnan(intersections).any(axis=-1)).any(axis=-1)
+    n = (~torch.isnan(intersections).any(axis=-1)).any(axis=-1)
     intersections = intersections[n,:,:]
 
-    closest = np.nanargmin(intersections[:, :, 2], axis=1)
+    closest = torch.nanargmin(intersections[:, :, 2], axis=1)
     return intersections[list(range(0, intersections.shape[0])), closest, :2]
 
 
@@ -112,7 +104,7 @@ def segments_from_path2d(path2d,WIDTH,DEPTH):
         segments=[]
        
         #print(vertices)
-        vertices=np.array(path2d.vertices)*MESH_EXPAND_RATIO
+        vertices=torch.from_numpy(np.array(path2d.vertices)*MESH_EXPAND_RATIO)
         vertices[:,1]=vertices[:,1]*-1
         vertices[:,0]+=(WIDTH/2)
         vertices[:,1]+=(DEPTH/2)
@@ -145,13 +137,13 @@ if __name__ == "__main__":
         mesh = trimesh.load_mesh(full_graph_path)
         path3d= mesh.section(plane_origin=[0,0,0], plane_normal=[0, 1, 0]) 
         path2d,matrix_to_3D = path3d.to_2D()
-        v=np.array(mesh.vertices)
-        max_x=np.max(v[:,0])
-        min_x=np.min(v[:,0])
-        max_y=np.max(v[:,1])
-        min_y=np.min(v[:,1])
-        max_z=np.max(v[:,2])
-        min_z=np.min(v[:,2])
+        v=torch.array(mesh.vertices)
+        max_x=torch.max(v[:,0])
+        min_x=torch.min(v[:,0])
+        max_y=torch.max(v[:,1])
+        min_y=torch.min(v[:,1])
+        max_z=torch.max(v[:,2])
+        min_z=torch.min(v[:,2])
         
         DEPTH=(max_x-min_x)
         WIDTH=(max_z-min_z)
@@ -170,7 +162,7 @@ if __name__ == "__main__":
         clock = pygame.time.Clock()
 
         segments=segments_from_path2d(path2d,WIDTH,DEPTH)
-        segments = np.array(segments)
+        segments = torch.from_numpy(np.array(segments))
    
         points = unique_points_from_segments(segments)
 
@@ -201,14 +193,13 @@ if __name__ == "__main__":
 #            for intersect in closest:
 #                pygame.draw.aaline(screen, (0, 255, 0), mouse_position, (intersect[0], intersect[1]))
 
-            print(f"len(closest)={len(closest)}")
-            
-            rays2=generate_rays_from_points_2(closest, points)
-            intersections2 = raycast_rays_segments(rays2, segments)
-            closest2=closest_intersection_from_raycast_rays_segments(intersections2)
-            pygame.draw.polygon(screen, (0,0,255), closest2)
-            #for intersect2 in closest2:
-            #              pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
+            for origin in closest:
+                    rays2=generate_rays_from_points(origin, points)
+                    intersections2 = raycast_rays_segments(rays2, segments)
+                    closest2=closest_intersection_from_raycast_rays_segments(intersections2)
+                    pygame.draw.polygon(screen, (0,0,255), closest2)
+                    for intersect2 in closest2:
+                          pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
 
             pygame.draw.polygon(screen, (255,0,0), closest)
             for intersect in closest:
