@@ -13,6 +13,7 @@ from contextlib import redirect_stdout
 import io
 import pickle
 import trimesh
+import pygame
 
 
 class RIRDataset(data.Dataset):
@@ -68,16 +69,16 @@ class RIRDataset(data.Dataset):
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
         data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
-        data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"],data["room_height"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
+        data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"],data["room_depth"],data["room_width"],data["room_height"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
         return data
         
     def __len__(self):
         return len(self.embeddings)
 
-     def loadMeshAndProject(self,full_graph_path):
+    def loadMeshAndProject(self,full_graph_path):
         mesh = trimesh.load_mesh(full_graph_path)
         path3d= mesh.section(plane_origin=[0,0,0], plane_normal=[0, 1, 0]) 
-        path2d,matrix_to_3D = path3d.to_2D()
+        path2d,matrix_to_3D = path3d.to_planar()
         v=np.array(mesh.vertices)
         max_x=np.max(v[:,0])
         min_x=np.min(v[:,0])
@@ -91,47 +92,53 @@ class RIRDataset(data.Dataset):
         max_dim=max(DEPTH,WIDTH)
         return path2d,DEPTH,WIDTH,HEIGHT,max_dim
     
-    def generate_ray_cast_image(self,full_graph_path,path2d,DEPTH,WIDTH,origin):
+    def generate_ray_cast_image(self,full_graph_path,path2d,DEPTH,WIDTH,origin,MESH_EXPAND_RATIO):
             #https://github.com/RaubCamaioni/Raycast-Shadows-
             SAVE_IMAGE=True
             
-            width, height = WIDTH*1.2,DEPTH*1.2
+            #width, height = WIDTH*1.2,DEPTH*1.2
+            width, height = WIDTH,DEPTH
             screen = pygame.display.set_mode((width, height))
             pygame.display.set_caption("Visual Demo")
-            segments=segments_from_path2d(path2d,WIDTH,DEPTH)
+            segments=segments_from_path2d(path2d,WIDTH,DEPTH,MESH_EXPAND_RATIO)
             segments = np.array(segments)
             points = unique_points_from_segments(segments)
             screen.fill((255,255,255))
             rays = generate_rays_from_points(origin, points)
             intersections = raycast_rays_segments(rays, segments)
             closest = closest_intersection_from_raycast_rays_segments(intersections)
-            for origin in closest:  
-                    rays2=generate_rays_from_points(origin, points)
+            for origin2 in closest:  
+                    rays2=generate_rays_from_points(origin2, points)
                     intersections2 = raycast_rays_segments(rays2, segments)
                     closest2=closest_intersection_from_raycast_rays_segments(intersections2)
                     pygame.draw.polygon(screen, (0,0,255), closest2)
                     for intersect2 in closest2:
-                          pygame.draw.aaline(screen, (0, 255, 255), origin, (intersect2[0], intersect2[1]))
+                          pygame.draw.aaline(screen, (0, 255, 255), origin2, (intersect2[0], intersect2[1]))
             pygame.draw.polygon(screen, (100,0,0), closest)
             for intersect in closest:
-                  pygame.draw.aaline(screen, (255, 0, 0), mouse_position, (intersect[0], intersect[1]))
+                  pygame.draw.aaline(screen, (255, 0, 0), origin, (intersect[0], intersect[1]))
             draw_segments(screen, segments)
             pygame.display.flip()
             
             if SAVE_IMAGE:
-                 pygame.image.save( screen, full_graph_path+'.'+int(origin[0])+'.'+int(origin[1])+'.ray_cast_image.png' )
+                 filename=full_graph_path+'.'+str(int(origin[0]))+'.'+str(int(origin[1]))+'.ray_cast_image.png'
+                 print(filename)
+                 pygame.image.save( screen, filename )
      
-            return  np.array(pygame.surfarray.array2d(screen)).copy()
+            img1=np.array(pygame.surfarray.array3d(screen)).copy()
+            image = np.zeros((cfg.RAY_CASTING_IMAGE_RESOLUTION, cfg.RAY_CASTING_IMAGE_RESOLUTION, 3))
+            image[:img1.shape[0],:img1.shape[1],:]=img1[:,:,:]
+            return image.astype(np.float32).transpose(2, 0, 1)
             
     def mesh_embeddings(self,full_graph_path,source,receiver):
         full_graph_path=full_graph_path.replace(".pickle",".obj")
-        path2d,DEPTH,WIDTH,HEIGHT,max_dim=self.loadMeshAndProject(full_graph_path)
+        path2d,ROOM_DEPTH,ROOM_WIDTH,ROOM_HEIGHT,max_dim=self.loadMeshAndProject(full_graph_path)
         #mesh = trimesh.load_mesh(full_graph_path, process=False)
         #Y=np.max(mesh.vertices[:,2])/2
         #X=np.max(mesh.vertices[:,0])/2
         MESH_EXPAND_RATIO=cfg.RAY_CASTING_IMAGE_RESOLUTION/max_dim
-        DEPTH=DEPTH*MESH_EXPAND_RATIO
-        WIDTH=WIDTH*MESH_EXPAND_RATIO
+        DEPTH=ROOM_DEPTH*MESH_EXPAND_RATIO
+        WIDTH=ROOM_WIDTH*MESH_EXPAND_RATIO
         
         
 #
@@ -140,10 +147,13 @@ class RIRDataset(data.Dataset):
 #        s12.append(-s[2])
 #        s12.append(s[1])
 #            
-        ray_cast_image_source=self.rgenerate_ray_cast_image(path2d,DEPTH,WIDTH,(source[0],-source[2])) # -z ==y
-        ray_cast_image_receiver=self.rgenerate_ray_cast_image(path2d,DEPTH,WIDTH,(receiver[0],-receiver[2])) # -z ==y
+        ray_cast_image_source=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(float(source[0]),-float(source[2])),MESH_EXPAND_RATIO) # -z ==y
+        ray_cast_image_receiver=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(float(receiver[0]),-float(receiver[2])),MESH_EXPAND_RATIO) # -z ==y
+        #print(f"ray_cast_image_source.shape={ray_cast_image_source.shape}")
+        #print(f"ray_cast_image_source.shape={ray_cast_image_source.shape}")
+        #print(f"ray_cast_image_receiver.shape={ray_cast_image_receiver.shape}")
 
-        return ray_cast_image_source,ray_cast_image_receiver,HEIGHT
+        return ray_cast_image_source,ray_cast_image_receiver,ROOM_DEPTH,ROOM_WIDTH,ROOM_HEIGHT
 
  
 def raycast_rays_segments(rays, segments):
@@ -220,7 +230,7 @@ def closest_intersection_from_raycast_rays_segments(intersections):
     return intersections[list(range(0, intersections.shape[0])), closest, :2]
 
 
-def segments_from_path2d(path2d,WIDTH,DEPTH):
+def segments_from_path2d(path2d,WIDTH,DEPTH,MESH_EXPAND_RATIO):
         segments=[]
        
         #print(vertices)
@@ -231,7 +241,7 @@ def segments_from_path2d(path2d,WIDTH,DEPTH):
 
         for line in path2d.entities:
                 line_segments=vertices[line.points]
-                print(f"line_segments={line_segments}")
+                #print(f"line_segments={line_segments}")
                 if line_segments.shape[0]>2:
                      for i in range(1,line_segments.shape[0]-1):
                               segments.append(line_segments[i-1:i+1])

@@ -3,6 +3,7 @@
 #ulimit -n 100000
 #export CUDA_LAUNCH_BLOCKING=1
 
+
 CURRENT_DIR=$(pwd)
 
 DEFAULT_MAIN_DATA_DIR=$HOME/RIR_DATA
@@ -31,5 +32,9 @@ else
 fi
 
 cd $CURRENT_DIR/train/MESH2IR 
+
+export DISPLAY=:20
+Xvfb :20 -screen 0 1024x768x16 &
+sleep 1
 
 python3 main.py --cfg cfg/RIR_s1.yml --gpu 2 --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs 

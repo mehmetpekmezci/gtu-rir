@@ -208,8 +208,8 @@ class GANTrainer(object):
                 txt_embedding = data['source_and_receiver']
                 mesh_embedding_source_image = data['mesh_embeddings_source_image'] 
                 mesh_embedding_receiver_image = data['mesh_embeddings_receiver_image'] 
-                print(mesh_embedding_source_image)
-                print(mesh_embedding_receiver_image)
+                #print(mesh_embedding_source_image)
+                #print(mesh_embedding_receiver_image)
                 
                 
                 real_RIRs = Variable(real_RIR_cpu)
@@ -306,7 +306,7 @@ class GANTrainer(object):
                     print("saving model ...")                    
                     save_model(netG, netD, epoch, self.model_dir)
 
-                if generator_lr > 0.0000001 and i>0 and (i%1000==0) ):
+                if generator_lr > 0.0000001 and i>0 and (i%1000==0) :
                     rate=0.5
                     print(f"decreasing lr by 0.5 old generator_lr={generator_lr} discriminator_lr={discriminator_lr}")
                     generator_lr *= rate
