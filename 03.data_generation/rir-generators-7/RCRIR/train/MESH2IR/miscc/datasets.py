@@ -139,16 +139,25 @@ class RIRDataset(data.Dataset):
         MESH_EXPAND_RATIO=cfg.RAY_CASTING_IMAGE_RESOLUTION/max_dim
         DEPTH=ROOM_DEPTH*MESH_EXPAND_RATIO
         WIDTH=ROOM_WIDTH*MESH_EXPAND_RATIO
-        
-        
+        source=np.array(source).astype(np.float32)*MESH_EXPAND_RATIO 
+        receiver=np.array(receiver).astype(np.float32)*MESH_EXPAND_RATIO 
+
+        source[0]+=DEPTH/2 
+        source[2]=-source[2]
+        source[2]+=WIDTH/2 
+
+        receiver[0]+=DEPTH/2 
+        receiver[2]=-receiver[2] 
+        receiver[2]+=WIDTH/2 
 #
 #        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
 #        s12.append(s[0])
 #        s12.append(-s[2])
 #        s12.append(s[1])
 #            
-        ray_cast_image_source=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(float(source[0]),-float(source[2])),MESH_EXPAND_RATIO) # -z ==y
-        ray_cast_image_receiver=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(float(receiver[0]),-float(receiver[2])),MESH_EXPAND_RATIO) # -z ==y
+
+        ray_cast_image_source=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(source[2],source[0]),MESH_EXPAND_RATIO) # -z ==y
+        ray_cast_image_receiver=self.generate_ray_cast_image(full_graph_path,path2d,DEPTH,WIDTH,(receiver[2],receiver[0]),MESH_EXPAND_RATIO) # -z ==y
         #print(f"ray_cast_image_source.shape={ray_cast_image_source.shape}")
         #print(f"ray_cast_image_source.shape={ray_cast_image_source.shape}")
         #print(f"ray_cast_image_receiver.shape={ray_cast_image_receiver.shape}")
