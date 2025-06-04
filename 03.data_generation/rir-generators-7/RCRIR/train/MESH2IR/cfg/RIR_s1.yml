@@ -9,7 +9,7 @@ DATA_DIR: '../dataset'
   #NET_G: '../pre-trained-models/netG.pth'
   #NET_D: '../pre-trained-models/netD.pth'
 
-RAY_CASTING_IMAGE_RESOLUTION: 8 # 256x256x3 input,  4x 256/8 x 256/8 = 4096 output
+RAY_CASTING_IMAGE_RESOLUTION: 256 # 256x256x3 input,  4x 256/8 x 256/8 = 4096 output
 MAX_RAY_CASTING_DISTANCE: 15 # meters
 RIRSIZE: 4096
 WORKERS: 4 #4
@@ -22,8 +22,8 @@ TRAIN:
     SNAPSHOT_INTERVAL: 25
     # DISCRIMINATOR_LR: 0.000004
     # GENERATOR_LR: 0.000004
-    DISCRIMINATOR_LR: 0.01
-    GENERATOR_LR: 0.0001
+    DISCRIMINATOR_LR: 0.001
+    GENERATOR_LR: 0.00001
     COEFF:
       KL: 2.0
 
