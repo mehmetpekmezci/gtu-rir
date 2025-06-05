@@ -28,12 +28,13 @@ from miscc.config import cfg
 
 #embeddings = [mesh_path,RIR_path,source,receiver]
 class TextDataset(data.Dataset):
-    def __init__(self, data_dir, split='train',rirsize=4096): #, transform=None, target_transform=None):
+    def __init__(self, data_dir, split='train',rirsize=4096,embedding_file_name="training.embeddings.pickle"): #, transform=None, target_transform=None):
 
         self.rirsize = rirsize
         self.data = []
         self.data_dir = data_dir       
         self.bbox = None
+        self.embedding_file_name=embedding_file_name
         
   
         self.embeddings = self.load_embedding(data_dir)
@@ -129,7 +130,7 @@ class TextDataset(data.Dataset):
 
     def load_embedding(self, data_dir):
         #embedding_directory   = self.data_dir+'/embeddings.pickle'  
-        embedding_directory   = self.data_dir+'/training.embeddings.pickle'  
+        embedding_directory   = self.data_dir+'/'+self.embedding_file_name  
         with open(embedding_directory, 'rb') as f:
             embeddings = pickle.load(f)
         return embeddings
@@ -151,6 +152,7 @@ class TextDataset(data.Dataset):
 
         graph = self.get_graph(full_graph_path);
         graph.RIR = RIR
+        graph.full_RIR_path=full_RIR_path
         graph.embeddings = embedding
 
       
