@@ -96,10 +96,11 @@ def load_network_stageI(netG_path,mesh_net_path):
         return netG, mesh_net
 
 def evaluate(main_dir,validation_pickle_file):
+    torch.set_default_device('cuda:0')
     cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
     mesh_net_path = "Models/mesh_net.pth"
-    batch_size = 1000
+    batch_size = 500
     fs = 16000
     netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
@@ -107,7 +108,7 @@ def evaluate(main_dir,validation_pickle_file):
 
 
     dataset = TextDataset(main_dir, 'train', rirsize=cfg.RIRSIZE,embedding_file_name=validation_pickle_file)
-    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=3,)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,)
     mses=[]
     ssims=[]
      
@@ -129,9 +130,8 @@ def evaluate(main_dir,validation_pickle_file):
                 data = data.cuda()
 
                 GPU_NOs=[0]
-                mesh_embed = nn.parallel.data_parallel(mesh_net, data,  GPU_NOs)
-                inputs = (txt_embedding,mesh_embed)
-                _, fake_RIRs,c_code = nn.parallel.data_parallel(netG, inputs,  GPU_NOs)
+                mesh_embed = mesh_net.forward(data)
+                _, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
                 fake_RIR_only = fake_RIRs[:,:,0:(4096-128)]
                 fake_energy = torch.median(fake_RIRs[:,:,(4096-128):4096])*10
                 fake_RIRs_computed = fake_RIR_only*fake_energy
