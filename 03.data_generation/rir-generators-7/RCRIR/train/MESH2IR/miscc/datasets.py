@@ -94,7 +94,7 @@ class RIRDataset(data.Dataset):
     
     def generate_ray_cast_image(self,full_graph_path,path2d,DEPTH,WIDTH,origin,MESH_EXPAND_RATIO):
             #https://github.com/RaubCamaioni/Raycast-Shadows-
-            SAVE_IMAGE=True
+            SAVE_IMAGE=False
             
             #width, height = WIDTH*1.2,DEPTH*1.2
             width, height = WIDTH,DEPTH
@@ -122,7 +122,7 @@ class RIRDataset(data.Dataset):
             
             if SAVE_IMAGE:
                  filename=full_graph_path+'.'+str(int(origin[0]))+'.'+str(int(origin[1]))+'.ray_cast_image.png'
-                 print(filename)
+                 #print(filename)
                  pygame.image.save( screen, filename )
      
             img1=np.array(pygame.surfarray.array3d(screen)).copy()

@@ -39,6 +39,10 @@ from miscc.config import cfg
 from miscc.datasets import TextDataset
 from miscc.config import cfg, cfg_from_file
 
+from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
+import torchaudio
+
+SSIM_DATA_RANGE=4 # 1 means lower SSIM, 2,4,8... means greater ssim, but will stay parralel 
 
 def pure_ssim(real_data,generated_data):
          generated_data_tiled=torch.tile(generated_data, (2, 1)) ## duplicate 1d data to 2d
@@ -46,11 +50,11 @@ def pure_ssim(real_data,generated_data):
          generated_data_tiled=torch.reshape(generated_data_tiled,(1,generated_data_tiled.shape[0],generated_data_tiled.shape[1],generated_data_tiled.shape[2]))
          real_data_tiled=torch.reshape(real_data_tiled,(1,real_data_tiled.shape[0],real_data_tiled.shape[1],real_data_tiled.shape[2]))
 
-         SSIM=ssim(generated_data_tiled,real_data_tiled, data_range=1, size_average=True).item()
+         SSIM=ssim(generated_data_tiled,real_data_tiled, data_range=SSIM_DATA_RANGE, size_average=True).item()
          return SSIM
 
 def compute_error(real_RIRs, fake_RIRs):
-    return nn.MSELoss()(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968]),pure_ssim(real_RIRs[:,:,0:3968],fake_RIRs[:,:,0:3968])
+    return nn.MSELoss()(real_RIRs,fake_RIRs),pure_ssim(real_RIRs,fake_RIRs)
 
 
 
@@ -95,7 +99,7 @@ def evaluate(main_dir,validation_pickle_file):
     cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
     mesh_net_path = "Models/mesh_net.pth"
-    batch_size = 256
+    batch_size = 1000
     fs = 16000
     netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
@@ -103,11 +107,12 @@ def evaluate(main_dir,validation_pickle_file):
 
 
     dataset = TextDataset(main_dir, 'train', rirsize=cfg.RIRSIZE,embedding_file_name=validation_pickle_file)
-    dataloader = DataLoader(dataset, batch_size=cfg.TRAIN.BATCH_SIZE , num_workers=int(cfg.WORKERS),)
-     mses=[]
-     ssims=[]
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=3,)
+    mses=[]
+    ssims=[]
      
-    for i, data in enumerate(data_loader, 0):
+    for i, data in enumerate(dataloader, 0):
+        with torch.no_grad():
                 full_real_RIR_paths=data.full_RIR_path
                 real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
                 txt_embedding = torch.from_numpy(np.array(data['embeddings']))
@@ -118,6 +123,7 @@ def evaluate(main_dir,validation_pickle_file):
                 txt_embedding = Variable(txt_embedding)
 
 
+                real_RIRs = real_RIRs[:,:,0:(4096-128)]
                 real_RIRs = real_RIRs.cuda()
                 txt_embedding = txt_embedding.cuda()
                 data = data.cuda()
@@ -126,15 +132,16 @@ def evaluate(main_dir,validation_pickle_file):
                 mesh_embed = nn.parallel.data_parallel(mesh_net, data,  GPU_NOs)
                 inputs = (txt_embedding,mesh_embed)
                 _, fake_RIRs,c_code = nn.parallel.data_parallel(netG, inputs,  GPU_NOs)
-                fake_IR_only = fake_IR[:,0:(4096-128)]
-                fake_energy = np.median(fake_IR[:,(4096-128):4096])*10
-                fake_IRs = fake_IR_only*fake_energy
-                mse,ssim=compute_error(real_RIRs,fake_RIRs)
+                fake_RIR_only = fake_RIRs[:,:,0:(4096-128)]
+                fake_energy = torch.median(fake_RIRs[:,:,(4096-128):4096])*10
+                fake_RIRs_computed = fake_RIR_only*fake_energy
+                mse,ssim=compute_error(real_RIRs,fake_RIRs_computed)
+                print(f"{i}/{len(dataloader)} MSE={mse} SSIM={ssim}",flush=True)
                 mses.append(mse)
                 ssims.append(ssim)
-#               for j in range(len(fake_RIRs)):
+#               for j in range(len(fake_RIRs_computed)):
 #                   fake_RIR_path=full_real_RIR_paths+'.MESH2IR.wav'
-#                   fake_IR = np.array(fake[j].to("cpu").detach())
+#                   fake_IR = np.array(fake_RIRs_computed[j].to("cpu").detach())
 #                   f = WaveWriter(fake_RIR_path, channels=1, samplerate=fs)
 #                   f.write(np.array(fake_IR))
 
@@ -142,7 +149,7 @@ def evaluate(main_dir,validation_pickle_file):
     MEAN_MSE=np.array(mses).mean()
     MEAN_SSIM=np.array(ssims).mean()
     
-    print(f"MEAN_MSE={MEAN_MSE} MEAN_SSIM={MEAN_SSIM}")
+    print(f"MEAN_MSE={MEAN_MSE} MEAN_SSIM={MEAN_SSIM}",flush=True)
  
 
 evaluate(str(sys.argv[1]).strip(),str(sys.argv[2]).strip())

@@ -22,6 +22,6 @@ fi
 
 cd $CURRENT_DIR/evaluate
 
-python3 evaluate.py  $MESH2IR_TRAINING_DATA/3D-FRONT/outputs   validation.embeddings.pickle
+python3 evaluate.py  $MESH2IR_EVALUATION_DATA/3D-FRONT/outputs   validation.embeddings.pickle
 
 
