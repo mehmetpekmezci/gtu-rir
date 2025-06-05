@@ -42,6 +42,9 @@ from miscc.config import cfg, cfg_from_file
 from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
 import torchaudio
 
+import gc
+
+
 SSIM_DATA_RANGE=4 # 1 means lower SSIM, 2,4,8... means greater ssim, but will stay parralel 
 
 def pure_ssim(real_data,generated_data):
@@ -53,16 +56,15 @@ def pure_ssim(real_data,generated_data):
          SSIM=ssim(generated_data_tiled,real_data_tiled, data_range=SSIM_DATA_RANGE, size_average=True).item()
          return SSIM
 
-def compute_error(real_RIRs, fake_RIRs):
-    return nn.MSELoss()(real_RIRs,fake_RIRs),pure_ssim(real_RIRs,fake_RIRs)
-
-
 
 
 def load_network_stageI(netG_path,mesh_net_path):
-        from model import STAGE1_G, STAGE1_D, MESH_NET
+        from model import STAGE1_G, STAGE1_D
+        from model_mesh import MESH_TRANSFORMER_AE
+
         netG = STAGE1_G()     
-        mesh_net =MESH_NET() 
+        mesh_net = MESH_TRANSFORMER_AE()
+
 
 
         try:
@@ -96,49 +98,63 @@ def load_network_stageI(netG_path,mesh_net_path):
         return netG, mesh_net
 
 def evaluate(main_dir,validation_pickle_file):
-    torch.set_default_device('cuda:0')
+#    torch.set_default_device('cuda:0')
     cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
     mesh_net_path = "Models/mesh_net.pth"
-    batch_size = 500
+    batch_size = 1600
     fs = 16000
     netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
     mesh_net.eval()
 
-
     dataset = TextDataset(main_dir, 'train', rirsize=cfg.RIRSIZE,embedding_file_name=validation_pickle_file)
-    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,gae_mesh_net=mesh_net)
     mses=[]
     ssims=[]
-     
-    for i, data in enumerate(dataloader, 0):
+    mse_loss=nn.MSELoss()     
+    for i, data in enumerate(dataloader):
         with torch.no_grad():
                 full_real_RIR_paths=data.full_RIR_path
-                real_RIR_cpu = torch.from_numpy(np.array(data['RIR']))
+                real_RIRs = torch.from_numpy(np.array(data['RIR']))
                 txt_embedding = torch.from_numpy(np.array(data['embeddings']))
-                data.pop('RIR')
-                data.pop('embeddings')
+                mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings']))
 
-                real_RIRs = Variable(real_RIR_cpu)
-                txt_embedding = Variable(txt_embedding)
+                #data.pop('RIR')
+                #data.pop('embeddings')
+
+                #real_RIRs = Variable(real_RIR_cpu)
+                #txt_embedding = Variable(txt_embedding)
 
 
                 real_RIRs = real_RIRs[:,:,0:(4096-128)]
                 real_RIRs = real_RIRs.cuda()
                 txt_embedding = txt_embedding.cuda()
+                mesh_embed = txt_embedding.cuda()
                 data = data.cuda()
 
                 GPU_NOs=[0]
-                mesh_embed = mesh_net.forward(data)
+
                 _, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
+                fake_RIRs.detach().cpu()
+                real_RIRs.detach().cpu()
+                data.detach().cpu()
+                txt_embedding.detach().cpu()
+                mesh_embed.detach().cpu()
                 fake_RIR_only = fake_RIRs[:,:,0:(4096-128)]
                 fake_energy = torch.median(fake_RIRs[:,:,(4096-128):4096])*10
-                fake_RIRs_computed = fake_RIR_only*fake_energy
-                mse,ssim=compute_error(real_RIRs,fake_RIRs_computed)
+                fake_RIRs = fake_RIR_only*fake_energy
+                mse=mse_loss(real_RIRs,fake_RIRs).item()
+                ssim=pure_ssim(real_RIRs,fake_RIRs)
                 print(f"{i}/{len(dataloader)} MSE={mse} SSIM={ssim}",flush=True)
                 mses.append(mse)
                 ssims.append(ssim)
+                torch.cuda.empty_cache()
+                del mesh_embed
+                del fake_RIRs
+                del real_RIRs
+                del data
+                gc.collect()
 #               for j in range(len(fake_RIRs_computed)):
 #                   fake_RIR_path=full_real_RIR_paths+'.MESH2IR.wav'
 #                   fake_IR = np.array(fake_RIRs_computed[j].to("cpu").detach())

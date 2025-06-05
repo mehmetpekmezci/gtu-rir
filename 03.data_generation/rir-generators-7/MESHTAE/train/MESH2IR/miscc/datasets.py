@@ -87,13 +87,13 @@ class MeshDataset(data.Dataset):
             
 
 class TextDataset(data.Dataset):
-    def __init__(self, data_dir,embeddings,mesh_embeddings, split='train',rirsize=4096): #, transform=None, target_transform=None):
+    def __init__(self, data_dir,embeddings,mesh_embeddings, split='train',rirsize=4096,gae_mesh_net=None): #, transform=None, target_transform=None):
 
         self.rirsize = rirsize
         self.data = []
         self.data_dir = data_dir       
         self.bbox = None
-        
+        self.gae_mesh_net=gae_mesh_net 
   
         self.embeddings = embeddings
         self.mesh_embeddings = mesh_embeddings
@@ -144,22 +144,6 @@ class TextDataset(data.Dataset):
 
         data_dir = self.data_dir
 
-#        s=(np.array(source_location).astype(np.float32))
-#        r=(np.array(receiver_location).astype(np.float32))
-        
-#        s12=[] ## sadece bu olabilir, hepsinde calisan durum.
-#        s12.append(s[0])
-#        s12.append(-s[2])
-#        s12.append(s[1])
-#
-#        r12=[]
-#        r12.append(r[0])
-#        r12.append(-r[2])
-#        r12.append(r[1])
-#
-#        source_location=s12
-#        receiver_location=r12
-
         full_graph_path = os.path.join(data_dir,graph_path)
         full_RIR_path  = os.path.join(data_dir,RIR_path)
         source_receiver = source_location+receiver_location
@@ -170,17 +154,41 @@ class TextDataset(data.Dataset):
         
         data["RIR"] = RIR
         data["embeddings"] =  np.array(source_receiver).astype('float32')
-        data["mesh_embeddings"] = self.mesh_embeddings[graph_path]
-
+        if self.mesh_embeddings is not None and graph_path in self.mesh_embeddings:
+           data["mesh_embeddings"] = self.mesh_embeddings[graph_path]
+        else:
+            if os.path.exists(full_graph_path):
+               data["mesh_embeddings"] = get_mesh_embedding(self.gae_mesh_net,full_graph_path)
+            else:
+               data["mesh_embeddings"] = None
         return data
         
     def __len__(self):
         return len(self.embeddings)
 
+def get_mesh_embedding(mesh_net,full_graph_path):
+           full_mesh_path = full_graph_path.replace('.pickle','.obj')
+           #triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
+           triangle_coordinates,normals,centers,areas = load_mesh2(full_graph_path)
+           real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
+           triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
+           triangle_coordinates=torch.from_numpy(triangle_coordinates).float()
+           normals=torch.from_numpy(normals).float()
+           centers=torch.from_numpy(centers).float()
+           areas=torch.from_numpy(areas).float()
+           faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
+           faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
+           #faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
+           faceData=faceData.unsqueeze(0).detach().cuda()
+           #time.sleep(10)
+           faceData_predicted , latent_vector =  mesh_net.forward(faceData)
+           faceData=faceData.detach().cpu()
+           faceData_predicted=faceData_predicted.detach().cpu()
+           return faceData_predicted.detach().cpu(),latent_vector.squeeze().detach().cpu()
 
 
 def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_directory,data_set_name,obj_file_name_list):
-    GENERATE_SAMPLES_FOR_DOCUMENTING=True
+    GENERATE_SAMPLES_FOR_DOCUMENTING=False
 
     print("build_mesh_embeddings_for_evaluation_data started...")
     from model_mesh import MESH_TRANSFORMER_AE
@@ -211,24 +219,8 @@ def build_mesh_embeddings_for_evaluation_data(mesh_net_path,data_dir,embedding_d
         if os.path.exists(full_graph_path):
          if graph_path not in  mesh_embeddings:
            print(f"calculating mesh embedding of {graph_path}")
-           full_mesh_path = full_graph_path.replace('.pickle','.obj')
-           #triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
-           triangle_coordinates,normals,centers,areas = load_mesh2(full_graph_path)
-           real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas
-           triangle_coordinates,normals,centers,areas = normalize_mesh_values(triangle_coordinates,normals,centers,areas)
-           triangle_coordinates=torch.from_numpy(triangle_coordinates).float()
-           normals=torch.from_numpy(normals).float()
-           centers=torch.from_numpy(centers).float()
-           areas=torch.from_numpy(areas).float()
-           faceDataDim=triangle_coordinates.shape[1]+centers.shape[1]+normals.shape[1]+areas.shape[1]
-           faceData=torch.cat((triangle_coordinates,normals,centers,areas),1)
-           #faceData=faceData.unsqueeze(0).detach().to(device='cuda:2')
-           faceData=faceData.unsqueeze(0).detach().cuda()
-           #time.sleep(10)
-           faceData_predicted , latent_vector =  gae_mesh_net.forward(faceData)
-           faceData=faceData.detach().cpu()
-           faceData_predicted=faceData_predicted.detach().cpu()
-           mesh_embeddings[graph_path]=latent_vector.squeeze().detach().cpu()
+           faceData_predicted,latent_vector=get_mesh_embedding(gae_mesh_net,full_graph_path)
+           mesh_embeddings[graph_path]=latent_vector
 
            #triangle_coordinates=torch.autograd.Variable(torch.from_numpy(triangle_coordinates)).float()
            #normals=torch.autograd.Variable(torch.from_numpy(normals)).float()
