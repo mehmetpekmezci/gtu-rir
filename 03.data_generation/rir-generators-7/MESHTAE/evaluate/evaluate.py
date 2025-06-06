@@ -57,6 +57,14 @@ def pure_ssim(real_data,generated_data):
          return SSIM
 
 
+def load_embedding(data_dir,embedding_file_name):
+        print("Loading embeddings ...")
+        embedding_directory   = data_dir+'/'+embedding_file_name
+        with open(embedding_directory, 'rb') as f:
+            embeddings = pickle.load(f)
+        print(embedding_file_name+" embeddings are loaded ...")
+        return embeddings
+
 
 def load_network_stageI(netG_path,mesh_net_path):
         from model import STAGE1_G, STAGE1_D
@@ -107,9 +115,9 @@ def evaluate(main_dir,validation_pickle_file):
     netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
     mesh_net.eval()
-
-    dataset = TextDataset(main_dir, 'train', rirsize=cfg.RIRSIZE,embedding_file_name=validation_pickle_file)
-    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,gae_mesh_net=mesh_net)
+    embeddings = load_embedding(main_dir,'validation.embeddings.pickle')
+    dataset = TextDataset(main_dir,embeddings,None, gae_mesh_net=mesh_net)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0)
     mses=[]
     ssims=[]
     mse_loss=nn.MSELoss()     

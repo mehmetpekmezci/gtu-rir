@@ -167,7 +167,7 @@ class TextDataset(data.Dataset):
         return len(self.embeddings)
 
 def get_mesh_embedding(mesh_net,full_graph_path):
-           full_mesh_path = full_graph_path.replace('.pickle','.obj')
+           full_graph_path = full_graph_path.replace('.pickle','.obj')
            #triangle_coordinates,normals,centers,areas = load_mesh(full_graph_path)
            triangle_coordinates,normals,centers,areas = load_mesh2(full_graph_path)
            real_triangle_coordinates,real_normals,real_centers,real_areas = triangle_coordinates,normals,centers,areas

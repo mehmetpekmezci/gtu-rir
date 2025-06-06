@@ -1,9 +1,7 @@
 from __future__ import print_function
 from six.moves import range
 from PIL import Image
-from diffusers.models import AutoencoderKL
 
-from miscc.datasets import RIRDataset
 
 import torch.backends.cudnn as cudnn
 import torch
@@ -37,184 +35,143 @@ import dateutil.tz
 
 import librosa
 
+from miscc.config import cfg
+from miscc.datasets import TextDataset
 from miscc.config import cfg, cfg_from_file
 
+from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
+import torchaudio
 
-import requests
-from huggingface_hub import configure_http_backend
-
-def backend_factory() -> requests.Session:
-    session = requests.Session()
-    session.verify = False
-    return session
-configure_http_backend(backend_factory=backend_factory)
+import gc
 
 
+SSIM_DATA_RANGE=4 # 1 means lower SSIM, 2,4,8... means greater ssim, but will stay parralel 
 
-generated_rirs_dir=str(sys.argv[1]).strip()
-metadata_dirname=str(sys.argv[2]).strip()
-metadata_dir = generated_rirs_dir+"/"+metadata_dirname
+def pure_ssim(real_data,generated_data):
+         generated_data_tiled=torch.tile(generated_data, (2, 1)) ## duplicate 1d data to 2d
+         real_data_tiled=torch.tile(real_data, (2, 1)) ## duplicate 1d data to 2d
+         generated_data_tiled=torch.reshape(generated_data_tiled,(1,generated_data_tiled.shape[0],generated_data_tiled.shape[1],generated_data_tiled.shape[2]))
+         real_data_tiled=torch.reshape(real_data_tiled,(1,real_data_tiled.shape[0],real_data_tiled.shape[1],real_data_tiled.shape[2]))
 
-
-
-
-def weights_init(m):
-    classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
-        m.weight.data.normal_(0.0, 0.02)
-    elif classname.find('BatchNorm') != -1:
-        m.weight.data.normal_(1.0, 0.02)
-        m.bias.data.fill_(0)
-    elif classname.find('Linear') != -1:
-        m.weight.data.normal_(0.0, 0.02)
-        if m.bias is not None:
-            m.bias.data.fill_(0.0)
-
-def load_network_stageI(netG_path):
-        from model import STAGE1_G, STAGE1_D
-        netG = STAGE1_G()
-        netG.apply(weights_init)
-
-        print(netG)
-       
+         SSIM=ssim(generated_data_tiled,real_data_tiled, data_range=SSIM_DATA_RANGE, size_average=True).item()
+         return SSIM
 
 
 
-        if netG_path!= '':
+def load_network_stageI(netG_path,mesh_net_path):
+        from model import STAGE1_G, STAGE1_D, MESH_NET
+        netG = STAGE1_G()     
+        mesh_net =MESH_NET() 
+
+
+        try:
+         if netG_path!= '':
             state_dict = \
                 torch.load(netG_path,
                            map_location=lambda storage, loc: storage)
             netG.load_state_dict(state_dict)
             print('Load from: ', netG_path)
-       
-        #netG.to(device='cuda:2')
+         else:
+            print("CAN NOT FIND NETG, EXITING")
+            sys.exit(1)
+            
+         if mesh_net_path != '':
+            state_dict = \
+                torch.load(mesh_net_path,
+                           map_location=lambda storage, loc: storage)
+            mesh_net.load_state_dict(state_dict)
+            print('Load from: ', mesh_net_path)
+         else:
+            print("CAN NOT FIND MESH_NET, EXITING")
+            sys.exit(1)
+        except:
+            print("CAN NOT LOAD TRAINED NETWORKS, EXITING")
+            sys.exit(1)
+
+
+        
         netG.cuda()
+        mesh_net.cuda()
+        return netG, mesh_net
 
-        image_vae = AutoencoderKL.from_pretrained("zelaki/eq-vae")
-        image_vae.eval()
-        image_vae.cuda()
-
-        return netG,image_vae
-
-
-def load_embedding(data_dir):
-    # embedding_filename   = '/embeddings.pickle'  
-    with open(data_dir, 'rb') as f:
-        embeddings = pickle.load(f)
-    return embeddings
-
-
-def evaluate():
-    print(f"metadata_dir={metadata_dir}") 
-    gpus = cfg.GPU_ID.split(',')
-    gpus = [int(ix) for ix in gpus]
-        #self.gpus=[0]
-    num_gpus = len(gpus)
-
-    torch.cuda.set_device(gpus[0]) 
-    
-    SCRIPT_DIR=os.path.dirname(os.path.realpath(__file__))
-    
-    print("This file is found in "+SCRIPT_DIR)
-    
-    cfg_from_file(SCRIPT_DIR+'/cfg/RIR_s1.yml')
-   
-    cfg.TRAIN.FLAG = False
-
-    embedding_directory =metadata_dir+"/Embeddings/"
-    mesh_directory = metadata_dir+"/Meshes"
-    output_directory = generated_rirs_dir
-
-    #netG_path = "Models/netG_GAN_"+str(cfg.MAX_FACE_COUNT)+"_nodes_"+str(cfg.NUMBER_OF_TRANSFORMER_HEADS)+"_heads.pth"
+def evaluate(main_dir,validation_pickle_file):
+#    torch.set_default_device('cuda:0')
+    cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
-    #gpus =[0,1]
-    #gpus =[0]
-
-    #batch_size = 256
-    batch_size = 1
+    mesh_net_path = "Models/mesh_net.pth"
+    batch_size = 1600
     fs = 16000
-
-
-    if(not os.path.exists(output_directory)):
-        os.mkdir(output_directory)
-
-    netG,image_vae = load_network_stageI(netG_path)
+    netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
+    mesh_net.eval()
 
-    embedding_list = os.listdir(embedding_directory)
+    dataset = TextDataset(main_dir, 'train', rirsize=cfg.RIRSIZE,embedding_file_name=validation_pickle_file)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,)
+    mses=[]
+    ssims=[]
+    mse_loss=nn.MSELoss()     
+    for i, data in enumerate(dataloader):
+        with torch.no_grad():
+                full_real_RIR_paths=data.full_RIR_path
+                real_RIRs = torch.from_numpy(np.array(data['RIR']))
+                txt_embedding = torch.from_numpy(np.array(data['embeddings']))
+                #data.pop('RIR')
+                #data.pop('embeddings')
 
-    for embedding_pickle_per_room in embedding_list:
-      print("embedding_pickle_per_room:",embedding_pickle_per_room)
-      if not "mesh_embeddings" in embedding_pickle_per_room:
-        embed_path = embedding_directory + "/"+embedding_pickle_per_room
-        embeddings = load_embedding(embed_path)
-        embed_name = embedding_pickle_per_room[0:len(embedding_pickle_per_room)-7]
-        output_embed  = output_directory+'/'+embed_name
-        if(not os.path.exists(output_embed)):
-            os.mkdir(output_embed)
-
-        print("embed_name   ",output_embed)
-        print("len(embeddings)   ",len(embeddings))
-
-        mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[0]
-        print("mesh_obj:",mesh_obj)
-        print("folder_name:",folder_name)
-        print("wave_name:",wave_name)
-        print("source_location:",source_location)
-        print("receiver_location:",receiver_location)
-
-        rir_dataset = RIRDataset(cfg.DATA_DIR, embeddings, rirsize=cfg.RIRSIZE)
+                #real_RIRs = Variable(real_RIR_cpu)
+                #txt_embedding = Variable(txt_embedding)
 
 
+                real_RIRs = real_RIRs[:,:,0:(4096-128)]
+                real_RIRs = real_RIRs.cuda()
+                txt_embedding = txt_embedding.cuda()
+                data = data.cuda()
 
-        embed_sets = len(embeddings) /batch_size
-        embed_sets = int(embed_sets)
-
-        for i in range(embed_sets):
-            txt_embedding_list = []
-            folder_name_list =[]
-            wave_name_list = []
-            for j in range(batch_size):
-                mesh_obj,folder_name,wave_name,source_location,receiver_location = embeddings[((i*batch_size)+j)]
-
-                source_receiver = source_location+receiver_location
-                txt_embedding_single = np.array(source_receiver).astype('float32')
-
-                txt_embedding_list.append(txt_embedding_single)
-                folder_name_list.append(folder_name)
-                wave_name_list.append(wave_name)
-
-            mesh_embedding_source_image,mesh_embedding_receiver_image=rir_dataset.mesh_embeddings(os.path.join(mesh_directory,mesh_obj),source_location,receiver_location)
-            mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
-            mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image.unsqueeze(0).cuda()).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
-            mesh_embed=torch.concatenate((mesh_embedding_source_image_latents,mesh_embedding_receiver_image_latents),axis=1)
-            print(mesh_embed)
-            print(mesh_embed.shape)
-            txt_embedding =torch.from_numpy(np.array(txt_embedding_list))
-            #txt_embedding = Variable(txt_embedding).detach().to(device='cuda:2')
-            txt_embedding = Variable(txt_embedding).detach().cuda()
-            print(txt_embedding)
-            print(txt_embedding.shape)
-            #print(f"txt_embedding.shape={txt_embedding.shape} mesh_embed.shape={mesh_embed.shape}")
-            #lr_fake, fake, _  = netG(txt_embedding,mesh_embed.repeat(2,1))
-            #print(txt_embedding.shape)
-            #print(mesh_embed.unsqueeze(0).shape)
-            #lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed.unsqueeze(0))
-            lr_fake, fake, _  = netG.forward(txt_embedding,mesh_embed)
-
-            for i in range(len(fake)):
-                if(not os.path.exists(output_embed+"/"+folder_name_list[i])):
-                    os.mkdir(output_embed+"/"+folder_name_list[i])
-
-                fake_RIR_path = output_embed+"/"+folder_name_list[i]+"/"+wave_name_list[i]
-                fake_IR = np.array(fake[i].to("cpu").detach())
-                fake_IR_only = fake_IR[:,0:(4096-128)]
-                fake_energy = np.median(fake_IR[:,(4096-128):4096])*10
-                fake_IR = fake_IR_only*fake_energy
-                f = WaveWriter(fake_RIR_path, channels=1, samplerate=fs)
-                f.write(np.array(fake_IR))
-                f.close()
+                GPU_NOs=[0]
+                mesh_embed = mesh_net.forward(data)
+                _, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
+                fake_RIRs.detach().cpu()
+                real_RIRs.detach().cpu()
+                data.detach().cpu()
+                txt_embedding.detach().cpu()
+                mesh_embed.detach().cpu()
+                fake_RIR_only = fake_RIRs[:,:,0:(4096-128)]
+                fake_energy = torch.median(fake_RIRs[:,:,(4096-128):4096])*10
+                fake_RIRs = fake_RIR_only*fake_energy
+                mse=mse_loss(real_RIRs,fake_RIRs).item()
+                ssim=pure_ssim(real_RIRs,fake_RIRs)
+                print(f"{i}/{len(dataloader)} MSE={mse} SSIM={ssim}",flush=True)
+                mses.append(mse)
+                ssims.append(ssim)
+                torch.cuda.empty_cache()
+                del mesh_embed
+                del fake_RIRs
+                del real_RIRs
+                del data
+                gc.collect()
+#               for j in range(len(fake_RIRs_computed)):
+#                   fake_RIR_path=full_real_RIR_paths+'.MESH2IR.wav'
+#                   fake_IR = np.array(fake_RIRs_computed[j].to("cpu").detach())
+#                   f = WaveWriter(fake_RIR_path, channels=1, samplerate=fs)
+#                   f.write(np.array(fake_IR))
 
 
-evaluate()
+    MEAN_MSE=np.array(mses).mean()
+    MEAN_SSIM=np.array(ssims).mean()
+    
+    print(f"MEAN_MSE={MEAN_MSE} MEAN_SSIM={MEAN_SSIM}",flush=True)
+ 
 
+evaluate(str(sys.argv[1]).strip(),str(sys.argv[2]).strip())
+
+
+
+
+
+
+
+
+
+
+
+   # 
