@@ -96,7 +96,10 @@ class TextDataset(data.Dataset):
         self.gae_mesh_net=gae_mesh_net 
   
         self.embeddings = embeddings
-        self.mesh_embeddings = mesh_embeddings
+        if mesh_embeddings is None:
+           self.mesh_embeddings = {}
+        else:
+           self.mesh_embeddings = mesh_embeddings
 
     def get_RIR(self, full_RIR_path):
 
@@ -151,14 +154,16 @@ class TextDataset(data.Dataset):
         RIR = self.get_RIR(full_RIR_path)
 
         data = {}
-        
-        data["RIR"] = RIR
-        data["embeddings"] =  np.array(source_receiver).astype('float32')
+        #data["full_RIR_path"]=full_RIR_path
+        #data["full_graph_path"]=full_graph_path
+        data["RIR"] = torch.from_numpy(RIR)
+        data["embeddings"] =  torch.from_numpy(np.array(source_receiver).astype('float32'))
         if self.mesh_embeddings is not None and graph_path in self.mesh_embeddings:
            data["mesh_embeddings"] = self.mesh_embeddings[graph_path]
         else:
             if os.path.exists(full_graph_path):
-               data["mesh_embeddings"] = get_mesh_embedding(self.gae_mesh_net,full_graph_path)
+               _,data["mesh_embeddings"] = get_mesh_embedding(self.gae_mesh_net,full_graph_path)
+               self.mesh_embeddings[graph_path]=data["mesh_embeddings"]
             else:
                data["mesh_embeddings"] = None
         return data

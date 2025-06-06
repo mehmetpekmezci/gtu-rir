@@ -74,8 +74,8 @@ def load_network_stageI(netG_path,mesh_net_path):
         mesh_net = MESH_TRANSFORMER_AE()
 
 
-
-        try:
+        if True:
+#        try:
          if netG_path!= '':
             state_dict = \
                 torch.load(netG_path,
@@ -95,9 +95,9 @@ def load_network_stageI(netG_path,mesh_net_path):
          else:
             print("CAN NOT FIND MESH_NET, EXITING")
             sys.exit(1)
-        except:
-            print("CAN NOT LOAD TRAINED NETWORKS, EXITING")
-            sys.exit(1)
+#        except:
+#            print("CAN NOT LOAD TRAINED NETWORKS, EXITING")
+#            sys.exit(1)
 
 
         
@@ -110,20 +110,19 @@ def evaluate(main_dir,validation_pickle_file):
     cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
     mesh_net_path = "Models/mesh_net.pth"
-    batch_size = 1600
+    batch_size = 1000 # 1600
     fs = 16000
     netG, mesh_net = load_network_stageI(netG_path,mesh_net_path)
     netG.eval()
     mesh_net.eval()
     embeddings = load_embedding(main_dir,'validation.embeddings.pickle')
-    dataset = TextDataset(main_dir,embeddings,None, gae_mesh_net=mesh_net)
-    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0)
+    dataset = TextDataset(main_dir,embeddings,None, split='train',rirsize=4096, gae_mesh_net=mesh_net)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,)
     mses=[]
     ssims=[]
     mse_loss=nn.MSELoss()     
     for i, data in enumerate(dataloader):
         with torch.no_grad():
-                full_real_RIR_paths=data.full_RIR_path
                 real_RIRs = torch.from_numpy(np.array(data['RIR']))
                 txt_embedding = torch.from_numpy(np.array(data['embeddings']))
                 mesh_embed = torch.from_numpy(np.array(data['mesh_embeddings']))
@@ -138,15 +137,17 @@ def evaluate(main_dir,validation_pickle_file):
                 real_RIRs = real_RIRs[:,:,0:(4096-128)]
                 real_RIRs = real_RIRs.cuda()
                 txt_embedding = txt_embedding.cuda()
-                mesh_embed = txt_embedding.cuda()
-                data = data.cuda()
+                mesh_embed = mesh_embed.cuda()
+                #print(f"txt_embedding.shape={txt_embedding.shape}")
+                #print(f"mesh_embed.shape={mesh_embed.shape}")
+                #data = data.cuda()
 
                 GPU_NOs=[0]
 
                 _, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
                 fake_RIRs.detach().cpu()
                 real_RIRs.detach().cpu()
-                data.detach().cpu()
+                #data.detach().cpu()
                 txt_embedding.detach().cpu()
                 mesh_embed.detach().cpu()
                 fake_RIR_only = fake_RIRs[:,:,0:(4096-128)]
