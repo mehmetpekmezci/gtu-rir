@@ -1,0 +1,38 @@
+CONFIG_NAME: 'stageI'
+
+DATASET_NAME: 'RIR'
+EMBEDDING_TYPE: 'cnn-rnn'
+#GPU_ID: '0,1'
+GPU_ID: '0'
+DATA_DIR: '../dataset'
+
+  #NET_G: '../pre-trained-models/netG.pth'
+  #NET_D: '../pre-trained-models/netD.pth'
+
+RAY_CASTING_IMAGE_RESOLUTION: 256 # 256x256x3 input,  4x 256/8 x 256/8 = 4096 output
+MAX_RAY_CASTING_DISTANCE: 15 # meters
+RIRSIZE: 4096
+WORKERS: 8 #4
+STAGE: 1
+TRAIN:
+    FLAG: True
+    BATCH_SIZE: 16 #64
+    MAX_EPOCH: 100
+    LR_DECAY_EPOCH: 7
+    SNAPSHOT_INTERVAL: 25
+    # DISCRIMINATOR_LR: 0.000004
+    # GENERATOR_LR: 0.000004
+    DISCRIMINATOR_LR: 0.001
+    GENERATOR_LR: 0.0001
+    COEFF:
+      KL: 2.0
+
+GAN:
+    CONDITION_DIM: 10
+    DF_DIM: 96
+    GF_DIM: 256
+
+      #TEXT:
+      # DIMENSION: 16 ##  RAY_CASTING_IMAGE_RESOLUTION'da yazan 4096'dan 2 tane, biri speaker digeri microphone
+    
+    
