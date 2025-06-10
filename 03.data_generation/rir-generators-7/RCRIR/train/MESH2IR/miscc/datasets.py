@@ -5,8 +5,8 @@ import numpy as np
 import torch
 import librosa
 import sys
-import bpy
-import bmesh
+#import bpy
+#import bmesh
 from miscc.config import cfg
 from PIL import Image
 from contextlib import redirect_stdout
@@ -15,6 +15,12 @@ import pickle
 import trimesh
 import pygame
 
+from torch.multiprocessing import Pool, Process, set_start_method
+try:
+     set_start_method('spawn')
+except RuntimeError:
+    pass
+
 
 class RIRDataset(data.Dataset):
     def __init__(self,data_dir,embeddings,split='train',rirsize=4096): 
@@ -22,6 +28,7 @@ class RIRDataset(data.Dataset):
         self.data = []
         self.data_dir = data_dir       
         self.embeddings = embeddings
+        self.ray_cast_image_cache={}
 
     def get_RIR(self, full_RIR_path):
 
@@ -68,8 +75,9 @@ class RIRDataset(data.Dataset):
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
-        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
         data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"],data["room_depth"],data["room_width"],data["room_height"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
+        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
+#        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32'),np.array([data["room_depth"],data["room_width"],data["room_height"]]).astype('float32')))
         return data
         
     def __len__(self):
@@ -93,10 +101,19 @@ class RIRDataset(data.Dataset):
         return path2d,DEPTH,WIDTH,HEIGHT,max_dim
     
     def generate_ray_cast_image(self,full_graph_path,path2d,DEPTH,WIDTH,origin,MESH_EXPAND_RATIO):
+        if full_graph_path in self.ray_cast_image_cache and origin in self.ray_cast_image_cache[full_graph_path] :
+           #print(type(origin))
+           #print(f"found : self.ray_cast_image_cache[{full_graph_path}][{origin}].shape={self.ray_cast_image_cache[full_graph_path][origin].shape}")
+           return self.ray_cast_image_cache[full_graph_path][origin]
+           
+        else:
+            if full_graph_path not in  self.ray_cast_image_cache:
+                 self.ray_cast_image_cache[full_graph_path]={}
             #https://github.com/RaubCamaioni/Raycast-Shadows-
             SAVE_IMAGE=False
-            
+
             #width, height = WIDTH*1.2,DEPTH*1.2
+            t1=time.time()
             width, height = WIDTH,DEPTH
             screen = pygame.display.set_mode((width, height))
             pygame.display.set_caption("Visual Demo")
@@ -104,9 +121,12 @@ class RIRDataset(data.Dataset):
             segments = np.array(segments)
             points = unique_points_from_segments(segments)
             screen.fill((255,255,255))
+            t2=time.time()
             rays = generate_rays_from_points(origin, points)
             intersections = raycast_rays_segments(rays, segments)
             closest = closest_intersection_from_raycast_rays_segments(intersections)
+            t3=time.time()
+            #print(f"len(closest)={len(closest)}")
             for origin2 in closest:  
                     rays2=generate_rays_from_points(origin2, points)
                     intersections2 = raycast_rays_segments(rays2, segments)
@@ -114,12 +134,15 @@ class RIRDataset(data.Dataset):
                     pygame.draw.polygon(screen, (0,0,255), closest2)
                     for intersect2 in closest2:
                           pygame.draw.aaline(screen, (0, 255, 255), origin2, (intersect2[0], intersect2[1]))
+            t4=time.time()
             pygame.draw.polygon(screen, (100,0,0), closest)
             for intersect in closest:
                   pygame.draw.aaline(screen, (255, 0, 0), origin, (intersect[0], intersect[1]))
+            t5=time.time()
             draw_segments(screen, segments)
             pygame.display.flip()
             
+            t6=time.time()
             if SAVE_IMAGE:
                  filename=full_graph_path+'.'+str(int(origin[0]))+'.'+str(int(origin[1]))+'.ray_cast_image.png'
                  #print(filename)
@@ -128,7 +151,30 @@ class RIRDataset(data.Dataset):
             img1=np.array(pygame.surfarray.array3d(screen)).copy()
             image = np.zeros((cfg.RAY_CASTING_IMAGE_RESOLUTION, cfg.RAY_CASTING_IMAGE_RESOLUTION, 3))
             image[:img1.shape[0],:img1.shape[1],:]=img1[:,:,:]
-            return image.astype(np.float32).transpose(2, 0, 1)
+
+            t7=time.time()
+            self.ray_cast_image_cache[full_graph_path][origin]=image.astype(np.float32).transpose(2, 0, 1)
+
+            t8=time.time()
+            #print(f"t2-t1={t2-t1}")
+            #print(f"t3-t2={t3-t2}")
+            #print(f"t4-t3={t4-t3}")
+            #print(f"t5-t4={t5-t4}")
+            #print(f"t6-t5={t6-t5}")
+            #print(f"t7-t6={t7-t6}")
+            #print(f"t8-t7={t8-t7}")
+
+
+#len(closest)=392
+#t2-t1=0.04779410362243652
+#t3-t2=0.0068569183349609375
+#t4-t3=1.8102550506591797
+#t5-t4=0.0016949176788330078
+#t6-t5=0.0015702247619628906
+#t7-t6=0.0011014938354492188
+#t8-t7=0.0003771781921386719
+
+            return self.ray_cast_image_cache[full_graph_path][origin]
             
     def mesh_embeddings(self,full_graph_path,source,receiver):
         full_graph_path=full_graph_path.replace(".pickle",".obj")
@@ -164,8 +210,49 @@ class RIRDataset(data.Dataset):
 
         return ray_cast_image_source,ray_cast_image_receiver,ROOM_DEPTH,ROOM_WIDTH,ROOM_HEIGHT
 
- 
+
 def raycast_rays_segments(rays, segments):
+#  try:
+  if True:
+    rays=torch.from_numpy(rays).cuda()
+    segments=torch.from_numpy(segments).cuda()
+    n_r = rays.shape[0]
+    n_s = segments.shape[0]
+    r_px = rays[:, 0, 0]
+    r_py = rays[:, 0, 1]
+    r_dx = rays[:, 1, 0] - rays[:, 0, 0]
+    r_dy = rays[:, 1, 1] - rays[:, 0, 1]
+    s_px = torch.tile(segments[:, 0, 0], (n_r, 1))
+    s_py = torch.tile(segments[:, 0, 1], (n_r, 1))
+    s_dx = torch.tile(segments[:, 1, 0] - segments[:, 0, 0], (n_r, 1))
+    s_dy = torch.tile(segments[:, 1, 1] - segments[:, 0, 1], (n_r, 1))
+    t1 = (s_py.T - r_py).T
+    t2 = (-s_px.T + r_px).T
+    t3 = (s_dx.T * r_dy).T
+    t4 = (s_dy.T * r_dx).T
+    t5 = (r_dx * t1.T).T
+    t6 = (r_dy * t2.T).T
+    t7 = t3 - t4
+    t8 = (r_dx * t1.T).T
+    t9 = (r_dy * t2.T).T
+    T2 = (t8 + t9) / (t3 - t4)
+    T1 = (((s_px + (s_dx * T2)).T - r_px) / r_dx).T
+    ix = ((r_px + r_dx * T1.T).T)
+    iy = ((r_py + r_dy * T1.T).T)
+    ix=ix-torch.sign(ix-r_px.reshape((r_px.shape[0],1)))*0.001*ix
+    iy=iy-torch.sign(iy-r_py.reshape((r_py.shape[0],1)))*0.001*iy
+    intersections = torch.stack((ix, iy, T1), axis=-1)
+    bad_values = torch.logical_or((T1 < 0), torch.logical_or(T2 < 0, T2 > 1))
+    intersections[bad_values, :] = torch.nan
+    intersections=intersections.detach().cpu().numpy()
+#  except:
+#    intersections = torch.zeros((1, 1,3)).detach().cpu().numpy()
+
+  #print(f"TORCH intersections.shape={intersections.shape}")
+  return intersections
+
+def raycast_rays_segments_(rays, segments):
+  try:
     n_r = rays.shape[0]
     n_s = segments.shape[0]
 
@@ -202,8 +289,11 @@ def raycast_rays_segments(rays, segments):
 
     bad_values = np.logical_or((T1 < 0), np.logical_or(T2 < 0, T2 > 1))
     intersections[bad_values, :] = np.nan
+  except:
+    intersections = np.zeros((1, 1,3))
 
-    return intersections
+  #print(f"NP intersections.shape={intersections.shape}")
+  return intersections
     
 def generate_rays_from_points(view_position, points):
     angles = np.arctan2(points[:, 1] - view_position[1], points[:, 0] - view_position[0])
@@ -226,6 +316,7 @@ def generate_rays_from_points(view_position, points):
 def unique_points_from_segments(segments):
     all_points = segments.reshape(-1, 2)
     return np.unique(all_points, axis=0)
+
 
 def closest_intersection_from_raycast_rays_segments(intersections):
     # get closest intersections (rays, segments, (x,y,T1))

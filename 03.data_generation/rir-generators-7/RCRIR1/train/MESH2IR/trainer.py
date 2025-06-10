@@ -109,7 +109,7 @@ class GANTrainer(object):
             print('Load NETD from: ', cfg.NET_D)
 
         
-        SOURCE_RECEIVER_XYZ_DIM=6    
+        SOURCE_RECEIVER_XYZ_DIM=9    
         summary(netG,[(self.batch_size,SOURCE_RECEIVER_XYZ_DIM),(self.batch_size,int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))] )
         summary(netD,(self.batch_size,1,cfg.RIRSIZE) )
        

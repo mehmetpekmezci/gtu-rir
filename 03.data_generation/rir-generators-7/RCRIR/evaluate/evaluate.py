@@ -9,7 +9,8 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 from torch.autograd import Variable
 import torch.optim as optim
-from torch_geometric.loader import DataLoader
+#from torch_geometric.loader import DataLoader
+from  torch.utils.data import DataLoader
 
 import numpy as np
 import cupy as cp
@@ -112,13 +113,13 @@ def evaluate(main_dir,validation_pickle_file):
 #    torch.set_default_device('cuda:0')
     cfg_from_file("cfg/RIR_s1.yml")    
     netG_path = "Models/netG.pth"
-    batch_size = 1000 # 1600
+    batch_size = 32 # 500
     fs = 16000
     netG, image_vae = load_network_stageI(netG_path)
     embeddings = load_embedding(main_dir,'validation.embeddings.pickle')
     #dataset = TextDataset(main_dir,embeddings,None, split='train',rirsize=4096, gae_mesh_net=mesh_net)
-    rir_dataset = RIRDataset(main_dir, embeddings, rirsize=cfg.RIRSIZE)
-    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=0,)
+    dataset = RIRDataset(main_dir, embeddings, rirsize=cfg.RIRSIZE)
+    dataloader = DataLoader(dataset, batch_size=batch_size , num_workers=8,)
     mses=[]
     ssims=[]
     mse_loss=nn.MSELoss()     
@@ -141,11 +142,20 @@ def evaluate(main_dir,validation_pickle_file):
                     mesh_embedding_receiver_image = mesh_embedding_receiver_image.cuda()
 
                 if True:
-                     mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image).latent_dist.sample().reshape(self.batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
-                     mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image).latent_dist.sample().reshape(self.batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+                     mesh_embedding_source_image_latents=image_vae.encode(mesh_embedding_source_image).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
+                     mesh_embedding_receiver_image_latents=image_vae.encode(mesh_embedding_receiver_image).latent_dist.sample().reshape(batch_size,int(4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8))
                      mesh_embed=torch.concatenate((mesh_embedding_source_image_latents,mesh_embedding_receiver_image_latents),axis=1)
 
-                _, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
+                inputs = (txt_embedding,mesh_embed)
+
+                # _, fake_RIRs, mu, logvar = \
+                #     nn.parallel.data_parallel(netG, inputs, self.gpus)
+
+                # print("self.gpus ", [self.gpus[0]])
+                _, fake_RIRs,c_code = nn.parallel.data_parallel(netG, inputs,  [0])
+
+
+                #_, fake_RIRs,c_code = netG.forward(txt_embedding,mesh_embed)
 
                 real_RIRs = real_RIRs[:,:,0:(4096-128)]
                 real_RIRs = real_RIRs.cuda()
@@ -184,8 +194,8 @@ def evaluate(main_dir,validation_pickle_file):
     
     print(f"MEAN_MSE={MEAN_MSE} MEAN_SSIM={MEAN_SSIM}",flush=True)
  
-
-evaluate(str(sys.argv[1]).strip(),str(sys.argv[2]).strip())
+if __name__ == '__main__':
+   evaluate(str(sys.argv[1]).strip(),str(sys.argv[2]).strip())
 
 
 

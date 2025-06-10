@@ -22,6 +22,11 @@ fi
 
 cd $CURRENT_DIR/evaluate
 
+export DISPLAY=:21
+Xvfb $DISPLAY -screen 0 1024x768x16 -noreset &
+#Xvfb :1 -screen 0 800x600x24 -ac +extension RANDR +render -noreset
+sleep 1
+
 python3 evaluate.py  $MESH2IR_EVALUATION_DATA/3D-FRONT/outputs   validation.embeddings.pickle
 
 

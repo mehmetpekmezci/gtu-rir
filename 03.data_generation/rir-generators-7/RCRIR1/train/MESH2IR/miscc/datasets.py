@@ -68,8 +68,9 @@ class RIRDataset(data.Dataset):
         graph_path,RIR_path,source_location,receiver_location= self.embeddings[index]
         data = {}
         data["RIR"] =  self.get_RIR(os.path.join(self.data_dir,RIR_path))
-        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32')))
         data["mesh_embeddings_source_image"],data["mesh_embeddings_receiver_image"],data["room_depth"],data["room_width"],data["room_height"] = self.mesh_embeddings(os.path.join(self.data_dir,graph_path),source_location,receiver_location)
+        room_dims=[data["room_depth"],data["room_width"],data["room_height"]]
+        data["source_and_receiver"] =  np.concatenate((np.array(source_location).astype('float32'),np.array(receiver_location).astype('float32'),np.array(room_dims).astype('float32')))
         return data
         
     def __len__(self):

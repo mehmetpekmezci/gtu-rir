@@ -33,8 +33,8 @@ fi
 
 cd $CURRENT_DIR/train/MESH2IR 
 
-export DISPLAY=:20
-Xvfb :20 -screen 0 1024x768x16 &
-sleep 1
+#export DISPLAY=:20
+#Xvfb :20 -screen 0 1024x768x16 &
+#sleep 1
 
-python3 main.py --cfg cfg/RIR_s1.yml --gpu 2 --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs 
+python3 main.py --cfg cfg/RIR_s1.yml --gpu 1 --data_dir $MESH2IR_TRAINING_DATA/3D-FRONT/outputs 

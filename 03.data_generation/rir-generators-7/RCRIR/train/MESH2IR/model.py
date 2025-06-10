@@ -88,6 +88,7 @@ class COND_NET(nn.Module): #not chnaged yet
     def __init__(self):
         super(COND_NET, self).__init__()
         self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)+3+3  ## 3 is source_location, 3 is microphone_location
+#        self.t_dim = int(2*4*cfg.RAY_CASTING_IMAGE_RESOLUTION/8*cfg.RAY_CASTING_IMAGE_RESOLUTION/8)+3+3+3  ## 3 is source_location, 3 is microphone_location, 3 is room depth,width,height
         self.c_dim = cfg.GAN.CONDITION_DIM
         self.fc = nn.Linear(self.t_dim, self.c_dim, bias=True)
         self.relu = nn.PReLU()#nn.ReLU()
